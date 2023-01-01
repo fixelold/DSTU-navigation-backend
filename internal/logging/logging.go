@@ -1,6 +1,8 @@
 package logging
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+)
 
 var e *logrus.Entry
 
