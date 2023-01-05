@@ -7,6 +7,6 @@ import (
 
 func main() {
 	logger := logging.GetLogger()
-	l := locationDetermination.NewLocation("xyi", logger)
+	l := locationDetermination.NewLocation("1-318", logger)
 	l.GetSector()
 }
