@@ -1,0 +1,1 @@
+psql -U root -p 3308 -h localhost -d navigation -a -f $1

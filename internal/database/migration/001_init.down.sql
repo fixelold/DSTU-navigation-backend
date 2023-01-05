@@ -1,6 +1,6 @@
-DROP TABLE user;
-DROP TABLE building;
-DROP TABLE floor;
-DROP TABLE sector;
-DROP TABLE transition;
-DROP TABLE auditorium;
+DROP TABLE "user" CASCADE;
+DROP TABLE "floor" CASCADE;
+DROP TABLE "building" CASCADE;
+DROP TABLE "sector" CASCADE;
+DROP TABLE "transition" CASCADE;
+DROP TABLE "auditorium" CASCADE;
