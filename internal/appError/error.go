@@ -18,6 +18,11 @@ func NewError(packageName, function, message, description, code string) *AppErro
 	}
 }
 
+func (a *AppError) ChangeDescription(description string) *AppError {
+	a.description = description
+	return a
+}
+
 func (a *AppError) Error() string {
 	return a.description
 }
