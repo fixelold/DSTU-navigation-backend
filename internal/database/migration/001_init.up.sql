@@ -33,7 +33,7 @@ CREATE TABLE "transition" (
 
 CREATE TABLE "auditorium" (
     id smallint GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
-    number smallint,
+    number varchar,
     id_sector smallint,
     PRIMARY KEY (id)
 );
