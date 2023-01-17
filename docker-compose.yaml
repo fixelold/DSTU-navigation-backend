@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "navigation"
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      TZ: Europe/Moscow
+      PGTZ: Europe/Moscow
+    volumes:
+      - ./db/:/var/lib/postgresql/data:rw
+    ports:
+      - "3308:5432"
+    restart: unless-stopped

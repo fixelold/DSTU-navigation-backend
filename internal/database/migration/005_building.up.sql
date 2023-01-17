@@ -1,0 +1,1 @@
+INSERT INTO building (number) VALUES(1);

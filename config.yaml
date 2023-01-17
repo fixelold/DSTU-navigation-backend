@@ -1,0 +1,7 @@
+is_debug: true
+storage:
+  host: 0.0.0.0
+  port: 3308
+  username: root
+  database: navigation
+  password: root
