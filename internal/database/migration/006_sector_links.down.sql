@@ -1,0 +1,1 @@
+DELETE FROM sector_link;
