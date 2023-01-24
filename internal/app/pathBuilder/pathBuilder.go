@@ -24,9 +24,54 @@ func NewPathBuilder(logger *logging.Logger, client postgresql.Client) *pathBuild
 }
 
 // you must provide a start sector and an end sector
-func (p *pathBuilder) Builder(start, end uint) ([]int, error) {
-	_, _ = p.adjacencyMatrix()
-	return nil, nil
+func (p *pathBuilder) Builder(start, end int) ([]int, error) {
+	matrix, err := p.adjacencyMatrix()
+	if err != nil {
+		return nil, err
+	}
+
+	res := p.bfs(start, end, matrix) 
+
+	return res, nil
+}
+
+func (p *pathBuilder) bfs(start, end int, matrix map[int][]int) []int {
+	var queue []int
+	visited := make(map[int]bool)
+	distance := make(map[int]int)
+	top := make(map[int]int) // top of the graph
+	d := 0
+
+	queue = append(queue, start)
+	visited[start] = true
+	distance[start] = 0
+	top[start] = 0
+
+	for i := 0; i < len(matrix); i++ {
+		d += 1
+		current := queue[0]
+
+		if current == end {
+			result := p.getPath(end, top)
+			return reverse(result)
+		}
+
+		for _, neighbor := range(matrix[current]) {
+			if visited[neighbor] {
+				continue
+			}
+
+			visited[neighbor] = true
+			queue = append(queue, neighbor)
+			distance[neighbor] = d
+			top[neighbor] = current
+		}
+
+		queue = queue[1:]
+	}
+
+	result := p.getPath(end, top)
+	return result
 }
 
 func (p *pathBuilder) adjacencyMatrix() (map[int][]int, error) {
@@ -84,4 +129,29 @@ func (p *pathBuilder) getSectorLink() ([]models.SectorLink, error) {
 	}
 
 	return sectorLink, nil
+}
+
+func (p *pathBuilder) getPath(end int, sectors map[int]int) []int {
+	b := true
+	var res []int
+	for b {
+		res = append(res, end)
+		if sectors[end] == 0 {
+			b = false
+			break
+		}
+
+		end = sectors[end]
+	}
+
+	return res
+}
+
+func reverse(array []int) []int {
+	var res []int
+	for i := len(array) -1; i >= 0; i-- {
+		res = append(res, array[i])
+	}
+
+	return res
 }

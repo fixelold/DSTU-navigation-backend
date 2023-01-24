@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"navigation/internal/app/pathBuilder"
 	"navigation/internal/config"
 	"navigation/internal/database/client/postgresql"
@@ -16,6 +17,7 @@ func main() {
 	pgConn := postgresql.NewClient(appContext, *appConfig)
 
 	p := pathBuilder.NewPathBuilder(logger, pgConn)
-	_, _ = p.Builder(1, 1)
+	res, _ := p.Builder(31, 37)
+	fmt.Println(res)
 
 }
