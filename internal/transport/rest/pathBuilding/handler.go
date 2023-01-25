@@ -17,8 +17,11 @@ func NewHandler(logger *logging.Logger) handlers.Handler {
 	return &handler{logger: logger}
 }
 
-func (h *handler) Register(router *gin.RouterGroup) {}
+func (h *handler) Register(router *gin.RouterGroup) {
+	pathBuilding := router.Group(pathBuildingURL)
+	pathBuilding.GET("", h.pathBuilding)
+}
 
-func (h *handler) pathBuilding(c *gin.Context) error {
+func (h *handler) pathBuilding(c *gin.Context) {
 	return nil
 }
