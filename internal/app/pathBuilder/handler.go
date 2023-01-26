@@ -48,5 +48,4 @@ func (h *handler) pathBuilding(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, res)
-	return
 }
