@@ -2,7 +2,6 @@ package locationDetermination
 
 import (
 	"navigation/internal/appError"
-	"navigation/internal/logging"
 	"strconv"
 	"strings"
 )
@@ -13,24 +12,12 @@ var (
 	User000003 = appError.NewError("locationDetermination", "GetSelector", "Errir in getting sector", "-", "US-000003")
 )
 
-type location struct {
-	repository Repository
-	logger     *logging.Logger
-}
-
-func NewLocation(logger *logging.Logger, repository Repository) *location {
-	return &location{
-		logger:     logger,
-		repository: repository,
-	}
-}
-
-func (l *location) GetSector(number string) (uint, error) {
+func (h *handler) GetSector(number string) (uint, error) {
 	var err error
 
 	splitText := strings.Split(number, "-")
 	if len(splitText) != 2 {
-		l.logger.Errorf("function GetSelector. Input does not match desired length expected: %d, received: %d", 2, len(splitText))
+		h.logger.Errorf("function GetSelector. Input does not match desired length expected: %d, received: %d", 2, len(splitText))
 		return 0, User000001
 	}
 
@@ -38,14 +25,14 @@ func (l *location) GetSector(number string) (uint, error) {
 
 	building, err := strconv.Atoi(splitText[0])
 	if err != nil {
-		l.logger.Errorf("function GetSelector not convert string to int, err: %s", err)
+		h.logger.Errorf("function GetSelector not convert string to int, err: %s", err)
 		User000002.ChangeDescription(err.Error())
 		return 0, User000002
 	}
 
-	sector, err := l.repository.GetSector(audienceNumber, uint(building))
+	sector, err := h.repository.GetSector(audienceNumber, uint(building))
 	if err != nil {
-		l.logger.Errorf("the getSector function call returned %s", err.Error())
+		h.logger.Errorf("the getSector function call returned %s", err.Error())
 		User000003.ChangeDescription(err.Error())
 		return 0, User000003
 	}

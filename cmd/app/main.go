@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"navigation/internal/app/locationDetermination"
 	"navigation/internal/app/pathBuilder"
 	"navigation/internal/config"
 	"navigation/internal/database/client/postgresql"
@@ -21,6 +22,10 @@ func main() {
 
 	pathBuildingRepo := pathBuilder.NewRepository(pgConn, logger)
 	pathBuldingController := pathBuilder.NewHandler(logger, pathBuildingRepo)
+
+	locationDeterminationRepo := locationDetermination.NewRepository(pgConn, logger)
+	locationDeterminationController := locationDetermination.NewHandler(logger, locationDeterminationRepo)
+	locationDeterminationController.Register(v1Group)
 	pathBuldingController.Register(v1Group)
 
 	logger.Fatalln(router.Run(":8080"))
