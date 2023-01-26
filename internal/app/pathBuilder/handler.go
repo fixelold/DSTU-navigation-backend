@@ -1,8 +1,6 @@
-package pathBuilding
+package pathBuilder
 
 import (
-	"navigation/internal/app/pathBuilder"
-	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"net/http"
@@ -13,12 +11,15 @@ import (
 const pathBuildingURL = "/path-building"
 
 type handler struct {
-	logger *logging.Logger
-	client postgresql.Client
+	logger     *logging.Logger
+	repository Repository
 }
 
-func NewHandler(logger *logging.Logger) handlers.Handler {
-	return &handler{logger: logger}
+func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler {
+	return &handler{
+		logger:     logger,
+		repository: repository,
+	}
 }
 
 func (h *handler) Register(router *gin.RouterGroup) {
@@ -28,7 +29,7 @@ func (h *handler) Register(router *gin.RouterGroup) {
 
 type auditorys struct {
 	Start int `form:"start" binding:"required"`
-	End int `form:"end" binding:"required"`
+	End   int `form:"end" binding:"required"`
 }
 
 func (h *handler) pathBuilding(c *gin.Context) {
@@ -39,10 +40,8 @@ func (h *handler) pathBuilding(c *gin.Context) {
 		return
 	}
 
-	pathBuilder := pathBuilder.NewPathBuilder(h.logger, h.client)
-
 	// TODO сделать обработку ошибки
-	res, err := pathBuilder.Builder(auditorys.Start, auditorys.End)
+	res, err := h.Builder(auditorys.Start, auditorys.End)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return

@@ -2,22 +2,26 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"navigation/internal/app/pathBuilder"
 	"navigation/internal/config"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	appContext := context.Background()
 	logger := logging.GetLogger()
+	router := gin.Default()
+	v1Group := router.Group("/api/v1")
 
 	appConfig := config.GetConfig()
 	pgConn := postgresql.NewClient(appContext, *appConfig)
 
-	p := pathBuilder.NewPathBuilder(logger, pgConn)
-	res, _ := p.Builder(31, 37)
-	fmt.Println(res)
+	pathBuildingRepo := pathBuilder.NewRepository(pgConn, logger)
+	pathBuldingController := pathBuilder.NewHandler(logger, pathBuildingRepo)
+	pathBuldingController.Register(v1Group)
 
+	logger.Fatalln(router.Run(":8080"))
 }
