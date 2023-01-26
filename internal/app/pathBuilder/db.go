@@ -1,0 +1,63 @@
+package pathBuilder
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"navigation/internal/database/client/postgresql"
+	"navigation/internal/logging"
+	"navigation/internal/models"
+
+	"github.com/jackc/pgconn"
+)
+
+type repository struct {
+	client postgresql.Client
+	logger *logging.Logger
+}
+
+func NewRepository(client postgresql.Client, logger *logging.Logger) Repository {
+	return &repository{
+		client: client,
+		logger: logger,
+	}
+}
+
+func (r *repository) GetSectorLink() ([]models.SectorLink, error) {
+	var sectorLink []models.SectorLink
+	req := `SELECT number_sector, link FROM sector_link;`
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		r.logger.Tracef("can't start transaction: %s", err.Error())
+		return nil, err
+	}
+
+	rows, err := tx.Query(context.Background(), req)
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
+				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
+			r.logger.Error(newErr)
+			return nil, newErr
+		}
+		r.logger.Error(err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		var sl models.SectorLink
+		err := rows.Scan(&sl.NumberSector, &sl.NumberLink)
+		if err != nil {
+			r.logger.Errorf("getSectorLink function. Scan error: %s", err.Error())
+			return nil, err
+		}
+		sectorLink = append(sectorLink, sl)
+	}
+
+	_ = tx.Commit(context.Background())
+	return sectorLink, nil
+}
