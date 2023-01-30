@@ -3,12 +3,13 @@ package locationDetermination
 import (
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
+	"navigation/internal/transport/rest/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-const pathBuildingURL = "/get-sector"
+const getSectorURL = "/get-sector"
 
 type handler struct {
 	logger     *logging.Logger
@@ -23,15 +24,16 @@ func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler 
 }
 
 func (h *handler) Register(router *gin.RouterGroup) {
-	pathBuilding := router.Group(pathBuildingURL)
-	pathBuilding.GET("", h.pathBuilding)
+	getSector := router.Group(getSectorURL)
+	getSector.Use(middleware.CORSMiddleware)
+	getSector.GET("", h.getSector)
 }
 
 type auditoryNumber struct {
 	Number string `form:"number" binding:"required"`
 }
 
-func (h *handler) pathBuilding(c *gin.Context) {
+func (h *handler) getSector(c *gin.Context) {
 	var audNumber auditoryNumber
 
 	if err := c.ShouldBindQuery(&audNumber); err != nil {

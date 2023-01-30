@@ -36,6 +36,7 @@ func (r *repository) GetSector(id string, building uint) (uint, error) {
 	AND building.number = $2;`
 
 	tx, err := r.client.Begin(context.Background())
+	r.logger.Infoln("tx - ", tx)
 	if err != nil {
 		_ = tx.Rollback(context.Background())
 		r.logger.Tracef("can't start transaction: %s", err.Error())
