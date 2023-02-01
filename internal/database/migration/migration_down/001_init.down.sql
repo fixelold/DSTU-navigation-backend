@@ -4,3 +4,4 @@ DROP TABLE "building" CASCADE;
 DROP TABLE "sector" CASCADE;
 DROP TABLE "transition" CASCADE;
 DROP TABLE "auditorium" CASCADE;
+DROP TABLE "sector_link" CASCADE;
