@@ -33,8 +33,13 @@ type auditoryNumber struct {
 	Number string `form:"number" binding:"required"`
 }
 
+type response struct {
+	sector uint `json:"sector"`
+}
+
 func (h *handler) getSector(c *gin.Context) {
 	var audNumber auditoryNumber
+	var sector response
 
 	if err := c.ShouldBindQuery(&audNumber); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
@@ -48,5 +53,6 @@ func (h *handler) getSector(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	sector.sector = res
+	c.JSON(http.StatusOK, sector)
 }
