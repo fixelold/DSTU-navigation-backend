@@ -34,7 +34,7 @@ type auditoryNumber struct {
 }
 
 type response struct {
-	sector uint `json:"sector"`
+	Sector uint `json:"sector"`
 }
 
 func (h *handler) getSector(c *gin.Context) {
