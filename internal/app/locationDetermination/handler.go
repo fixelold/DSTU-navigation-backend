@@ -53,6 +53,6 @@ func (h *handler) getSector(c *gin.Context) {
 		return
 	}
 
-	sector.sector = res
+	sector.Sector = res
 	c.JSON(http.StatusOK, sector)
 }
