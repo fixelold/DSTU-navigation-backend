@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS "auditorium_position" (
 
 CREATE TABLE IF NOT EXISTS "border_points" (
   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
-  id_position INT,
+  id_auditorium INT,
   x INT,
   y INT,
   widht INT,
@@ -72,4 +72,4 @@ ALTER TABLE "sector_link" ADD FOREIGN KEY (id_link) REFERENCES "sector" (id);
 
 ALTER TABLE "auditorium_position" ADD FOREIGN KEY (id_auditorium) REFERENCES "auditorium" (id);
 
-ALTER TABLE "border_points" ADD FOREIGN KEY (id_position) REFERENCES "auditorium_position" (id);
+ALTER TABLE "border_points" ADD FOREIGN KEY (id_auditorium) REFERENCES "auditorium" (id);
