@@ -1,0 +1,1 @@
+DELETE FROM border_points
