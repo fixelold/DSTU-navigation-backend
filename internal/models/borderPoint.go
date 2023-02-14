@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type AuditoryPosition struct {
+type BorderPoint struct {
 	ID        uint `json:"id"`
 	CreatedAt time.Time
 	DeletedAt *time.Time `sql:"index"`
