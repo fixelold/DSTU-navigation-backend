@@ -14,7 +14,7 @@ var (
 	User000004 = appError.NewError("drawPath", "GetSelector", "Input does not match desired length", "-", "US-000004")
 )
 
-func DrawPathAuditory(position *models.BorderPoint, auditory *models.AuditoryPosition) ([]int, error) {
+func DrawPathAuditory(position, auditory *models.Reactangle) ([]int, error) {
 	var err error
 	var points []int
 	axis := defenitionAxis(position)
@@ -35,7 +35,7 @@ func DrawPathAuditory(position *models.BorderPoint, auditory *models.AuditoryPos
 	return points, err
 }
 
-func defenitionAxis(position *models.BorderPoint) int {
+func defenitionAxis(position *models.Reactangle) int {
 	if position.Widht == 1 {
 		return AxisX
 	} else if position.Height == 1 {
