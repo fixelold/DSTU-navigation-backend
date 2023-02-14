@@ -1,6 +1,7 @@
 package pathBuilder
 
 import (
+	"fmt"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
@@ -30,24 +31,36 @@ func (h *handler) Register(router *gin.RouterGroup) {
 }
 
 type auditorys struct {
-	Start int `form:"start" binding:"required"`
-	End   int `form:"end" binding:"required"`
+	Start string `form:"start" binding:"required"`
+	End   string `form:"end" binding:"required"`
+}
+
+type response struct {
+	Sectors []int `json:"sectors"`
 }
 
 func (h *handler) pathBuilding(c *gin.Context) {
 	var auditorys auditorys
+	var response response
 
 	if err := c.ShouldBindQuery(&auditorys); err != nil {
+		fmt.Println("Error! - ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
 
-	// TODO сделать обработку ошибки
-	res, err := h.Builder(auditorys.Start, auditorys.End)
+	start, end, err := h.GetSector(auditorys.Start, auditorys.End)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	// TODO сделать обработку ошибки
+	response.Sectors, err = h.Builder(start, end)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }
