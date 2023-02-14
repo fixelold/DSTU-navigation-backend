@@ -40,6 +40,15 @@ CREATE TABLE IF NOT EXISTS "sector_link"(
   link INT
 );
 
+CREATE TABLE IF NOT EXISTS "auditorium_position" (
+  id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
+  id_auditorium INT,
+  x INT,
+  y INT,
+  widht INT,
+  height INT
+);
+
 ALTER TABLE "floor" ADD FOREIGN KEY (id_building) REFERENCES "building" (id);
 
 ALTER TABLE "sector" ADD FOREIGN KEY (id_floor) REFERENCES "floor" (id);
@@ -51,3 +60,5 @@ ALTER TABLE "auditorium" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
 ALTER TABLE "sector_link" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
 
 ALTER TABLE "sector_link" ADD FOREIGN KEY (id_link) REFERENCES "sector" (id);
+
+ALTER TABLE "auditorium_position" ADD FOREIGN KEY (id_auditorium) REFERENCES "auditorium" (id);
