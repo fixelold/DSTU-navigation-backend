@@ -15,46 +15,24 @@ var (
 func (h *handler) GetSector(start, end string) (int, int, error) {
 	var err error
 
-	splitText := strings.Split(start, "-")
-	if len(splitText) != 2 {
-		h.logger.Errorf("function GetSelector. Input does not match desired length expected: %d, received: %d", 2, len(splitText))
-		return 0, 0, User000001
-	}
-
-	buildingStart, err := strconv.Atoi(splitText[0])
+	startAud, startBuild, err := separationAudidotyNumber(start)
 	if err != nil {
-		h.logger.Errorf("function GetSelector not convert string to int, err: %s", err)
-		User000002.ChangeDescription(err.Error())
-		return 0, 0, User000002
+		return 0, 0, err
 	}
 
-	startAuditory := splitText[1]
-
-	splitText = strings.Split(end, "-")
-	if len(splitText) != 2 {
-		h.logger.Errorf("function GetSelector. Input does not match desired length expected: %d, received: %d", 2, len(splitText))
-		return 0, 0, User000001
-	}
-
-
-	buildingEnd, err := strconv.Atoi(splitText[0])
+	endAud, endBuild, err := separationAudidotyNumber(end)
 	if err != nil {
-		h.logger.Errorf("function GetSelector not convert string to int, err: %s", err)
-		User000002.ChangeDescription(err.Error())
-		return 0, 0, User000002
+		return 0, 0, err
 	}
 
-
-	endAuditory := splitText[1]
-
-	sectorStart, err := h.repository.GetSector(startAuditory, uint(buildingStart))
+	sectorStart, err := h.repository.GetSector(startAud, uint(startBuild))
 	if err != nil {
 		h.logger.Errorf("the getSector function call returned %s", err.Error())
 		User000003.ChangeDescription(err.Error())
-		return 0,0, User000003
+		return 0, 0, User000003
 	}
 
-	sectorEnd, err := h.repository.GetSector(endAuditory, uint(buildingEnd))
+	sectorEnd, err := h.repository.GetSector(endAud, uint(endBuild))
 	if err != nil {
 		h.logger.Errorf("the getSector function call returned %s", err.Error())
 		User000003.ChangeDescription(err.Error())
@@ -62,4 +40,20 @@ func (h *handler) GetSector(start, end string) (int, int, error) {
 	}
 
 	return sectorStart, sectorEnd, nil
+}
+
+func separationAudidotyNumber(number string) (string, int, error) {
+	splitText := strings.Split(number, "-")
+	if len(splitText) != 2 {
+		return "", 0, User000001
+	}
+
+	building, err := strconv.Atoi(splitText[0])
+	if err != nil {
+		return "", 0, User000002
+	}
+
+	auditory := splitText[1]
+
+	return auditory, building, nil
 }
