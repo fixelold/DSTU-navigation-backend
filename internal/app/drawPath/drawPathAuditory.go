@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"database/sql/driver"
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -10,13 +9,13 @@ const (
 	AxisX = 1
 	AxisY = 2
 
-	WidhtX = 130
+	WidhtX  = 130
 	HeightX = 30
 
-	WidhtY = 30
+	WidhtY  = 30
 	HeightY = 130
-	
-	plus = 0
+
+	plus  = 0
 	minus = 1
 )
 
@@ -79,7 +78,7 @@ func drawAxis(widht, height int, borderPoints *models.Reactangle, sign int) (mod
 	var path models.Reactangle
 	var err error
 	switch sign {
-	
+
 	case plus:
 		path.X = borderPoints.Widht / 2
 		path.Y = borderPoints.Y
@@ -91,7 +90,7 @@ func drawAxis(widht, height int, borderPoints *models.Reactangle, sign int) (mod
 		path.Y = borderPoints.Y
 		path.Widht = path.X - widht
 		path.Height = path.Y - height
-	
+
 	default:
 		err = User000004
 	}
