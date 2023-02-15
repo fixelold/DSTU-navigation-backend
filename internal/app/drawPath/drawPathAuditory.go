@@ -54,7 +54,7 @@ func DrawPathAuditory(borderPoints, auditory *models.Reactangle) ([]int, error) 
 
 func draw(widht, height int, borderPoints, auditory *models.Reactangle) (models.Reactangle, error) {
 	var err error
-	path, err := drawAxisX(widht, height, borderPoints, plus)
+	path, err := drawAxis(widht, height, borderPoints, plus)
 	if err != nil {
 		return path, err
 	}
@@ -62,7 +62,7 @@ func draw(widht, height int, borderPoints, auditory *models.Reactangle) (models.
 	if checkBorder(&path, auditory) {
 		return path, nil
 	} else {
-		path, err = drawAxisX(widht, height, borderPoints, minus)
+		path, err = drawAxis(widht, height, borderPoints, minus)
 		if err != nil {
 			return path, err
 		}
@@ -75,7 +75,7 @@ func draw(widht, height int, borderPoints, auditory *models.Reactangle) (models.
 	}
 }
 
-func drawAxisX(widht, height int, borderPoints *models.Reactangle, sign int) (models.Reactangle, error) {
+func drawAxis(widht, height int, borderPoints *models.Reactangle, sign int) (models.Reactangle, error) {
 	var path models.Reactangle
 	var err error
 	switch sign {
@@ -83,14 +83,14 @@ func drawAxisX(widht, height int, borderPoints *models.Reactangle, sign int) (mo
 	case plus:
 		path.X = borderPoints.Widht / 2
 		path.Y = borderPoints.Y
-		path.Widht = path.X + WidhtX
-		path.Height = path.Y + HeightX
+		path.Widht = path.X + widht
+		path.Height = path.Y + height
 
 	case minus:
 		path.X = borderPoints.Widht / 2
 		path.Y = borderPoints.Y
-		path.Widht = path.X - WidhtX
-		path.Height = path.Y - HeightX
+		path.Widht = path.X - widht
+		path.Height = path.Y - height
 	
 	default:
 		err = User000004
