@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/models"
 )
 
@@ -12,9 +11,6 @@ func checkBorder(axis int, path, auditory *models.Reactangle) bool {
 	switch axis {
 	case AxisX:
 		if auditory.X <= pointX && pointX <= auditory.Widht+auditory.X {
-			fmt.Println(auditory)
-			fmt.Println(path)
-			fmt.Println("Error")
 			return false
 		}
 	case AxisY:
