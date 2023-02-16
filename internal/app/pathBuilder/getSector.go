@@ -1,6 +1,7 @@
 package pathBuilder
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"strconv"
 	"strings"
@@ -24,6 +25,9 @@ func (h *handler) GetSector(start, end string) (int, int, error) {
 	if err != nil {
 		return 0, 0, err
 	}
+
+	fmt.Println(startAud)
+	fmt.Println(endAud)
 
 	sectorStart, err := h.repository.GetSector(startAud, uint(startBuild))
 	if err != nil {
@@ -53,7 +57,5 @@ func separationAudidotyNumber(number string) (string, int, error) {
 		return "", 0, User000002
 	}
 
-	auditory := splitText[1]
-
-	return auditory, building, nil
+	return number, building, nil
 }

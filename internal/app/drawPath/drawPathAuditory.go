@@ -1,7 +1,9 @@
 package drawPath
 
 import (
+	"fmt"
 	"navigation/internal/appError"
+	"navigation/internal/logging"
 	"navigation/internal/models"
 )
 
@@ -31,65 +33,111 @@ func DrawPathAuditory(borderPoints, auditory *models.Reactangle) ([]int, error) 
 	switch axis {
 
 	case AxisX:
-		path, err := draw(WidhtX, HeightX, borderPoints, auditory)
+		logging.GetLogger().Info("AxisX - work!")
+		path, err := draw(axis, borderPoints, auditory)
 		if err != nil {
+			logging.GetLogger().Errorln("DrawPathAuditory case AxisX. Error - ", err)
 			return nil, err
 		}
 
 		points = append(points, path.X, path.Y, path.Widht, path.Height)
+
 	case AxisY:
-		path, err := draw(WidhtY, HeightY, borderPoints, auditory)
+		logging.GetLogger().Info("AxisY - work!")
+		path, err := draw(axis, borderPoints, auditory)
 		if err != nil {
+			logging.GetLogger().Errorln("DrawPathAuditory case AxisY. Error - ", err.Error())
 			return nil, err
 		}
 
 		points = append(points, path.X, path.Y, path.Widht, path.Height)
 	default:
+		logging.GetLogger().Errorln("DrawPathAuditory case default. Error - ", err)
 		err = User000004
 	}
 
 	return points, err
 }
 
-func draw(widht, height int, borderPoints, auditory *models.Reactangle) (models.Reactangle, error) {
+func draw(axis int, borderPoints, auditory *models.Reactangle) (models.Reactangle, error) {
 	var err error
-	path, err := drawAxis(widht, height, borderPoints, plus)
+	var path models.Reactangle
+
+	if axis == AxisX {
+		path, err = drawAxisX(borderPoints, plus)
+	} else {
+		fmt.Println("Work")
+		path, err = drawAxisY(borderPoints, plus)
+	}
 	if err != nil {
+		logging.GetLogger().Errorln("draw drawAxis. Error - ", err)
 		return path, err
 	}
 
-	if checkBorder(&path, auditory) {
+	if checkBorder(axis, &path, auditory) {
 		return path, nil
 	} else {
-		path, err = drawAxis(widht, height, borderPoints, minus)
+		if axis == AxisX {
+			path, err = drawAxisX(borderPoints, minus)
+		} else {
+			fmt.Println("Work 2")
+			path, err = drawAxisY(borderPoints, minus)
+		}
 		if err != nil {
+			logging.GetLogger().Errorln("draw else. Error - ", err)
 			return path, err
 		}
 
-		if checkBorder(&path, auditory) {
+		if checkBorder(axis, &path, auditory) {
 			return path, nil
 		} else {
+			err = User000004
+			logging.GetLogger().Errorln("draw else 2. Error - ", err)
 			return path, User000004
 		}
 	}
 }
 
-func drawAxis(widht, height int, borderPoints *models.Reactangle, sign int) (models.Reactangle, error) {
+func drawAxisX(borderPoints *models.Reactangle, sign int) (models.Reactangle, error) {
 	var path models.Reactangle
 	var err error
-	switch sign {
 
+	switch sign {
 	case plus:
-		path.X = borderPoints.Widht / 2
-		path.Y = borderPoints.Y
-		path.Widht = path.X + widht
-		path.Height = path.Y + height
+		path.X = borderPoints.X + 1
+		path.Y = (borderPoints.Y + (borderPoints.Height + borderPoints.Y)) / 2
+		path.Widht = WidhtX
+		path.Height = HeightX
 
 	case minus:
-		path.X = borderPoints.Widht / 2
-		path.Y = borderPoints.Y
-		path.Widht = path.X - widht
-		path.Height = path.Y - height
+		path.X = borderPoints.X + 1
+		path.Y = (borderPoints.Y + (borderPoints.Height + borderPoints.Y)) / 2
+		path.Widht = -WidhtX
+		path.Height = -HeightX
+
+	default:
+		err = User000004
+	}
+
+	return path, err
+}
+
+func drawAxisY(borderPoints *models.Reactangle, sign int) (models.Reactangle, error) {
+	var path models.Reactangle
+	var err error
+
+	switch sign {
+	case plus:
+		path.X = (borderPoints.X + (borderPoints.Widht + borderPoints.X)) / 2
+		path.Y = borderPoints.Y + 1
+		path.Widht = WidhtY
+		path.Height = HeightY
+
+	case minus:
+		path.X = (borderPoints.X + (borderPoints.Widht + borderPoints.X)) / 2
+		path.Y = borderPoints.Y + 1
+		path.Widht = -WidhtY
+		path.Height = -HeightY
 
 	default:
 		err = User000004

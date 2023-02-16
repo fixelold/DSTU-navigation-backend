@@ -69,9 +69,9 @@ func (r *repository) getBorderPoint(number string) (*models.Reactangle, error) {
 	var borderPoint models.Reactangle
 	request :=
 		`SELECT x, y, widht, height 
-	FROM border_point 
+	FROM border_points 
 	JOIN auditorium 
-	ON border_point.id_auditorium = auditorium.id 
+	ON border_points.id_auditorium = auditorium.id 
 	WHERE auditorium.number = $1;`
 
 	tx, err := r.client.Begin(context.Background())

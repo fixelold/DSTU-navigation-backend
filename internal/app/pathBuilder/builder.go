@@ -1,9 +1,5 @@
 package pathBuilder
 
-import (
-	"navigation/internal/logging"
-)
-
 // you must provide a start sector and an end sector
 func (h *handler) Builder(start, end int) ([]int, error) {
 	matrix, err := h.adjacencyMatrix()
@@ -52,7 +48,6 @@ func (h *handler) bfs(start, end int, matrix map[int][]int) []int {
 	}
 
 	result := h.getPath(end, top)
-	logging.GetLogger().Infoln("Work 3")
 	return result
 }
 

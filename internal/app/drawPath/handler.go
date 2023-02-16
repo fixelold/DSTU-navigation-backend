@@ -30,9 +30,9 @@ func (h *handler) Register(router *gin.RouterGroup) {
 }
 
 type navigationObject struct {
-	Start   string `form:"start" binding:"required"`
-	End     string `form:"end" binding:"required"`
-	Sectors []int  `form:"sectors" binding:"requred"`
+	Start   string `json:"start" binding:"required"`
+	End     string `json:"end" binding:"required"`
+	Sectors []int  `json:"sectors" binding:"required"`
 }
 
 type response struct {
@@ -44,8 +44,8 @@ func (h *handler) getPoints(c *gin.Context) {
 	var navObj navigationObject
 	var response response
 
-	if err := c.ShouldBindQuery(&navObj); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
+	if err := c.ShouldBindJSON(&navObj); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
 		return
 	}
 
