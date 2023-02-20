@@ -26,6 +26,8 @@ type drawPathAud2Sector struct {
 	SectorNumber        int
 	AudienceNumber      string
 	Path                []int
+	Repository          Repository
+	// добавить repository, чтобы можно было обращаться в БД.
 }
 
 func NewDrawPathAud2Sector(audienceCoordinates, audienceBorderPoint models.Coordinates, sectorNumber int, audienceNumber string) *drawPathAud2Sector {
@@ -53,30 +55,24 @@ func (d *drawPathAud2Sector) DrawInitPath() error {
 
 func (d *drawPathAud2Sector) drawPathAuditory() error {
 	var err error
-	//var points []int
 	axis := d.defenitionAxis()
 
 	switch axis {
 
 	case AxisX:
-		logging.GetLogger().Info("AxisX - work!")
 		err := d.drawX()
 		if err != nil {
 			logging.GetLogger().Errorln("DrawPathAuditory case AxisX. Error - ", err)
 			return err
 		}
 
-		//points = append(points, path.X, path.Y, path.Widht, path.Height)
-
 	case AxisY:
-		logging.GetLogger().Info("AxisY - work!")
 		err := d.drawY()
 		if err != nil {
 			logging.GetLogger().Errorln("DrawPathAuditory case AxisY. Error - ", err.Error())
 			return err
 		}
 
-		//points = append(points, path.X, path.Y, path.Widht, path.Height)
 	default:
 		logging.GetLogger().Errorln("DrawPathAuditory case default. Error - ", err)
 		err = User000004

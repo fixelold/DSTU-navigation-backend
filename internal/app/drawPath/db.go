@@ -106,3 +106,51 @@ func (r *repository) getBorderPoint(number string) (*models.Coordinates, error) 
 	_ = tx.Commit(context.Background())
 	return &borderPoint, nil
 }
+
+func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error) {
+	var borderPoint models.Coordinates
+	request :=
+	`SELECT * FROM auditorium_position 
+	WHERE x <= $1 AND $1 <= (x+widht)
+	AND y <= $2 AND $2 <= (y+height)`
+	// Возможно тут надо добавить вместо x написать x+widht и т.д с y.
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		r.logger.Tracef("can't start transaction: %s", err.Error())
+		return false, err
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		request,
+		coordinates.X,
+		coordinates.Y).Scan(
+		&borderPoint.X,
+		&borderPoint.Y,
+		&borderPoint.Widht,
+		&borderPoint.Height)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
+				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
+			r.logger.Error(newErr)
+			return false, newErr
+		}
+		r.logger.Error(err)
+		return false, err
+	}
+	_ = tx.Commit(context.Background())
+
+	if borderPoint == (models.Coordinates{}) {
+		return false, nil
+	}
+
+	// Возможно тут надо это добавить в else.
+	return true, nil
+}
