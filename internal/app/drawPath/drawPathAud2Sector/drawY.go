@@ -5,38 +5,38 @@ import (
 	"navigation/internal/models"
 )
 
-func drawY(borderPoints, auditory *models.Reactangle) (models.Reactangle, error) {
+func (d *drawPathAud2Sector) drawY() error {
 	var err error
-	var path models.Reactangle
+	var path models.Coordinates
 
-	path, err = drawAxisY(borderPoints, plus)
+	path, err = drawAxisY(d.AudienceBorderPoint, plus)
 	if err != nil {
 		logging.GetLogger().Errorln("draw drawAxis. Error - ", err)
-		return path, err
+		return err
 	}
 
-	if checkBorder(AxisY, &path, auditory) {
-		return path, nil
+	if checkBorderAud(AxisY, path, d.AudienceCoordinates) {
+		return nil
 	} else {
-		path, err = drawAxisY(borderPoints, minus)
+		path, err = drawAxisY(d.AudienceCoordinates, minus)
 
 		if err != nil {
 			logging.GetLogger().Errorln("draw else. Error - ", err)
-			return path, err
+			return err
 		}
 
-		if checkBorder(AxisY, &path, auditory) {
-			return path, nil
+		if checkBorderAud(AxisY, path, d.AudienceCoordinates) {
+			return nil
 		} else {
 			err = User000004
 			logging.GetLogger().Errorln("draw else 2. Error - ", err)
-			return path, User000004
+			return User000004
 		}
 	}
 }
 
-func drawAxisY(borderPoints *models.Reactangle, sign int) (models.Reactangle, error) {
-	var path models.Reactangle
+func drawAxisY(borderPoints models.Coordinates, sign int) (models.Coordinates, error) {
+	var path models.Coordinates
 	var err error
 
 	switch sign {

@@ -4,7 +4,7 @@ import (
 	"navigation/internal/models"
 )
 
-func checkBorder(axis int, path, auditory *models.Reactangle) bool {
+func checkBorderAud(axis int, path, auditory models.Coordinates) bool {
 	pointX := path.X + path.Widht
 	pointY := path.Y + path.Height
 

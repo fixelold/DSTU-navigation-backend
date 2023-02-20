@@ -3,6 +3,6 @@ package drawPath
 import "navigation/internal/models"
 
 type Repository interface {
-	getAuditoryPosition(audNumber string) (*models.Reactangle, error)
-	getBorderPoint(number string) (*models.Reactangle, error)
+	getAuditoryPosition(audNumber string) (*models.Coordinates, error)
+	getBorderPoint(number string) (*models.Coordinates, error)
 }

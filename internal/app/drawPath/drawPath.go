@@ -1,5 +1,7 @@
 package drawPath
 
+import drawPath "navigation/internal/app/drawPath/drawPathAud2Sector"
+
 func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
 	var points [][]int
 	borderPoints, err := h.repository.getBorderPoint(start)
@@ -12,12 +14,14 @@ func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
 		return nil, err
 	}
 
-	res, err := DrawPathAuditory(borderPoints, auditory)
+	d := drawPath.NewDrawPathAud2Sector(*auditory, *borderPoints ,133, "1-33")
+
+	err = d.DrawInitPath()
 	if err != nil {
 		return nil, err
 	}
 
-	points = append(points, res)
+	points = append(points, d.Path)
 
 	return points, nil
 }

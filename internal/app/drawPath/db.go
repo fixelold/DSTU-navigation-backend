@@ -23,8 +23,8 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 	}
 }
 
-func (r *repository) getAuditoryPosition(number string) (*models.Reactangle, error) {
-	var position models.Reactangle
+func (r *repository) getAuditoryPosition(number string) (*models.Coordinates, error) {
+	var position models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
 	FROM auditorium_position 
@@ -65,8 +65,8 @@ func (r *repository) getAuditoryPosition(number string) (*models.Reactangle, err
 	return &position, nil
 }
 
-func (r *repository) getBorderPoint(number string) (*models.Reactangle, error) {
-	var borderPoint models.Reactangle
+func (r *repository) getBorderPoint(number string) (*models.Coordinates, error) {
+	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
 	FROM border_points 

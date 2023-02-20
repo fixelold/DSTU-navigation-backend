@@ -1,7 +1,6 @@
 package pathBuilder
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 	"strconv"
 	"strings"
@@ -25,9 +24,6 @@ func (h *handler) GetSector(start, end string) (int, int, error) {
 	if err != nil {
 		return 0, 0, err
 	}
-
-	fmt.Println(startAud)
-	fmt.Println(endAud)
 
 	sectorStart, err := h.repository.GetSector(startAud, uint(startBuild))
 	if err != nil {
