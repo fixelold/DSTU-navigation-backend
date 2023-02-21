@@ -157,7 +157,6 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, er
 	FROM border_points 
 	WHERE x <= $1 AND $1 <= (x+widht)
 	AND y <= $2 AND $2 <= (y+height)`
-	// Возможно тут надо добавить вместо x написать x+widht и т.д с y.
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -191,6 +190,5 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, er
 		return false, nil
 	}
 
-	// Возможно тут надо это добавить в else.
 	return true, nil
 }

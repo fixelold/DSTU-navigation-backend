@@ -5,7 +5,7 @@ import (
 	"navigation/internal/models"
 )
 
-func (d *drawPathAud2Sector) drawY() error {
+func (d *drawPathAud2Sector) drawAudY() error {
 	var err error
 	var path models.Coordinates
 
