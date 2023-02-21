@@ -26,7 +26,7 @@ type drawPathAud2Sector struct {
 	SectorBorderPoint models.Coordinates
 	SectorNumber        int
 	AudienceNumber      string
-	Path                []int
+	Path                []models.Coordinates
 	Repository          Repository
 	// добавить repository, чтобы можно было обращаться в БД.
 }
@@ -91,9 +91,42 @@ func (d *drawPathAud2Sector) drawPathAuditory() error {
 }
 
 func (d *drawPathAud2Sector) drawPathSector() error {
+	var path models.Coordinates
 	axis := d.defenitionAxis(d.SectorBorderPoint.Widht, d.SectorBorderPoint.Height)
+	boolean := true
 
-	
+	for boolean {
+		if d.checkPath2Sector(d.Path[0], axis) {
+			//TODO: рисуем прямую линию впритык до сектора
+		} else {
+			// определяем в каком направлении рисовать
+			//if d.SectorBorderPoint
+
+		}
+	}
+
+
+}
+
+func (d *drawPathAud2Sector) getDrawPoints(path models.Coordinates, axis int) (int, int) {
+	switch axis {
+	case AxisX:
+		sectorPoints := (d.SectorBorderPoint.Y + (d.SectorBorderPoint.Height + d.SectorBorderPoint.Y))/ 2
+		if sectorPoints > path.X {
+			return WidhtY, HeightY
+		} else {
+			return -WidhtY, -HeightY
+		}
+	case AxisY:
+		sectorPoints := (d.SectorBorderPoint.X + (d.SectorBorderPoint.Widht + d.SectorBorderPoint.X))/ 2
+		if sectorPoints > path.X {
+			return WidhtX, HeightX
+		} else {
+			return -WidhtX, -HeightX
+		}
+	default:
+		return 0, 0
+	}
 }
 
 func (d *drawPathAud2Sector) checkPath2Sector(path models.Coordinates, axis int) bool {
