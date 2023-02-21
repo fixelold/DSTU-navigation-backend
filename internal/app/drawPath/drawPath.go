@@ -1,7 +1,8 @@
 package drawPath
 
-func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
-	var points [][]int
+import "navigation/internal/models"
+
+func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinates, error) {
 	borderPoints, err := h.repository.getBorderPoint(start)
 	if err != nil {
 		return nil, err
@@ -21,7 +22,5 @@ func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
 		return nil, err
 	}
 
-	points = append(points, d.Path)
-
-	return points, nil
+	return d.Path, nil
 }
