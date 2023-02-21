@@ -15,7 +15,13 @@ func (d *drawPathAud2Sector) drawY() error {
 		return err
 	}
 
-	if checkBorderAud(AxisY, path, d.AudienceCoordinates) {
+	check, err := d.Repository.checkBorderSector(path)
+	if err != nil {
+		logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
+		return err
+	}
+
+	if check {
 		return nil
 	} else {
 		path, err = drawAxisY(d.AudienceCoordinates, minus)
@@ -25,7 +31,13 @@ func (d *drawPathAud2Sector) drawY() error {
 			return err
 		}
 
-		if checkBorderAud(AxisY, path, d.AudienceCoordinates) {
+		check, err = d.Repository.checkBorderSector(path)
+		if err != nil {
+			logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
+			return err
+		}
+
+		if check {
 			return nil
 		} else {
 			err = User000004

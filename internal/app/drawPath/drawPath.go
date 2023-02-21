@@ -12,7 +12,7 @@ func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
 		return nil, err
 	}
 
-	d := NewDrawPathAud2Sector(*auditory, *borderPoints ,133, "1-33")
+	d := NewDrawPathAud2Sector(*auditory, *borderPoints ,133, "1-333", h.repository)
 
 	err = d.DrawInitPath()
 	if err != nil {

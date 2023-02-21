@@ -30,12 +30,13 @@ type drawPathAud2Sector struct {
 	// добавить repository, чтобы можно было обращаться в БД.
 }
 
-func NewDrawPathAud2Sector(audienceCoordinates, audienceBorderPoint models.Coordinates, sectorNumber int, audienceNumber string) *drawPathAud2Sector {
+func NewDrawPathAud2Sector(audienceCoordinates, audienceBorderPoint models.Coordinates, sectorNumber int, audienceNumber string, repository Repository) *drawPathAud2Sector {
 	return &drawPathAud2Sector{
 		AudienceCoordinates: audienceCoordinates,
 		AudienceBorderPoint: audienceBorderPoint,
 		SectorNumber:        sectorNumber,
 		AudienceNumber:      audienceNumber,
+		Repository:          repository,
 	}
 }
 
