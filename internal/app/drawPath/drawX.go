@@ -1,13 +1,11 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
 
 func (d *drawPathAud2Sector) drawAudX() error {
-	fmt.Println("Work - drawAudX")
 	var err error
 	var path models.Coordinates
 

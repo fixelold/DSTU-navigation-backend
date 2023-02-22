@@ -7,7 +7,6 @@ import (
 )
 
 func (d *drawPathAud2Sector) drawAudY() error {
-	fmt.Println("Work - drawAudY")
 	var err error
 	var path models.Coordinates
 
@@ -17,7 +16,7 @@ func (d *drawPathAud2Sector) drawAudY() error {
 		return err
 	}
 
-	check, err := d.Repository.checkBorderSector(path)
+	check, err := d.Repository.checkBorderAud(path)
 	if err != nil {
 		logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
 		return err
@@ -34,7 +33,7 @@ func (d *drawPathAud2Sector) drawAudY() error {
 			return err
 		}
 
-		check, err = d.Repository.checkBorderSector(path)
+		check, err = d.Repository.checkBorderAud(path)
 		if err != nil {
 			logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
 			return err
