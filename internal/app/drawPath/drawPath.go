@@ -3,7 +3,7 @@ package drawPath
 import "navigation/internal/models"
 
 func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinates, error) {
-	borderPoints, err := h.repository.getBorderPoint(start)
+	audBorderPoints, err := h.repository.getAudBorderPoint(start)
 	if err != nil {
 		return nil, err
 	}
@@ -14,8 +14,12 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 	}
 
 	//TODO: получение координат секторов
+	sectorBorderPoints, err := h.repository.getSectorBorderPoint(sectors[1])
+	if err != nil {
+		return nil, err
+	}
 
-	d := NewDrawPathAud2Sector(*auditory, *borderPoints ,133, "1-333", h.repository, )
+	d := NewDrawPathAud2Sector(*auditory, *audBorderPoints, *sectorBorderPoints ,133, "1-333", h.repository)
 
 	err = d.DrawInitPath()
 	if err != nil {

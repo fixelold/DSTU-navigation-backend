@@ -1,4 +1,4 @@
-INSERT INTO border_points (id_auditorium, x, y, widht, height) 
+INSERT INTO aud_border_points (id_auditorium, x, y, widht, height) 
 VALUES (
     unnest(array[30,    31,    32,     33,     34,     35]),
     unnest(array[611,   667,    36,     791,    1015,   1017]),

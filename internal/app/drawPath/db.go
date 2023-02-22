@@ -65,14 +65,58 @@ func (r *repository) getAuditoryPosition(number string) (*models.Coordinates, er
 	return &position, nil
 }
 
-func (r *repository) getBorderPoint(number string) (*models.Coordinates, error) {
+func (r *repository) getAudBorderPoint(number string) (*models.Coordinates, error) {
+	fmt.Println("Work0 - ", number)
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
-	FROM border_points 
+	FROM aud_border_points 
 	JOIN auditorium 
-	ON border_points.id_auditorium = auditorium.id 
+	ON aud_border_points.id_auditorium = auditorium.id 
 	WHERE auditorium.number = $1;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		r.logger.Tracef("can't start transaction: %s", err.Error())
+		return nil, err
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		request,
+		number).Scan(
+		&borderPoint.X,
+		&borderPoint.Y,
+		&borderPoint.Widht,
+		&borderPoint.Height)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
+				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
+			r.logger.Error(newErr)
+			return nil, newErr
+		}
+		r.logger.Error(err)
+		return nil, err
+	}
+	_ = tx.Commit(context.Background())
+	return &borderPoint, nil
+}
+
+func (r *repository) getSectorBorderPoint(number int) (*models.Coordinates, error) {
+	fmt.Println("Work - ", number)
+	var borderPoint models.Coordinates
+	request :=
+		`SELECT x, y, widht, height 
+	FROM sector_border_points 
+	JOIN sector 
+	ON sector_border_points.id_sector = sector.id 
+	WHERE sector.number = $1;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {

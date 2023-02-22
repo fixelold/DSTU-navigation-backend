@@ -22,7 +22,7 @@ func (d *drawPathAud2Sector) drawAudX() error {
 	}
 
 	if check {
-		d.Path = append(d.Path, path.X, path.Y, path.Widht, path.Height)
+		d.Path = append(d.Path, path)
 		return nil
 	} else {
 		path, err = drawAxisX(d.AudienceBorderPoint, minus)
@@ -38,7 +38,7 @@ func (d *drawPathAud2Sector) drawAudX() error {
 		}
 
 		if check {
-			d.Path = append(d.Path, path.X, path.Y, path.Widht, path.Height)
+			d.Path = append(d.Path, path)
 			return nil
 		} else {
 			err = User000004
