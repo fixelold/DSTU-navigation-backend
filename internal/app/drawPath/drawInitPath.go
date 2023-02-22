@@ -1,6 +1,7 @@
 package drawPath
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -59,6 +60,8 @@ func (d *drawPathAud2Sector) DrawInitPath() error {
 		return err
 	}
 
+	fmt.Println("1 - ", d.Path)
+
 	err = d.drawPathSector()
 	if err != nil {
 		return err
@@ -96,17 +99,20 @@ func (d *drawPathAud2Sector) drawPathAuditory() error {
 }
 
 func (d *drawPathAud2Sector) drawPathSector() error {
+	fmt.Println(d.Path)
 	iterator := 0
 	axis := d.defenitionAxis(d.SectorBorderPoint.Widht, d.SectorBorderPoint.Height)
 	boolean := true
 
 	for boolean {
 		if d.checkPath2Sector(d.Path[iterator], axis) {
+			fmt.Println("Work 0")
 			points := d.getDrawPoints2Sector(d.Path[iterator], axis)
 
 			d.Path = append(d.Path, points)
 			boolean = false
 		} else {
+			fmt.Println("Work 1")
 			// определяем в каком направлении рисовать
 			points := d.getDrawPoints(d.Path[iterator], axis)
 			if points == (models.Coordinates{}) {
@@ -124,11 +130,14 @@ func (d *drawPathAud2Sector) drawPathSector() error {
 			}
 
 			if !ok && !ok2 {
+				fmt.Println("Work 2")
 				//TODO написать изменения направления или типо что-то такого
 			}
 
 			d.Path = append(d.Path, points)
 		}
+
+		fmt.Println("Work 3")
 
 		iterator += 1
 	}
@@ -177,23 +186,31 @@ func (d *drawPathAud2Sector) getDrawPoints2Sector(path models.Coordinates, axis 
 
 	switch axis {
 	case AxisX:
+		fmt.Println("Work AxisX")
 		sectorPoints := (d.SectorBorderPoint.Y + (d.SectorBorderPoint.Height + d.SectorBorderPoint.Y)) / 2
 		if sectorPoints > path.X {
+			fmt.Println("Work AxisX +")
 			points.Widht = WidhtY
 			points.Height = d.SectorBorderPoint.Height - (path.Y + path.Height)
 			return points
 		} else {
+			fmt.Println("Work AxisX -")
 			points.Widht = -WidhtY
 			points.Height = -d.SectorBorderPoint.Height - (path.Y + path.Height)
 			return points
 		}
 	case AxisY:
+		fmt.Println("Work AxisY")
 		sectorPoints := (d.SectorBorderPoint.X + (d.SectorBorderPoint.Widht + d.SectorBorderPoint.X)) / 2
+		fmt.Println("sectorPoints - ", sectorPoints)
+		fmt.Println("path - ", path.X)
 		if sectorPoints > path.X {
+			fmt.Println("Work AxisY +")
 			points.Widht = d.SectorBorderPoint.Widht - (path.X + path.Widht)
 			points.Height = HeightX
 			return points
 		} else {
+			fmt.Println("Work AxisY -")
 			points.Widht = -d.SectorBorderPoint.Widht - (path.X + path.Widht)
 			points.Height = -HeightX
 			return points

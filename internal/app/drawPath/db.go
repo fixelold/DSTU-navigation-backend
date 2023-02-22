@@ -66,7 +66,6 @@ func (r *repository) getAuditoryPosition(number string) (*models.Coordinates, er
 }
 
 func (r *repository) getAudBorderPoint(number string) (*models.Coordinates, error) {
-	fmt.Println("Work0 - ", number)
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
@@ -109,7 +108,6 @@ func (r *repository) getAudBorderPoint(number string) (*models.Coordinates, erro
 }
 
 func (r *repository) getSectorBorderPoint(number int) (*models.Coordinates, error) {
-	fmt.Println("Work - ", number)
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
@@ -153,7 +151,7 @@ func (r *repository) getSectorBorderPoint(number int) (*models.Coordinates, erro
 
 func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error) {
 	request :=
-	`SELECT x, y, widht, height
+		`SELECT x, y, widht, height
 	FROM auditorium_position 
 	WHERE x <= $1 AND $1 <= (x+widht)
 	AND y <= $2 AND $2 <= (y+height)`
@@ -169,8 +167,8 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error
 	res, err := tx.Exec(
 		context.Background(),
 		request,
-		coordinates.X + coordinates.Widht,
-		coordinates.Y + coordinates.Height)
+		coordinates.X+coordinates.Widht,
+		coordinates.Y+coordinates.Height)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -197,8 +195,8 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error
 
 func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, error) {
 	request :=
-	`SELECT x, y, widht, height
-	FROM border_points 
+		`SELECT x, y, widht, height
+	FROM sector_border_points 
 	WHERE x <= $1 AND $1 <= (x+widht)
 	AND y <= $2 AND $2 <= (y+height)`
 
@@ -212,8 +210,8 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, er
 	res, err := tx.Exec(
 		context.Background(),
 		request,
-		coordinates.X + coordinates.Widht,
-		coordinates.Y + coordinates.Height)
+		coordinates.X+coordinates.Widht,
+		coordinates.Y+coordinates.Height)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
