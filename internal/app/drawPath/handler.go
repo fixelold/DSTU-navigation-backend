@@ -26,7 +26,7 @@ func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler 
 func (h *handler) Register(router *gin.RouterGroup) {
 	drawPath := router.Group(drawPathURL)
 	drawPath.Use(middleware.CORSMiddleware)
-	drawPath.GET("", h.getPoints)
+	drawPath.POST("/points", h.getPoints)
 }
 
 type navigationObject struct {
@@ -34,10 +34,6 @@ type navigationObject struct {
 	End     string `json:"end" binding:"required"`
 	Sectors []int  `json:"sectors" binding:"required"`
 }
-
-// type response struct {
-// 	Points [][]int `json:"points"`
-// }
 
 func (h *handler) getPoints(c *gin.Context) {
 	var err error
