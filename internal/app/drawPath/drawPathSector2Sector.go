@@ -10,13 +10,13 @@ func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
 	for boolean {
 		i := (len(d.Path) - 1) + iterator
 		if d.checkPath2Sector(d.Path[i], axis) {
-			points := d.getDrawPoints2Sector(d.Path[iterator], axis)
+			points := d.getDrawPoints2Sector(d.Path[i], axis)
 
 			d.Path = append(d.Path, points)
 			boolean = false
 		} else {
 			// определяем в каком направлении рисовать
-			points := d.getDrawPoints(d.Path[iterator], axis)
+			points := d.getDrawPoints(d.Path[i], axis)
 			if points == (models.Coordinates{}) {
 				return User000004
 			}
