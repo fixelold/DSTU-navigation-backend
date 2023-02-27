@@ -25,5 +25,26 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 		return nil, err
 	}
 
+	//TODO тут будет цикл. Вообще все в цикл обернуть надо бы.
+
+	entry, exit := min(sectors[1], sectors[2])
+	borderSector, err := h.repository.getSectorBorderPoint2(entry, exit)
+	if err != nil {
+		return nil, err
+	}
+
+	err = d.DrawPathSector2Sector(*borderSector)
+	if err != nil {
+		return nil, err
+	}
+
 	return d.Path, nil
+}
+
+// TODO сделать проверку на равно. На всякий
+func min(a, b int) (int, int) {
+    if a < b {
+        return a, b
+    }
+    return b, a
 }
