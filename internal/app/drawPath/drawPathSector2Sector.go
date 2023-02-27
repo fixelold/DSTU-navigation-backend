@@ -8,7 +8,8 @@ func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
 	boolean := true
 
 	for boolean {
-		if d.checkPath2Sector(d.Path[iterator], axis) {
+		i := (len(d.Path) - 1) + iterator
+		if d.checkPath2Sector(d.Path[i], axis) {
 			points := d.getDrawPoints2Sector(d.Path[iterator], axis)
 
 			d.Path = append(d.Path, points)
