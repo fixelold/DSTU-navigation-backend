@@ -234,3 +234,46 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, er
 
 	return true, nil
 }
+
+//TODO точно надо будет переделать
+func (r *repository) getSectorBorderPoint2(entry, exit int) (*models.Coordinates, error) {
+	var borderPoint models.Coordinates
+	request :=
+		`SELECT x, y, widht, height 
+	FROM sector_border_points 
+	WHERE entry = $1 
+	AND exit = $2;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		r.logger.Tracef("can't start transaction: %s", err.Error())
+		return nil, err
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		request,
+		entry,
+		exit).Scan(
+		&borderPoint.X,
+		&borderPoint.Y,
+		&borderPoint.Widht,
+		&borderPoint.Height)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
+				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
+			r.logger.Error(newErr)
+			return nil, newErr
+		}
+		r.logger.Error(err)
+		return nil, err
+	}
+	_ = tx.Commit(context.Background())
+	return &borderPoint, nil
+}
