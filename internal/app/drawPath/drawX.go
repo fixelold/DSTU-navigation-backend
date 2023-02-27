@@ -5,7 +5,7 @@ import (
 	"navigation/internal/models"
 )
 
-func (d *drawPathAud2Sector) drawX() error {
+func (d *drawPathAud2Sector) drawAudX() error {
 	var err error
 	var path models.Coordinates
 
@@ -15,8 +15,14 @@ func (d *drawPathAud2Sector) drawX() error {
 		return err
 	}
 
-	if checkBorderAud(AxisX, path, d.AudienceCoordinates) {
-		d.Path = append(d.Path, path.X, path.Y, path.Widht, path.Height)
+	check, err := d.Repository.checkBorderAud(path)
+	if err != nil {
+		logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
+		return err
+	}
+
+	if check {
+		d.Path = append(d.Path, path)
 		return nil
 	} else {
 		path, err = drawAxisX(d.AudienceBorderPoint, minus)
@@ -25,8 +31,14 @@ func (d *drawPathAud2Sector) drawX() error {
 			return err
 		}
 
-		if checkBorderAud(AxisX, path, d.AudienceCoordinates) {
-			d.Path = append(d.Path, path.X, path.Y, path.Widht, path.Height)
+		check, err = d.Repository.checkBorderAud(path)
+		if err != nil {
+			logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
+			return err
+		}
+
+		if check {
+			d.Path = append(d.Path, path)
 			return nil
 		} else {
 			err = User000004

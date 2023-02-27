@@ -1,10 +1,9 @@
 package drawPath
 
-import drawPath "navigation/internal/app/drawPath/drawPathAud2Sector"
+import "navigation/internal/models"
 
-func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
-	var points [][]int
-	borderPoints, err := h.repository.getBorderPoint(start)
+func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinates, error) {
+	audBorderPoints, err := h.repository.getAudBorderPoint(start)
 	if err != nil {
 		return nil, err
 	}
@@ -14,14 +13,18 @@ func (h *handler) drawPath(start, end string, sectors []int) ([][]int, error) {
 		return nil, err
 	}
 
-	d := drawPath.NewDrawPathAud2Sector(*auditory, *borderPoints ,133, "1-33")
+	//TODO: получение координат секторов
+	sectorBorderPoints, err := h.repository.getSectorBorderPoint(sectors[1])
+	if err != nil {
+		return nil, err
+	}
+
+	d := NewDrawPathAud2Sector(*auditory, *audBorderPoints, *sectorBorderPoints ,133, "1-333", h.repository)
 
 	err = d.DrawInitPath()
 	if err != nil {
 		return nil, err
 	}
 
-	points = append(points, d.Path)
-
-	return points, nil
+	return d.Path, nil
 }
