@@ -181,6 +181,7 @@ func (d *Path) getDrawPoints2Sector(path models.Coordinates, axis int) models.Co
 
 	switch axis {
 	case AxisX:
+		fmt.Println("Work 21")
 		sectorPoints := (d.SectorBorderPoint.X + (d.SectorBorderPoint.Widht + d.SectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
 			points.Widht = d.SectorBorderPoint.X - (path.X + path.Widht)
@@ -192,8 +193,10 @@ func (d *Path) getDrawPoints2Sector(path models.Coordinates, axis int) models.Co
 			return points
 		}
 	case AxisY:
+		//TODO тут разобраться
+		fmt.Println("Work 22")
 		sectorPoints := (d.SectorBorderPoint.Y + (d.SectorBorderPoint.Height + d.SectorBorderPoint.Y)) / 2
-		if sectorPoints > path.X {
+		if sectorPoints < path.Y {
 			points.Widht = WidhtY
 			points.Height = d.SectorBorderPoint.Y - (path.Y + path.Height)
 			return points
@@ -222,7 +225,9 @@ func (d *Path) checkPath2Sector(path models.Coordinates, axis int) bool {
 		ph := path.X + path.Widht
 		x1 := d.SectorBorderPoint.X
 		x2 := d.SectorBorderPoint.X + d.SectorBorderPoint.Widht
+		fmt.Println(ph, x1, x2)
 		if x1 <= ph && ph <= x2 {
+			fmt.Println("Work 1")
 			return true
 		} else {
 			return false
