@@ -53,7 +53,5 @@ func separationAudidotyNumber(number string) (string, int, error) {
 		return "", 0, User000002
 	}
 
-	auditory := splitText[1]
-
-	return auditory, building, nil
+	return number, building, nil
 }

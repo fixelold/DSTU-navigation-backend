@@ -1,7 +1,6 @@
 package pathBuilder
 
 import (
-	"fmt"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
@@ -44,7 +43,6 @@ func (h *handler) pathBuilding(c *gin.Context) {
 	var response response
 
 	if err := c.ShouldBindQuery(&auditorys); err != nil {
-		fmt.Println("Error! - ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
