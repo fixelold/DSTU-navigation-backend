@@ -13,13 +13,12 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 		return nil, err
 	}
 
-	//TODO: получение координат секторов
 	sectorBorderPoints, err := h.repository.getSectorBorderPoint(sectors[1])
 	if err != nil {
 		return nil, err
 	}
 
-	d := NewDrawPathAud2Sector(*auditory, *audBorderPoints, *sectorBorderPoints ,133, "1-333", h.repository)
+	d := NewPath(*auditory, *audBorderPoints, *sectorBorderPoints ,133, "1-333", h.repository)
 
 	err = d.DrawInitPath()
 	if err != nil {

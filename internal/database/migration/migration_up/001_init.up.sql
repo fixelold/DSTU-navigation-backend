@@ -64,7 +64,9 @@ CREATE TABLE IF NOT EXISTS "sector_border_points" (
   x INT,
   y INT,
   widht INT,
-  height INT
+  height INT,
+  entry INT,
+  exit INT
 );
 
 ALTER TABLE "floor" ADD FOREIGN KEY (id_building) REFERENCES "building" (id);
