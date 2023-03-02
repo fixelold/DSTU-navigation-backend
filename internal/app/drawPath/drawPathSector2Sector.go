@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/models"
 )
 
@@ -12,10 +11,8 @@ func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
 
 	for boolean {
 		i := (len(d.Path) - 1) + iterator
-		fmt.Println(i)
-		fmt.Println(len(d.Path) -1)
 		if d.checkPath2Sector(d.Path[i], axis) {
-			points := d.getDrawPoints2Sector(d.Path[i], axis)
+			points := d.getDrawSector2Sector(d.Path[i], borderSector, axis)
 
 			d.Path = append(d.Path, points)
 			boolean = false

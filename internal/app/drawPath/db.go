@@ -24,6 +24,7 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 }
 
 func (r *repository) getAuditoryPosition(number string) (*models.Coordinates, error) {
+	r.logger.Infoln("db - get auditory position")
 	var position models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
@@ -66,6 +67,7 @@ func (r *repository) getAuditoryPosition(number string) (*models.Coordinates, er
 }
 
 func (r *repository) getAudBorderPoint(number string) (*models.Coordinates, error) {
+	r.logger.Infoln("db - get auditory border point")
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
@@ -108,6 +110,7 @@ func (r *repository) getAudBorderPoint(number string) (*models.Coordinates, erro
 }
 
 func (r *repository) getSectorBorderPoint(number int) (*models.Coordinates, error) {
+	r.logger.Infoln("db - get sector border point")
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
@@ -150,6 +153,7 @@ func (r *repository) getSectorBorderPoint(number int) (*models.Coordinates, erro
 }
 
 func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error) {
+	r.logger.Infoln("db - check border auditory")
 	request :=
 		`SELECT x, y, widht, height
 	FROM auditorium_position 
@@ -194,6 +198,7 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error
 }
 
 func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, error) {
+	r.logger.Infoln("db - check border sector")
 	request :=
 		`SELECT x, y, widht, height
 	FROM sector_border_points 
@@ -237,6 +242,7 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, er
 
 //TODO точно надо будет переделать
 func (r *repository) getSectorBorderPoint2(entry, exit int) (*models.Coordinates, error) {
+	r.logger.Infoln("db - get sector border point 2")
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
