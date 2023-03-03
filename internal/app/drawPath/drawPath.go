@@ -43,11 +43,6 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 	}
 
 	do := NewPath(*auditory, *audBorderPoints, *sectorBorderPoints, sectors[1], end, h.repository, logging.GetLogger())
-	// d.AudienceCoordinates = *auditory
-	// d.AudienceBorderPoint = *audBorderPoints
-	// d.SectorBorderPoint = *sectorBorderPoints
-	// d.SectorNumber = sectors[1]
-	// d.AudienceNumber = end
 
 	h.logger.Infoln("================Draw Final Path================")
 	fmt.Println(do)
