@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -12,10 +11,10 @@ const (
 	AxisY = 2
 
 	WidhtX  = 130
-	HeightX = 30
+	HeightX = 20
 
-	WidhtY  = 30
-	HeightY = 130
+	WidhtY  = 20
+	HeightY = 40
 
 	plus  = 0
 	minus = 1
@@ -145,12 +144,13 @@ func (d *Path) drawPathSector() error {
 	return nil
 }
 
+//TODO - Надо проверить что там с points.
 func (d *Path) getDrawPoints(path models.Coordinates, axis int) models.Coordinates {
 
 	switch axis {
 	case AxisX:
 		points := models.Coordinates{
-			X: (d.Path[0].X + d.Path[0].Widht),
+			X: (path.X + path.Widht - WidhtX),
 			Y: (path.Y + path.Height)}
 		sectorPoints := (d.SectorBorderPoint.Y + (d.SectorBorderPoint.Height + d.SectorBorderPoint.Y)) / 2
 		if sectorPoints > path.X {
@@ -165,7 +165,7 @@ func (d *Path) getDrawPoints(path models.Coordinates, axis int) models.Coordinat
 	case AxisY:
 		points := models.Coordinates{
 			X: (path.X + path.Widht),
-			Y: (d.Path[0].Y + d.Path[0].Height)}
+			Y: (d.Path[0].Y + d.Path[0].Height - HeightX)}
 		sectorPoints := (d.SectorBorderPoint.X + (d.SectorBorderPoint.Widht + d.SectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
 			points.Widht = WidhtX
@@ -183,14 +183,11 @@ func (d *Path) getDrawPoints(path models.Coordinates, axis int) models.Coordinat
 
 func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
 	d.logger.Infoln("draw init path - get draw points 2 sector")
-	// points := models.Coordinates{
-	// 	X: (path.X + path.Widht),
-	// 	Y: (path.Y + path.Height)}
 
 	switch axis {
 	case AxisX:
 		points := models.Coordinates{
-			X: (d.Path[0].X + d.Path[0].Widht),
+			X: (path.X),
 			Y: (path.Y + path.Height)}
 		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
@@ -205,13 +202,8 @@ func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, 
 	case AxisY:
 		points := models.Coordinates{
 			X: (path.X + path.Widht),
-			Y: (d.Path[0].Y + d.Path[0].Height)}
-		//TODO тут разобраться
+			Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		fmt.Println("sectorPoints - ", sectorPoints)
-		fmt.Println("sectorBorderPoint.Y - ", sectorBorderPoint.Y)
-		fmt.Println("height - ", path.Height)
-		fmt.Println("pathY - ", path.Y)
 		if sectorPoints > path.Y {
 			points.Widht = WidhtY
 			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
@@ -228,15 +220,15 @@ func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, 
 
 func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
 	d.logger.Infoln("draw init path - get draw points 2 sector")
-	points := models.Coordinates{
-		X: (path.X + path.Widht),
-		Y: (path.Y + path.Height)}
+	// points := models.Coordinates{
+	// 	X: (path.X + path.Widht),
+	// 	Y: (path.Y + path.Height)}
 
 	switch axis {
 	case AxisX:
-		// points := models.Coordinates{
-		// 	X: (d.Path[0].X + d.Path[0].Widht),
-		// 	Y: (path.Y + path.Height)}
+		points := models.Coordinates{
+			X: (path.X + path.Widht),
+			Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
 			points.Widht = sectorBorderPoint.X - (path.X + path.Widht)
@@ -248,15 +240,10 @@ func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, 
 			return points
 		}
 	case AxisY:
-		// points := models.Coordinates{
-		// 	X: (path.X + path.Widht),
-		// 	Y: (d.Path[0].Y + d.Path[0].Height)}
-		//TODO тут разобраться
+		points := models.Coordinates{
+			X: (path.X),
+			Y: (path.Y + path.Height)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		fmt.Println("sectorPoints - ", sectorPoints)
-		fmt.Println("sectorBorderPoint.Y - ", sectorBorderPoint.Y)
-		fmt.Println("height - ", path.Height)
-		fmt.Println("pathY - ", path.Y)
 		if sectorPoints > path.Y {
 			points.Widht = WidhtY
 			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)

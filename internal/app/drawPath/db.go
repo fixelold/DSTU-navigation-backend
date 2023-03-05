@@ -240,9 +240,10 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, er
 	return true, nil
 }
 
-//TODO точно надо будет переделать
+// TODO точно надо будет переделать
 func (r *repository) getSectorBorderPoint2(entry, exit int) (*models.Coordinates, error) {
 	r.logger.Infoln("db - get sector border point 2")
+	fmt.Println(entry, exit)
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
