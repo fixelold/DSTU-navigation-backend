@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -11,7 +10,7 @@ const (
 	AxisX = 1
 	AxisY = 2
 
-	WidhtX  = 130
+	WidhtX  = 40
 	HeightX = 20
 
 	WidhtY  = 20
@@ -115,9 +114,6 @@ func (d *Path) drawPathSector() error {
 			d.pathAlignment(d.SectorBorderPoint, axis)
 			points := d.getDrawPoints2Sector(d.Path[iterator], d.SectorBorderPoint, axis)
 
-			fmt.Println("COORDINATES 1 - ", points)
-			fmt.Println("COORDINATES 2 - ", d.Path)
-
 			d.Path = append(d.Path, points)
 			boolean = false
 		} else {
@@ -188,7 +184,6 @@ func (d *Path) getDrawPoints(path models.Coordinates, axis int) models.Coordinat
 }
 
 func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
-	d.logger.Infoln("draw init path - get draw points 2 sector")
 
 	switch axis {
 	case AxisX:
@@ -206,18 +201,18 @@ func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, 
 			return points
 		}
 	case AxisY:
-		points := models.Coordinates{
-			X: (path.X + path.Widht),
-			Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
 		if sectorPoints > path.Y {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y)}
 			points.Widht = -WidhtY
 			points.Height = sectorBorderPoint.Y - path.Y
-			fmt.Println("data 8 - ", path)
-			fmt.Println("data 9 - ", sectorBorderPoint)
-			fmt.Println("data 10 - ", points)
 			return points
 		} else {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y)}
 			points.Widht = -WidhtY
 			points.Height = sectorBorderPoint.Y - path.Y
 			return points
@@ -229,35 +224,38 @@ func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, 
 
 func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
 	d.logger.Infoln("draw init path - get draw points 2 sector")
-	// points := models.Coordinates{
-	// 	X: (path.X + path.Widht),
-	// 	Y: (path.Y + path.Height)}
 
 	switch axis {
 	case AxisX:
-		points := models.Coordinates{
-			X: (path.X + path.Widht),
-			Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y + path.Height)}
 			points.Widht = sectorBorderPoint.X - (path.X + path.Widht)
 			points.Height = HeightX
 			return points
 		} else {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y)}
 			points.Widht = -sectorBorderPoint.X - (path.X + path.Widht)
 			points.Height = -HeightX
 			return points
 		}
 	case AxisY:
-		points := models.Coordinates{
-			X: (path.X),
-			Y: (path.Y + path.Height)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
 		if sectorPoints > path.Y {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y + path.Height)}
 			points.Widht = WidhtY
 			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
 			return points
 		} else {
+			points := models.Coordinates{
+				X: (path.X),
+				Y: (path.Y + path.Height)}
 			points.Widht = -WidhtY
 			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
 			return points
