@@ -1,6 +1,7 @@
 package drawPath
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -110,7 +111,12 @@ func (d *Path) drawPathSector() error {
 
 	for boolean {
 		if d.checkPath2Sector(d.Path[iterator], axis) {
+			//TODO вызов функции
+			d.pathAlignment(d.SectorBorderPoint, axis)
 			points := d.getDrawPoints2Sector(d.Path[iterator], d.SectorBorderPoint, axis)
+
+			fmt.Println("COORDINATES 1 - ", points)
+			fmt.Println("COORDINATES 2 - ", d.Path)
 
 			d.Path = append(d.Path, points)
 			boolean = false
@@ -144,7 +150,7 @@ func (d *Path) drawPathSector() error {
 	return nil
 }
 
-//TODO - Надо проверить что там с points.
+// TODO - Надо проверить что там с points.
 func (d *Path) getDrawPoints(path models.Coordinates, axis int) models.Coordinates {
 
 	switch axis {
@@ -191,11 +197,11 @@ func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, 
 			Y: (path.Y + path.Height)}
 		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
-			points.Widht = sectorBorderPoint.X - (path.X + path.Widht)
-			points.Height = HeightX
+			points.Widht = sectorBorderPoint.X - path.X
+			points.Height = -HeightX
 			return points
 		} else {
-			points.Widht = -sectorBorderPoint.X - (path.X + path.Widht)
+			points.Widht = -sectorBorderPoint.X - path.X
 			points.Height = -HeightX
 			return points
 		}
@@ -205,12 +211,15 @@ func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, 
 			Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
 		if sectorPoints > path.Y {
-			points.Widht = WidhtY
-			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
+			points.Widht = -WidhtY
+			points.Height = sectorBorderPoint.Y - path.Y
+			fmt.Println("data 8 - ", path)
+			fmt.Println("data 9 - ", sectorBorderPoint)
+			fmt.Println("data 10 - ", points)
 			return points
 		} else {
 			points.Widht = -WidhtY
-			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
+			points.Height = sectorBorderPoint.Y - path.Y
 			return points
 		}
 	default:
@@ -292,5 +301,44 @@ func (d *Path) defenitionAxis(width, height int) int {
 		return AxisY
 	} else {
 		return 0
+	}
+}
+
+// Выравнивание пути
+func (d *Path) pathAlignment(sectorBorderPoint models.Coordinates, axis int) {
+	lenght := len(d.Path)
+	path := d.Path[lenght-1]
+	switch axis {
+	case AxisX:
+		points := models.Coordinates{
+			X: (path.X),
+			Y: (path.Y)}
+		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
+		if sectorPoints > path.Y {
+			points.Widht = WidhtY
+			points.Height = sectorPoints - path.Y
+			d.Path[lenght-1].Height = points.Height
+		} else if sectorPoints < path.Y {
+			points.Widht = WidhtY
+			points.Height = sectorPoints - path.Y
+			d.Path[lenght-1].Height = points.Height
+		}
+	case AxisY:
+
+		points := models.Coordinates{
+			X: (path.X),
+			Y: (path.Y)}
+		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
+		if sectorPoints > path.X {
+			points.Widht = sectorPoints - path.X
+			points.Height = HeightX
+			d.Path[lenght-1].Widht = points.Widht
+		} else if sectorPoints < path.X {
+			points.Widht = sectorPoints - path.X
+			points.Height = HeightX
+			d.Path[lenght-1].Widht = points.Widht
+		}
+	default:
+		d.logger.Errorln("Path Alignment default")
 	}
 }
