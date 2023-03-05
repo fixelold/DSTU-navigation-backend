@@ -8,4 +8,5 @@ type Repository interface {
 	getSectorBorderPoint(number int) (*models.Coordinates, error)
 	checkBorderAud(coordinates models.Coordinates) (bool, error)
 	checkBorderSector(coordinates models.Coordinates) (bool, error)
+	getSectorBorderPoint2(entry, exit int) (*models.Coordinates, error)
 }

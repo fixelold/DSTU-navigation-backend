@@ -5,11 +5,11 @@ import (
 	"navigation/internal/models"
 )
 
-func (d *drawPathAud2Sector) drawAudX() error {
+func (d *Path) drawAudX() error {
 	var err error
 	var path models.Coordinates
 
-	path, err = drawAxisX(d.AudienceBorderPoint, plus)
+	path, err = d.drawAxisX(d.AudienceBorderPoint, plus)
 	if err != nil {
 		logging.GetLogger().Errorln("draw drawAxis. Error - ", err)
 		return err
@@ -25,15 +25,15 @@ func (d *drawPathAud2Sector) drawAudX() error {
 		d.Path = append(d.Path, path)
 		return nil
 	} else {
-		path, err = drawAxisX(d.AudienceBorderPoint, minus)
+		d.logger.Infoln("draw aud X => draw axis x - minus")
+		path, err = d.drawAxisX(d.AudienceBorderPoint, minus)
 		if err != nil {
-			logging.GetLogger().Errorln("draw else. Error - ", err)
 			return err
 		}
 
+		d.logger.Infoln("draw aud X => check border aud")
 		check, err = d.Repository.checkBorderAud(path)
 		if err != nil {
-			logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
 			return err
 		}
 
@@ -42,13 +42,12 @@ func (d *drawPathAud2Sector) drawAudX() error {
 			return nil
 		} else {
 			err = User000004
-			logging.GetLogger().Errorln("draw else 2. Error - ", err)
 			return User000004
 		}
 	}
 }
 
-func drawAxisX(borderPoints models.Coordinates, sign int) (models.Coordinates, error) {
+func (d *Path) drawAxisX(borderPoints models.Coordinates, sign int) (models.Coordinates, error) {
 	var path models.Coordinates
 	var err error
 
@@ -66,6 +65,7 @@ func drawAxisX(borderPoints models.Coordinates, sign int) (models.Coordinates, e
 		path.Height = -HeightX
 
 	default:
+		d.logger.Errorln("draw axis X default")
 		err = User000004
 	}
 

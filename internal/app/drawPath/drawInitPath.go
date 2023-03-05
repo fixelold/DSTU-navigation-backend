@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -11,17 +10,17 @@ const (
 	AxisX = 1
 	AxisY = 2
 
-	WidhtX  = 130
-	HeightX = 30
+	WidhtX  = 40
+	HeightX = 20
 
-	WidhtY  = 30
-	HeightY = 130
+	WidhtY  = 20
+	HeightY = 40
 
 	plus  = 0
 	minus = 1
 )
 
-type drawPathAud2Sector struct {
+type Path struct {
 	AudienceCoordinates models.Coordinates
 	AudienceBorderPoint models.Coordinates
 	SectorBorderPoint   models.Coordinates
@@ -29,23 +28,25 @@ type drawPathAud2Sector struct {
 	AudienceNumber      string
 	Path                []models.Coordinates
 	Repository          Repository
-	// добавить repository, чтобы можно было обращаться в БД.
+	logger              *logging.Logger
 }
 
-func NewDrawPathAud2Sector(
+func NewPath(
 	audienceCoordinates,
 	audienceBorderPoint,
 	sectorBorderPoint models.Coordinates,
 	sectorNumber int,
 	audienceNumber string,
-	repository Repository) *drawPathAud2Sector {
-	return &drawPathAud2Sector{
+	repository Repository,
+	logger *logging.Logger) *Path {
+	return &Path{
 		AudienceCoordinates: audienceCoordinates,
 		AudienceBorderPoint: audienceBorderPoint,
 		SectorBorderPoint:   sectorBorderPoint,
 		SectorNumber:        sectorNumber,
 		AudienceNumber:      audienceNumber,
 		Repository:          repository,
+		logger:              logger,
 	}
 }
 
@@ -53,13 +54,15 @@ var (
 	User000004 = appError.NewError("drawPath", "GetSelector", "Input does not match desired length", "-", "US-000004")
 )
 
-func (d *drawPathAud2Sector) DrawInitPath() error {
+func (d *Path) DrawInitPath() error {
 
+	d.logger.Infoln("DrawInitPath => draw path auditory")
 	err := d.drawPathAuditory()
 	if err != nil {
 		return err
 	}
 
+	d.logger.Infoln("-----DrawInitPath => draw path sector-----")
 	err = d.drawPathSector()
 	if err != nil {
 		return err
@@ -68,14 +71,15 @@ func (d *drawPathAud2Sector) DrawInitPath() error {
 	return nil
 }
 
-func (d *drawPathAud2Sector) drawPathAuditory() error {
+func (d *Path) drawPathAuditory() error {
 	var err error
+	d.logger.Infoln("DrawInitPath => draw path auditory => defenition axis")
 	axis := d.defenitionAxis(d.AudienceBorderPoint.Widht, d.AudienceBorderPoint.Height)
 
 	switch axis {
 
 	case AxisX:
-		fmt.Println("Work AxisX")
+		d.logger.Infoln("|| draw path auditory => axis x")
 		err := d.drawAudX()
 		if err != nil {
 			logging.GetLogger().Errorln("DrawPathAuditory case AxisX. Error - ", err)
@@ -83,7 +87,7 @@ func (d *drawPathAud2Sector) drawPathAuditory() error {
 		}
 
 	case AxisY:
-		fmt.Println("Work AxisY")
+		d.logger.Infoln("|| draw path auditory => axis y")
 		err := d.drawAudY()
 		if err != nil {
 			logging.GetLogger().Errorln("DrawPathAuditory case AxisY. Error - ", err.Error())
@@ -91,21 +95,24 @@ func (d *drawPathAud2Sector) drawPathAuditory() error {
 		}
 
 	default:
-		logging.GetLogger().Errorln("DrawPathAuditory case default. Error - ", err)
+		d.logger.Errorln("|| draw path auditory => default")
 		err = User000004
 	}
 
 	return err
 }
 
-func (d *drawPathAud2Sector) drawPathSector() error {
+func (d *Path) drawPathSector() error {
+	d.logger.Infoln("draw init path - draw path sector")
 	iterator := 0
 	axis := d.defenitionAxis(d.SectorBorderPoint.Widht, d.SectorBorderPoint.Height)
 	boolean := true
 
 	for boolean {
 		if d.checkPath2Sector(d.Path[iterator], axis) {
-			points := d.getDrawPoints2Sector(d.Path[iterator], axis)
+			//TODO вызов функции
+			d.pathAlignment(d.SectorBorderPoint, axis)
+			points := d.getDrawPoints2Sector(d.Path[iterator], d.SectorBorderPoint, axis)
 
 			d.Path = append(d.Path, points)
 			boolean = false
@@ -139,14 +146,14 @@ func (d *drawPathAud2Sector) drawPathSector() error {
 	return nil
 }
 
-func (d *drawPathAud2Sector) getDrawPoints(path models.Coordinates, axis int) models.Coordinates {
+// TODO - Надо проверить что там с points.
+func (d *Path) getDrawPoints(path models.Coordinates, axis int) models.Coordinates {
 
 	switch axis {
 	case AxisX:
 		points := models.Coordinates{
-			X: (d.Path[0].X + d.Path[0].Widht),
+			X: (path.X + path.Widht - WidhtX),
 			Y: (path.Y + path.Height)}
-		//y := (d.Path[0].X + d.Path[0].Widht) - HeightX
 		sectorPoints := (d.SectorBorderPoint.Y + (d.SectorBorderPoint.Height + d.SectorBorderPoint.Y)) / 2
 		if sectorPoints > path.X {
 			points.Widht = WidhtY
@@ -160,7 +167,7 @@ func (d *drawPathAud2Sector) getDrawPoints(path models.Coordinates, axis int) mo
 	case AxisY:
 		points := models.Coordinates{
 			X: (path.X + path.Widht),
-			Y: (d.Path[0].Y + d.Path[0].Height)}
+			Y: (d.Path[0].Y + d.Path[0].Height - HeightX)}
 		sectorPoints := (d.SectorBorderPoint.X + (d.SectorBorderPoint.Widht + d.SectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
 			points.Widht = WidhtX
@@ -176,34 +183,38 @@ func (d *drawPathAud2Sector) getDrawPoints(path models.Coordinates, axis int) mo
 	}
 }
 
-func (d *drawPathAud2Sector) getDrawPoints2Sector(path models.Coordinates, axis int) models.Coordinates {
-	points := models.Coordinates{
-		X: (path.X + path.Widht),
-		Y: (path.Y + path.Height)}
+func (d *Path) getDrawPoints2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
 
 	switch axis {
 	case AxisX:
-		sectorPoints := (d.SectorBorderPoint.X + (d.SectorBorderPoint.Widht + d.SectorBorderPoint.X)) / 2
+		points := models.Coordinates{
+			X: (path.X),
+			Y: (path.Y + path.Height)}
+		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
-			points.Widht = d.SectorBorderPoint.X - (path.X + path.Widht)
-			points.Height = HeightX
+			points.Widht = sectorBorderPoint.X - path.X
+			points.Height = -HeightX
 			return points
 		} else {
-			points.Widht = -d.SectorBorderPoint.X - (path.X + path.Widht)
+			points.Widht = -sectorBorderPoint.X - path.X
 			points.Height = -HeightX
 			return points
 		}
 	case AxisY:
-		sectorPoints := (d.SectorBorderPoint.Y + (d.SectorBorderPoint.Height + d.SectorBorderPoint.Y)) / 2
-		if sectorPoints > path.X {
-			fmt.Println("Work - ", d.SectorBorderPoint.Y)
-			fmt.Println(path)
-			points.Widht = WidhtY
-			points.Height = d.SectorBorderPoint.Y - (path.Y + path.Height)
+		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
+		if sectorPoints > path.Y {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y)}
+			points.Widht = -WidhtY
+			points.Height = sectorBorderPoint.Y - path.Y
 			return points
 		} else {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y)}
 			points.Widht = -WidhtY
-			points.Height = -d.SectorBorderPoint.Y - (path.Y + path.Height)
+			points.Height = sectorBorderPoint.Y - path.Y
 			return points
 		}
 	default:
@@ -211,7 +222,51 @@ func (d *drawPathAud2Sector) getDrawPoints2Sector(path models.Coordinates, axis 
 	}
 }
 
-func (d *drawPathAud2Sector) checkPath2Sector(path models.Coordinates, axis int) bool {
+func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
+	d.logger.Infoln("draw init path - get draw points 2 sector")
+
+	switch axis {
+	case AxisX:
+		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
+		if sectorPoints > path.X {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y + path.Height)}
+			points.Widht = sectorBorderPoint.X - (path.X + path.Widht)
+			points.Height = HeightX
+			return points
+		} else {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y)}
+			points.Widht = -sectorBorderPoint.X - (path.X + path.Widht)
+			points.Height = -HeightX
+			return points
+		}
+	case AxisY:
+		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
+		if sectorPoints > path.Y {
+			points := models.Coordinates{
+				X: (path.X + path.Widht),
+				Y: (path.Y + path.Height)}
+			points.Widht = WidhtY
+			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
+			return points
+		} else {
+			points := models.Coordinates{
+				X: (path.X),
+				Y: (path.Y + path.Height)}
+			points.Widht = -WidhtY
+			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
+			return points
+		}
+	default:
+		return models.Coordinates{}
+	}
+}
+
+func (d *Path) checkPath2Sector(path models.Coordinates, axis int) bool {
+	d.logger.Infoln("draw init path - check path 2 sector")
 	switch axis {
 	case AxisX:
 		ph := path.Y + path.Height
@@ -236,12 +291,52 @@ func (d *drawPathAud2Sector) checkPath2Sector(path models.Coordinates, axis int)
 	}
 }
 
-func (d *drawPathAud2Sector) defenitionAxis(width, height int) int {
+func (d *Path) defenitionAxis(width, height int) int {
+	d.logger.Infoln("draw init path - defenition axis")
 	if width == 1 {
 		return AxisX
 	} else if height == 1 {
 		return AxisY
 	} else {
 		return 0
+	}
+}
+
+// Выравнивание пути
+func (d *Path) pathAlignment(sectorBorderPoint models.Coordinates, axis int) {
+	lenght := len(d.Path)
+	path := d.Path[lenght-1]
+	switch axis {
+	case AxisX:
+		points := models.Coordinates{
+			X: (path.X),
+			Y: (path.Y)}
+		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
+		if sectorPoints > path.Y {
+			points.Widht = WidhtY
+			points.Height = sectorPoints - path.Y
+			d.Path[lenght-1].Height = points.Height
+		} else if sectorPoints < path.Y {
+			points.Widht = WidhtY
+			points.Height = sectorPoints - path.Y
+			d.Path[lenght-1].Height = points.Height
+		}
+	case AxisY:
+
+		points := models.Coordinates{
+			X: (path.X),
+			Y: (path.Y)}
+		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
+		if sectorPoints > path.X {
+			points.Widht = sectorPoints - path.X
+			points.Height = HeightX
+			d.Path[lenght-1].Widht = points.Widht
+		} else if sectorPoints < path.X {
+			points.Widht = sectorPoints - path.X
+			points.Height = HeightX
+			d.Path[lenght-1].Widht = points.Widht
+		}
+	default:
+		d.logger.Errorln("Path Alignment default")
 	}
 }
