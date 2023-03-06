@@ -5,11 +5,26 @@ import (
 	"navigation/internal/models"
 )
 
-func (d *Path) drawAudY() error {
+func (d *Path) getPoints(axis int) error {
 	var err error
 	var path models.Coordinates
+	var x int
+	var y int
 
-	path, err = d.drawAxisY(d.AudienceBorderPoint, plus)
+	XX := d.AudienceBorderPoint.X + 1
+	YX := (d.AudienceBorderPoint.Y + (d.AudienceBorderPoint.Height + d.AudienceBorderPoint.Y)) / 2
+
+	XY := (d.AudienceBorderPoint.X + (d.AudienceBorderPoint.Widht + d.AudienceBorderPoint.X)) / 2
+	YY := d.AudienceBorderPoint.Y + 1
+
+	if axis == AxisX {
+		x = XX
+		y = YX
+	} else if axis == AxisY {
+		x = XY
+		y = YY
+	}
+	path, err = d.get(x, y, plus)
 	if err != nil {
 		logging.GetLogger().Errorln("draw drawAxis. Error - ", err)
 		return err
@@ -25,16 +40,13 @@ func (d *Path) drawAudY() error {
 		d.Path = append(d.Path, path)
 		return nil
 	} else {
-		path, err = d.drawAxisY(d.AudienceCoordinates, minus)
-
+		path, err = d.get(x, y, minus)
 		if err != nil {
-			logging.GetLogger().Errorln("draw else. Error - ", err)
 			return err
 		}
 
 		check, err = d.Repository.checkBorderAud(path)
 		if err != nil {
-			logging.GetLogger().Errorln("checkBorderSectro db error - ", err)
 			return err
 		}
 
@@ -43,31 +55,30 @@ func (d *Path) drawAudY() error {
 			return nil
 		} else {
 			err = User000004
-			logging.GetLogger().Errorln("draw else 2. Error - ", err)
 			return User000004
 		}
 	}
 }
 
-func (d *Path) drawAxisY(borderPoints models.Coordinates, sign int) (models.Coordinates, error) {
+func (d *Path) get(x, y, sign int) (models.Coordinates, error) {
 	var path models.Coordinates
 	var err error
 
 	switch sign {
 	case plus:
-		path.X = (borderPoints.X + (borderPoints.Widht + borderPoints.X)) / 2
-		path.Y = borderPoints.Y + 1
-		path.Widht = WidhtY
-		path.Height = HeightY
+		path.X = x
+		path.Y = y
+		path.Widht = WidhtX
+		path.Height = HeightX
 
 	case minus:
-		path.X = (borderPoints.X + (borderPoints.Widht + borderPoints.X)) / 2
-		path.Y = borderPoints.Y + 1
-		path.Widht = -WidhtY
-		path.Height = -HeightY
+		path.X = x
+		path.Y = y
+		path.Widht = -WidhtX
+		path.Height = -HeightX
 
 	default:
-		d.logger.Errorln("draw axis Y default")
+		d.logger.Errorln("draw axis X default")
 		err = User000004
 	}
 
