@@ -56,13 +56,11 @@ var (
 
 func (d *Path) DrawInitPath() error {
 
-	d.logger.Infoln("DrawInitPath => draw path auditory")
 	err := d.drawPathAuditory()
 	if err != nil {
 		return err
 	}
 
-	d.logger.Infoln("-----DrawInitPath => draw path sector-----")
 	err = d.drawPathSector()
 	if err != nil {
 		return err
@@ -73,13 +71,12 @@ func (d *Path) DrawInitPath() error {
 
 func (d *Path) drawPathAuditory() error {
 	var err error
-	d.logger.Infoln("DrawInitPath => draw path auditory => defenition axis")
+
 	axis := d.defenitionAxis(d.AudienceBorderPoint.Widht, d.AudienceBorderPoint.Height)
 
 	switch axis {
 
 	case AxisX:
-		d.logger.Infoln("|| draw path auditory => axis x")
 		err := d.drawAudX()
 		if err != nil {
 			logging.GetLogger().Errorln("DrawPathAuditory case AxisX. Error - ", err)
@@ -87,7 +84,6 @@ func (d *Path) drawPathAuditory() error {
 		}
 
 	case AxisY:
-		d.logger.Infoln("|| draw path auditory => axis y")
 		err := d.drawAudY()
 		if err != nil {
 			logging.GetLogger().Errorln("DrawPathAuditory case AxisY. Error - ", err.Error())
@@ -103,7 +99,6 @@ func (d *Path) drawPathAuditory() error {
 }
 
 func (d *Path) drawPathSector() error {
-	d.logger.Infoln("draw init path - draw path sector")
 	iterator := 0
 	axis := d.defenitionAxis(d.SectorBorderPoint.Widht, d.SectorBorderPoint.Height)
 	boolean := true
@@ -266,7 +261,6 @@ func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, 
 }
 
 func (d *Path) checkPath2Sector(path models.Coordinates, axis int) bool {
-	d.logger.Infoln("draw init path - check path 2 sector")
 	switch axis {
 	case AxisX:
 		ph := path.Y + path.Height
@@ -292,7 +286,6 @@ func (d *Path) checkPath2Sector(path models.Coordinates, axis int) bool {
 }
 
 func (d *Path) defenitionAxis(width, height int) int {
-	d.logger.Infoln("draw init path - defenition axis")
 	if width == 1 {
 		return AxisX
 	} else if height == 1 {

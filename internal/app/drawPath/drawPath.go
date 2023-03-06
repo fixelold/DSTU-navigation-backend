@@ -13,7 +13,7 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 		return nil, err
 	}
 
-	h.logger.Infoln("================Draw Init Path================")
+	h.logger.Infoln("Draw Init Path")
 	d := NewPath(*auditory, *audBorderPoints, *sectorBorderPoints, sectors[1], start, h.repository, logging.GetLogger())
 
 	err = d.DrawInitPath()
@@ -21,7 +21,7 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 		return nil, err
 	}
 
-	h.logger.Infoln("================Draw Sector to sector================")
+	h.logger.Infoln("Draw Sector to sector")
 	for i := 1; i < len(sectors)-1; i++ {
 		entry, exit := min(sectors[i], sectors[i+1])
 		borderSector, err := h.repository.getSectorBorderPoint2(entry, exit)
@@ -43,7 +43,7 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 
 	do := NewPath(*auditory, *audBorderPoints, *sectorBorderPoints, sectors[1], end, h.repository, logging.GetLogger())
 
-	h.logger.Infoln("================Draw Final Path================")
+	h.logger.Infoln("Draw Final Path")
 	err = do.DrawInitPath()
 	if err != nil {
 		return nil, err

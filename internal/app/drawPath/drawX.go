@@ -25,13 +25,11 @@ func (d *Path) drawAudX() error {
 		d.Path = append(d.Path, path)
 		return nil
 	} else {
-		d.logger.Infoln("draw aud X => draw axis x - minus")
 		path, err = d.drawAxisX(d.AudienceBorderPoint, minus)
 		if err != nil {
 			return err
 		}
 
-		d.logger.Infoln("draw aud X => check border aud")
 		check, err = d.Repository.checkBorderAud(path)
 		if err != nil {
 			return err
