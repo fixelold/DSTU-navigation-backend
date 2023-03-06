@@ -74,28 +74,34 @@ func (d *Path) drawPathAuditory() error {
 
 	axis := d.defenitionAxis(d.AudienceBorderPoint.Widht, d.AudienceBorderPoint.Height)
 
-	switch axis {
-
-	case AxisX:
-		err := d.drawAudX()
-		if err != nil {
-			logging.GetLogger().Errorln("DrawPathAuditory case AxisX. Error - ", err)
-			return err
-		}
-
-	case AxisY:
-		err := d.drawAudY()
-		if err != nil {
-			logging.GetLogger().Errorln("DrawPathAuditory case AxisY. Error - ", err.Error())
-			return err
-		}
-
-	default:
-		d.logger.Errorln("|| draw path auditory => default")
-		err = User000004
+	err = d.getPoints(axis)
+	if err != nil {
+		return err
 	}
+	// switch axis {
 
-	return err
+	// case AxisX:
+	// 	err := d.getPoints(axis)
+	// 	if err != nil {
+	// 		logging.GetLogger().Errorln("DrawPathAuditory case AxisX. Error - ", err)
+	// 		return err
+	// 	}
+
+	// case AxisY:
+	// 	err := d.drawAudY()
+	// 	if err != nil {
+	// 		logging.GetLogger().Errorln("DrawPathAuditory case AxisY. Error - ", err.Error())
+	// 		return err
+	// 	}
+
+	// default:
+	// 	d.logger.Errorln("|| draw path auditory => default")
+	// 	err = User000004
+	// }
+
+	// }
+
+	return nil
 }
 
 func (d *Path) drawPathSector() error {
