@@ -5,26 +5,15 @@ import (
 	"navigation/internal/models"
 )
 
+const ()
+
 func (d *Path) getPoints(axis int) error {
 	var err error
 	var path models.Coordinates
-	var x int
-	var y int
+	coordinates := prepare(d.AudienceBorderPoint, axis)
+	
 
-	XX := d.AudienceBorderPoint.X + 1
-	YX := (d.AudienceBorderPoint.Y + (d.AudienceBorderPoint.Height + d.AudienceBorderPoint.Y)) / 2
-
-	XY := (d.AudienceBorderPoint.X + (d.AudienceBorderPoint.Widht + d.AudienceBorderPoint.X)) / 2
-	YY := d.AudienceBorderPoint.Y + 1
-
-	if axis == AxisX {
-		x = XX
-		y = YX
-	} else if axis == AxisY {
-		x = XY
-		y = YY
-	}
-	path, err = d.get(x, y, plus)
+	path, err = d.get(coordinates, plus)
 	if err != nil {
 		logging.GetLogger().Errorln("draw drawAxis. Error - ", err)
 		return err
@@ -40,7 +29,7 @@ func (d *Path) getPoints(axis int) error {
 		d.Path = append(d.Path, path)
 		return nil
 	} else {
-		path, err = d.get(x, y, minus)
+		path, err = d.get(coordinates, minus)
 		if err != nil {
 			return err
 		}
@@ -60,27 +49,52 @@ func (d *Path) getPoints(axis int) error {
 	}
 }
 
-func (d *Path) get(x, y, sign int) (models.Coordinates, error) {
+func (d *Path) get(coordinates models.Coordinates, sign int) (models.Coordinates, error) {
 	var path models.Coordinates
 	var err error
 
 	switch sign {
 	case plus:
-		path.X = x
-		path.Y = y
-		path.Widht = WidhtX
-		path.Height = HeightX
+		path.X = coordinates.X
+		path.Y = coordinates.Y
+		path.Widht = coordinates.Widht
+		path.Height = coordinates.Height
 
 	case minus:
-		path.X = x
-		path.Y = y
-		path.Widht = -WidhtX
-		path.Height = -HeightX
+		path.X = coordinates.X
+		path.Y = coordinates.Y
+		path.Widht = -coordinates.Widht
+		path.Height = -coordinates.Height
 
 	default:
-		d.logger.Errorln("draw axis X default")
+		d.logger.Errorln("Function get. Error switch default")
 		err = User000004
 	}
 
 	return path, err
+}
+
+func prepare(borderPoint models.Coordinates, axis int) models.Coordinates {
+	var coordinates models.Coordinates
+
+	XX := borderPoint.X + 1
+	YX := (borderPoint.Y + (borderPoint.Height + borderPoint.Y)) / 2
+
+	XY := (borderPoint.X + (borderPoint.Widht + borderPoint.X)) / 2
+	YY := borderPoint.Y + 1
+
+	if axis == AxisX {
+		coordinates.X = XX
+		coordinates.Y = YX
+		coordinates.Widht = WidhtX
+		coordinates.Height = HeightX
+
+	} else if axis == AxisY {
+		coordinates.X = XY
+		coordinates.Y = YY
+		coordinates.Widht = WidhtY
+		coordinates.Height = HeightY
+	}
+
+	return coordinates
 }

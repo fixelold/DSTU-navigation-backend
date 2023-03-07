@@ -13,7 +13,17 @@ func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
 	for boolean {
 		i := (len(d.Path) - 1) + iterator
 		if d.checkPath2Sector(d.Path[i], axis) {
-			points := d.getDrawSector2Sector(d.Path[i], borderSector, axis)
+			switch axis {
+			case AxisX:
+				widht = d.SectorBorderPoint.X - (d.Path[iterator].X + d.Path[iterator].Widht)
+				height = HeightX
+			case AxisY:
+				widht = WidhtY
+				height =  d.SectorBorderPoint.Y - (d.Path[iterator].Y + d.Path[iterator].Y)
+			default:
+				d.logger.Errorln("Function drawPathSector. Error switch default")
+			}
+			points := d.getPoints2Sector(widht, height, axis, d.Path[iterator], d.SectorBorderPoint)
 
 			d.Path = append(d.Path, points)
 			boolean = false

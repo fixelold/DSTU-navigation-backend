@@ -18,6 +18,7 @@ const (
 
 	plus  = 0
 	minus = 1
+
 )
 
 type Path struct {
@@ -61,10 +62,10 @@ func (d *Path) DrawInitPath() error {
 		return err
 	}
 
-	err = d.drawPathSector()
-	if err != nil {
-		return err
-	}
+	// err = d.drawPathSector()
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -186,48 +187,48 @@ func (d *Path) getPoints2Sector(widht, heihgt, axis int, path, borderPoint model
 	}
 }
 
-func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
-	d.logger.Infoln("draw init path - get draw points 2 sector")
+// func (d *Path) getDrawSector2Sector(path, sectorBorderPoint models.Coordinates, axis int) models.Coordinates {
+// 	d.logger.Infoln("draw init path - get draw points 2 sector")
 
-	switch axis {
-	case AxisX:
-		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
-		if sectorPoints > path.X {
-			points := models.Coordinates{
-				X: (path.X + path.Widht),
-				Y: (path.Y + path.Height)}
-			points.Widht = sectorBorderPoint.X - (path.X + path.Widht)
-			points.Height = HeightX
-			return points
-		} else {
-			points := models.Coordinates{
-				X: (path.X + path.Widht),
-				Y: (path.Y)}
-			points.Widht = -sectorBorderPoint.X - (path.X + path.Widht)
-			points.Height = -HeightX
-			return points
-		}
-	case AxisY:
-		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		if sectorPoints > path.Y {
-			points := models.Coordinates{
-				X: (path.X + path.Widht),
-				Y: (path.Y + path.Height)}
-			points.Widht = WidhtY
-			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
-			return points
-		} else {
-			points := models.Coordinates{
-				X: (path.X),
-				Y: (path.Y + path.Height)}
-			points.Widht = -WidhtY
-			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
-			return points
-		}
-	default:
-		return models.Coordinates{}
-	}
-}
+// 	switch axis {
+// 	case AxisX:
+// 		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
+// 		if sectorPoints > path.X {
+// 			points := models.Coordinates{
+// 				X: (path.X + path.Widht),
+// 				Y: (path.Y + path.Height)}
+// 			points.Widht = sectorBorderPoint.X - (path.X + path.Widht)
+// 			points.Height = HeightX
+// 			return points
+// 		} else {
+// 			points := models.Coordinates{
+// 				X: (path.X + path.Widht),
+// 				Y: (path.Y)}
+// 			points.Widht = -sectorBorderPoint.X - (path.X + path.Widht)
+// 			points.Height = -HeightX
+// 			return points
+// 		}
+// 	case AxisY:
+// 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
+// 		if sectorPoints > path.Y {
+// 			points := models.Coordinates{
+// 				X: (path.X + path.Widht),
+// 				Y: (path.Y + path.Height)}
+// 			points.Widht = WidhtY
+// 			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
+// 			return points
+// 		} else {
+// 			points := models.Coordinates{
+// 				X: (path.X),
+// 				Y: (path.Y + path.Height)}
+// 			points.Widht = -WidhtY
+// 			points.Height = sectorBorderPoint.Y - (path.Y + path.Height)
+// 			return points
+// 		}
+// 	default:
+// 		return models.Coordinates{}
+// 	}
+// }
 
 func (d *Path) checkPath2Sector(path models.Coordinates, axis int) bool {
 	switch axis {
