@@ -5,6 +5,7 @@ import (
 )
 
 func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
+	var widht, height int
 	iterator := 0
 	axis := d.defenitionAxis(d.SectorBorderPoint.Widht, d.SectorBorderPoint.Height)
 	boolean := true
@@ -17,8 +18,18 @@ func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
 			d.Path = append(d.Path, points)
 			boolean = false
 		} else {
-			// определяем в каком направлении рисовать
-			points := d.getDrawPoints(d.Path[i], axis)
+				// TODO: возможно стоит вынести в отдельную функцию
+				switch axis {
+				case AxisX:
+					widht = WidhtY
+					height = HeightY
+				case AxisY:
+					widht = WidhtX
+					height = HeightX
+				default:
+					d.logger.Errorln("Function DrawPathSector2Sector. Error switch default")
+				}
+				points := d.getPoints2Sector(widht, height, axis, d.Path[iterator], d.SectorBorderPoint)
 			if points == (models.Coordinates{}) {
 				return User000004
 			}
