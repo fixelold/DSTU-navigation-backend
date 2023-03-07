@@ -1,6 +1,7 @@
 package drawPath
 
 import (
+	"fmt"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
@@ -11,7 +12,6 @@ func (d *Path) getPoints(axis int) error {
 	var err error
 	var path models.Coordinates
 	coordinates := prepare(d.AudienceBorderPoint, axis)
-	
 
 	path, err = d.get(coordinates, plus)
 	if err != nil {
@@ -38,6 +38,8 @@ func (d *Path) getPoints(axis int) error {
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("path one - ", path)
 
 		if check {
 			d.Path = append(d.Path, path)
