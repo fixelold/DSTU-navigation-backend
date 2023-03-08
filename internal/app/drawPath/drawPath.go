@@ -22,37 +22,36 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 		return nil, err
 	}
 
-	h.logger.Infoln("Draw Sector to sector")
-	for i := 1; i < len(sectors)-1; i++ {
-		entry, exit := min(sectors[i], sectors[i+1])
-		borderSector, err := h.repository.getSectorBorderPoint2(entry, exit)
-		fmt.Println("ONE - ", sectorBorderPoints)
-		fmt.Println("TWO - ", borderSector)
-		if err != nil {
-			return nil, err
-		}
+	// h.logger.Infoln("Draw Sector to sector")
+	// for i := 1; i < len(sectors)-1; i++ {
+	// 	entry, exit := min(sectors[i], sectors[i+1])
+	// 	borderSector, err := h.repository.getSectorBorderPoint2(entry, exit)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
 
-		err = d.DrawPathSector2Sector(*borderSector)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// 	err = d.DrawPathSector2Sector(*borderSector)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
-	entry, exit = min(sectors[len(sectors)-1], sectors[len(sectors)-2])
-	auditory, audBorderPoints, sectorBorderPoints, err = h.getData(end, entry, exit)
-	if err != nil {
-		return nil, err
-	}
+	// entry, exit = min(sectors[len(sectors)-1], sectors[len(sectors)-2])
+	// auditory, audBorderPoints, sectorBorderPoints, err = h.getData(end, entry, exit)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	do := NewPath(*auditory, *audBorderPoints, *sectorBorderPoints, sectors[1], end, h.repository, logging.GetLogger())
+	// do := NewPath(*auditory, *audBorderPoints, *sectorBorderPoints, sectors[1], end, h.repository, logging.GetLogger())
 
-	h.logger.Infoln("Draw Final Path")
-	err = do.DrawInitPath()
-	if err != nil {
-		return nil, err
-	}
+	// h.logger.Infoln("Draw Final Path")
+	// err = do.DrawInitPath()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	d.Path = append(d.Path, do.Path...)
+	// d.Path = append(d.Path, do.Path...)
+	fmt.Println("Final - ", d.Path)
 	return d.Path, nil
 }
 
