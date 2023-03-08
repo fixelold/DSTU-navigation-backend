@@ -1,7 +1,6 @@
 package drawPath
 
 import (
-	"fmt"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
@@ -13,7 +12,7 @@ func (d *Path) getPoints(axis int) error {
 	var path models.Coordinates
 	coordinates := prepare(d.AudienceBorderPoint, axis)
 
-	path, err = d.get(coordinates, plus)
+	path, err = d.get(coordinates, plus, axis)
 	if err != nil {
 		logging.GetLogger().Errorln("draw drawAxis. Error - ", err)
 		return err
@@ -29,7 +28,7 @@ func (d *Path) getPoints(axis int) error {
 		d.Path = append(d.Path, path)
 		return nil
 	} else {
-		path, err = d.get(coordinates, minus)
+		path, err = d.get(coordinates, minus, axis)
 		if err != nil {
 			return err
 		}
@@ -38,8 +37,6 @@ func (d *Path) getPoints(axis int) error {
 		if err != nil {
 			return err
 		}
-
-		fmt.Println("path one - ", path)
 
 		if check {
 			d.Path = append(d.Path, path)
@@ -51,26 +48,47 @@ func (d *Path) getPoints(axis int) error {
 	}
 }
 
-func (d *Path) get(coordinates models.Coordinates, sign int) (models.Coordinates, error) {
+func (d *Path) get(coordinates models.Coordinates, sign, axis int) (models.Coordinates, error) {
 	var path models.Coordinates
 	var err error
 
-	switch sign {
-	case plus:
-		path.X = coordinates.X
-		path.Y = coordinates.Y
-		path.Widht = coordinates.Widht
-		path.Height = coordinates.Height
-
-	case minus:
-		path.X = coordinates.X
-		path.Y = coordinates.Y
-		path.Widht = -coordinates.Widht
-		path.Height = -coordinates.Height
-
-	default:
-		d.logger.Errorln("Function get. Error switch default")
-		err = User000004
+	switch axis {
+	case AxisX:
+		switch sign {
+		case plus:
+			path.X = coordinates.X
+			path.Y = coordinates.Y
+			path.Widht = coordinates.Widht
+			path.Height = coordinates.Height
+	
+		case minus:
+			path.X = coordinates.X
+			path.Y = coordinates.Y
+			path.Widht = -coordinates.Widht
+			path.Height = coordinates.Height
+	
+		default:
+			d.logger.Errorln("Function get. Error switch default")
+			err = User000004
+		}
+	case AxisY:
+		switch sign {
+		case plus:
+			path.X = coordinates.X
+			path.Y = coordinates.Y
+			path.Widht = coordinates.Widht
+			path.Height = coordinates.Height
+	
+		case minus:
+			path.X = coordinates.X
+			path.Y = coordinates.Y
+			path.Widht = coordinates.Widht
+			path.Height = -coordinates.Height
+	
+		default:
+			d.logger.Errorln("Function get. Error switch default")
+			err = User000004
+		}
 	}
 
 	return path, err
