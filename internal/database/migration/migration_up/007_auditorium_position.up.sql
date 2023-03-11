@@ -33,3 +33,12 @@ VALUES (
     unnest(array[159,  129,   105,   61,     78,   228,   37,    23,     63,    63,    60]),
     unnest(array[85,   86,    88,    106,    128,  50,    53,    26,     78,    136,    50])
 );
+
+INSERT INTO auditorium_position (id_auditorium, x, y, widht, height) 
+VALUES (
+    unnest(array[12,   13,   14,    15,    16,   17,   18,    19,     20]),
+    unnest(array[230,  230,  230,   230,   230,  230,  230,   230,    438]),
+    unnest(array[319,  344,  368,   400,   430,  533,  580,   616,    565]),
+    unnest(array[60,   61,   160,   60,    59,   60,   60,    59,     62]),
+    unnest(array[25,   23,   32,    30,    103,  47,   36,    42,     69])
+);

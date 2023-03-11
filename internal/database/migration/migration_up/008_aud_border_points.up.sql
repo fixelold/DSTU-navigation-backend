@@ -33,3 +33,12 @@ VALUES (
     unnest(array[80,  130,   105,  1,    1,    228,   37,    23,     1,     1,      1]),
     unnest(array[1,   1,     1,    58,   128,  1,     1,     1,      80,    135,    50])
 );
+
+INSERT INTO aud_border_points (id_auditorium, x, y, widht, height) 
+VALUES (
+    unnest(array[12,   13,   14,    15,    16,   17,   18,    19,    20]),
+    unnest(array[287,  287,  287,   287,   287,  287,  287,   287,   438]),
+    unnest(array[319,  344,  368,   400,   430,  533,  580,   616,   565]),
+    unnest(array[1,    1,    1,     1,     1,    1,    1,     1,     1]),
+    unnest(array[25,   23,   32,    30,    103,  47,   36,    42,    72])
+);
