@@ -193,11 +193,7 @@ func (d *Path) prepare2(t, axis int, borderPoint, path models.Coordinates) model
 					Height: HeightX}
 			}
 		} else {
-			fmt.Println("border point - ", borderPoint.Y)
-			fmt.Println("path - ", path.Y)
-			fmt.Println("YYY - ", borderPoint.Y - path.Y)
 			if borderPoint.Y > path.Y {
-				fmt.Println("this mega work")
 				return models.Coordinates{
 					X:      path.X + path.Widht,
 					Y:      path.Y + path.Height - HeightX,
