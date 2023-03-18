@@ -22,6 +22,10 @@ func main() {
 	appConfig := config.GetConfig()
 	pgConn := postgresql.NewClient(appContext, *appConfig)
 
+	userPrepareRepo := user.NewRepository(pgConn, logger)
+	userPrepare := user.NewUser(logger, userPrepareRepo)
+	userPrepare.Create()
+
 	pathBuildingRepo := pathBuilder.NewRepository(pgConn, logger)
 	pathBuldingController := pathBuilder.NewHandler(logger, pathBuildingRepo)
 

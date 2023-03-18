@@ -1,5 +1,7 @@
 package user
 
-type Repository interface {
+import "navigation/internal/models"
 
+type Repository interface {
+	Create(user models.User) (models.User, error)
 }
