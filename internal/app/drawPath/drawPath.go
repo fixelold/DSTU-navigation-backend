@@ -1,6 +1,7 @@
 package drawPath
 
 import (
+	"fmt"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
@@ -50,6 +51,7 @@ func (h *handler) drawPath(start, end string, sectors []int) ([]models.Coordinat
 	}
 
 	d.Path = append(d.Path, do.Path...)
+	fmt.Println("Final - ", d.Path)
 	return d.Path, nil
 }
 

@@ -6,19 +6,30 @@ import (
 
 func (d *Path) DrawPathSector2Sector(borderSector models.Coordinates) error {
 	iterator := 0
-	axis := d.defenitionAxis(d.SectorBorderPoint.Widht, d.SectorBorderPoint.Height)
+	axis := d.defenitionAxis(borderSector.Widht, borderSector.Height)
 	boolean := true
+
+	if axis == AxisX {
+		axis = AxisY
+	} else {
+		axis = AxisX
+	}
 
 	for boolean {
 		i := (len(d.Path) - 1) + iterator
 		if d.checkPath2Sector(d.Path[i], axis) {
-			points := d.getDrawSector2Sector(d.Path[i], borderSector, axis)
+
+			p := d.prepare2(Sector2Sector, axis, borderSector, d.Path[i])
+
+			points := d.getPoints2(p, d.Path[i], borderSector, axis)
 
 			d.Path = append(d.Path, points)
 			boolean = false
 		} else {
-			// определяем в каком направлении рисовать
-			points := d.getDrawPoints(d.Path[i], axis)
+			// TODO: возможно тут ошибка. Надо будет проверить и, если что, подправить.
+			p := d.prepare2(Sector2Sector, axis, borderSector, d.Path[i])
+
+			points := d.getPoints2(p, d.Path[i], borderSector, axis)
 			if points == (models.Coordinates{}) {
 				return User000004
 			}
