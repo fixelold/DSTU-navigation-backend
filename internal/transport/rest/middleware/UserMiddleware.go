@@ -85,7 +85,7 @@ func (u *UserMiddleware) JwtMiddleware() *jwt.GinJWTMiddleware {
 				Password string `form:"password" json:"password" binding:"required"`
 			}{}
 
-			if err := c.ShouldBind(&credentials); err != nil {
+			if err := c.ShouldBindJSON(&credentials); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
 
@@ -131,6 +131,7 @@ func (u *UserMiddleware) JwtMiddleware() *jwt.GinJWTMiddleware {
 		},
 
 		Authorizator: func(data interface{}, c *gin.Context) bool {
+			fmt.Println("Work 1")
 			if _, ok := data.(*models.User); ok {
 				return true
 			}
