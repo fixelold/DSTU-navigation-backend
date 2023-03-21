@@ -69,6 +69,12 @@ CREATE TABLE IF NOT EXISTS "sector_border_points" (
   exit INT
 );
 
+CREATE TABLE IF NOT EXISTS "auditory_description" (
+  id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
+  id_auditory INT,
+  description VARCHAR
+);
+
 ALTER TABLE "floor" ADD FOREIGN KEY (id_building) REFERENCES "building" (id);
 
 ALTER TABLE "sector" ADD FOREIGN KEY (id_floor) REFERENCES "floor" (id);
@@ -86,3 +92,5 @@ ALTER TABLE "auditorium_position" ADD FOREIGN KEY (id_auditorium) REFERENCES "au
 ALTER TABLE "aud_border_points" ADD FOREIGN KEY (id_auditorium) REFERENCES "auditorium" (id);
 
 ALTER TABLE "sector_border_points" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
+
+ALTER TABLE "auditory_description" ADD FOREIGN KEY (id_auditory) REFERENCES "auditorium" (id);

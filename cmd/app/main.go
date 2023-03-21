@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"navigation/internal/app/auditory"
 	"navigation/internal/app/drawPath"
 	"navigation/internal/app/pathBuilder"
 	"navigation/internal/app/user"
@@ -35,9 +36,13 @@ func main() {
 	// users := user.NewRepository(pgConn, logger)
 	userController := user.NewHandler(logger, middleware.UserMiddleware{Client: pgConn, Logger: logger})
 
+	auditoryRepo := auditory.NewRepository(pgConn, logger)
+	auditoryController := auditory.NewHandler(logger, auditoryRepo, middleware.UserMiddleware{Client: pgConn, Logger: logger})
+
 	pathBuldingController.Register(v1Group)
 	drawPathController.Register(v1Group)
 	userController.Register(v1Group)
+	auditoryController.Register(v1Group)
 
 	logger.Fatalln(router.Run(":8080"))
 }

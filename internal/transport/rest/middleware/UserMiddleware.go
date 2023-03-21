@@ -39,6 +39,10 @@ type UserMiddleware struct {
 	Logger *logging.Logger
 }
 
+func (u *UserMiddleware) CheckJwtTocken() {
+	
+}
+
 func (u *UserMiddleware) JwtMiddleware() *jwt.GinJWTMiddleware {
 	m, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "navigation",
@@ -131,7 +135,6 @@ func (u *UserMiddleware) JwtMiddleware() *jwt.GinJWTMiddleware {
 		},
 
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			fmt.Println("Work 1")
 			if _, ok := data.(*models.User); ok {
 				return true
 			}
