@@ -23,6 +23,7 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 	}
 }
 
+// получаем координаты аудитории по ее номеру.
 func (r *repository) getAudPoints(number string) (models.Coordinates, error) {
 	var position models.Coordinates
 	request :=
@@ -65,6 +66,7 @@ func (r *repository) getAudPoints(number string) (models.Coordinates, error) {
 	return &position, nil
 }
 
+// получаем координаты границ аудитории по ее номеру.
 func (r *repository) getAudBorderPoint(number string) (models.Coordinates, error) {
 	var borderPoint models.Coordinates
 	request :=
@@ -107,6 +109,7 @@ func (r *repository) getAudBorderPoint(number string) (models.Coordinates, error
 	return &borderPoint, nil
 }
 
+// получаем координаты одной из границ сектора. По значению входа и выхода из него.
 func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, error) {
 	var borderPoint models.Coordinates
 	request :=

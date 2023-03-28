@@ -32,22 +32,23 @@ func newData(audNumber string, sectorEntry, sectorExit, sectorNumber int, logger
 	return data, nil
 }
 
+// получение audPoints, audBorderPoints, sectorBorderPoints
 func (d *data) getPoints(entry, exit int) error {
 	var err error
 
-	// Получаем координаты аудитории по ее номеру.
+	// получаем координаты аудитории по ее номеру.
 	d.audPoints, err = d.repository.getAudPoints(d.audNumber)
 	if err != nil {
 		return err
 	}
 
-	// Получаем координаты границ аудитории по ее номеру.
+	// получаем координаты границ аудитории по ее номеру.
 	d.audBorderPoints, err = d.repository.getAudBorderPoint(d.audNumber)
 	if err != nil {
 		return err
 	}
 
-	// Получаем координаты одной из границ сектора. По значению входа и выхода из него.
+	// получаем координаты одной из границ сектора. По значению входа и выхода из него.
 	d.sectorBorderPoints, err = d.repository.getSectorBorderPoint(entry, exit)
 	if err != nil {
 		return err
