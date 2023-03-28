@@ -15,6 +15,8 @@ type data struct {
 
 	logger     *logging.Logger // логирования.
 	repository Repository      // для обращения к базе данных.
+
+	points   []models.Coordinates // массив координат. Для построения пути.
 }
 
 func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, logger *logging.Logger, repository Repository) (*data, error) {

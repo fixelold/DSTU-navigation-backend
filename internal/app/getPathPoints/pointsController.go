@@ -2,7 +2,6 @@ package getPathPoints
 
 import (
 	"navigation/internal/logging"
-	"navigation/internal/models"
 )
 
 const (
@@ -20,19 +19,19 @@ const (
 )
 
 const (
-	Auditory2Sector = 1
-	Path2Sector     = 2
-	Sector2Sector   = 3
+	audStartPoints = 1
+	// Auditory2Sector = 1
+	// Path2Sector     = 2
+	// Sector2Sector   = 3
 )
 
 type pointsController struct {
 	logger     *logging.Logger // логирования.
 	repository Repository      // для обращения к базе данных.
 
-	audStart string               // номер начальной аудитории.
-	audEnd   string               // номер конечной аудитории.
-	sectors  []int                // массив номеров секторов
-	points   []models.Coordinates // массив координат. Для построения пути.
+	audStart string // номер начальной аудитории.
+	audEnd   string // номер конечной аудитории.
+	sectors  []int  // массив номеров секторов
 }
 
 func NewPointsController(logger *logging.Logger, repository Repository) *pointsController {
@@ -52,7 +51,6 @@ func (p *pointsController) getPathPoints() error {
 	if err != nil {
 		return err
 	}
-
 
 	return nil
 }
