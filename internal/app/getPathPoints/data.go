@@ -10,17 +10,17 @@ type data struct {
 	audBorderPoints    models.Coordinates // координаты места отрисовки пути (одна из границ аудитории).
 	sectorBorderPoints models.Coordinates // координаты одной из границ сектора.
 
-	sectorNumber int    // номер сектора.
-	audNumber    string // номер аудитории.
+	nextSectorNumber int    // номер сектора.
+	audNumber        string // номер аудитории.
 
 	logger     *logging.Logger // логирования.
 	repository Repository      // для обращения к базе данных.
 }
 
-func newData(audNumber string, sectorEntry, sectorExit, sectorNumber int, logger *logging.Logger, repository Repository) (*data, error) {
+func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, logger *logging.Logger, repository Repository) (*data, error) {
 	data := &data{
 		audNumber:    audNumber,
-		sectorNumber: sectorNumber,
+		nextSectorNumber: nextSectorNumber,
 		logger:       logger,
 		repository:   repository,
 	}
