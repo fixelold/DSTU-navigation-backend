@@ -52,6 +52,11 @@ func (p *pointsController) getPathPoints() error {
 		return err
 	}
 
+	err = data.getAudStartPoints()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

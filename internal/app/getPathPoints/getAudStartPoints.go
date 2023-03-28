@@ -20,36 +20,35 @@ func (d *data) audStartPoints(axis int) error {
 	var path models.Coordinates
 	coordinates := d.preparePoints(audStartPoints, axis, d.audBorderPoints)
 
-	path, err = d.get(coordinates, plus, axis)
+	path, err = d.setPoints(audStartPoints, plus, axis, coordinates)
 	if err != nil {
 		return err
 	}
 
-	check, err := d.Repository.checkBorderAud(path)
+	check, err := d.repository.checkBorderAud(path)
 	if err != nil {
 		return err
 	}
 
 	if check {
-		d.Path = append(d.Path, path)
+		d.points = append(d.points, path)
 		return nil
 	} else {
-		path, err = d.get(coordinates, minus, axis)
+		path, err = d.setPoints(audStartPoints, minus, axis, coordinates)
 		if err != nil {
 			return err
 		}
 
-		check, err = d.Repository.checkBorderAud(path)
+		check, err = d.repository.checkBorderAud(path)
 		if err != nil {
 			return err
 		}
 
 		if check {
-			d.Path = append(d.Path, path)
+			d.points = append(d.points, path)
 			return nil
 		} else {
-			err = User000004
-			return User000004
+			return nil
 		}
 	}
 }
