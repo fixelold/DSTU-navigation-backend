@@ -29,26 +29,27 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 		}
 
 		return coordinates
-	case Auditory2Sector:
 
+	// от начального пути до вхождения в сектор
+	case auditory2Sector:
 		if axis == AxisX {
-			if d.Path[0].Height == HeightY || d.Path[0].Widht == WidhtX{
+			if d.points[0].Height == HeightY || d.points[0].Widht == WidhtX{
 				return models.Coordinates{
-					X:      path.X + path.Widht,
-					Y:      d.Path[0].Y + d.Path[0].Height - HeightX,
+					X:      points.X + points.Widht,
+					Y:      d.points[0].Y + d.points[0].Height - HeightX,
 					Widht:  WidhtX,
 					Height: HeightX}
 			} else {
 				return models.Coordinates{
-					X:      path.X + path.Widht,
-					Y:      d.Path[0].Y + d.Path[0].Height,
+					X:      points.X + points.Widht,
+					Y:      d.points[0].Y + d.points[0].Height,
 					Widht:  WidhtX,
 					Height: HeightX}
 			}
 		} else {
 			return models.Coordinates{
-				X:      path.X + path.Widht,
-				Y:      d.Path[0].Y + d.Path[0].Height,
+				X:      points.X + points.Widht,
+				Y:      d.points[0].Y + d.points[0].Height,
 				Widht:  WidhtY,
 				Height: HeightY}
 		}
