@@ -24,10 +24,10 @@ func (d *data) audStartPoints(axis int) error {
 	var path models.Coordinates
 
 	// подготовка точек исходя из оси, типа и границ аудитории.
-	coordinates := d.preparePoints(audStartPoints, axis, d.audBorderPoints)
+	coordinates := d.preparePoints(audStartPoints, axis, d.audBorderPoints, models.Coordinates{})
 
 	// получение точек для начального пути.
-	path, err = d.setPoints(audStartPoints, plus, axis, coordinates)
+	path, err = d.setPointsAudStart(coordinates, axis, plus)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (d *data) audStartPoints(axis int) error {
 		d.points = append(d.points, path)
 		return nil
 	} else {
-		path, err = d.setPoints(audStartPoints, minus, axis, coordinates)
+		path, err = d.setPointsAudStart(coordinates, axis, plus)
 		if err != nil {
 			return err
 		}
