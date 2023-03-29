@@ -5,7 +5,6 @@ import (
 )
 
 func (d *data) middlePoints() error {
-	var err error
 	iterator := 0
 	boolean := true
 	axis := d.defenitionAxis(d.sectorBorderPoints.Widht, d.sectorBorderPoints.Height)
@@ -42,14 +41,14 @@ func (d *data) middlePoints() error {
 
 			ok2, err := d.repository.checkBorderSector(points)
 			if err != nil {
-				return User000004
+				return err
 			}
 
 			if !ok && !ok2 {
 				//TODO написать изменения направления или типо что-то такого
 			}
 
-			d.Path = append(d.Path, points)
+			d.points = append(d.points, points)
 		}
 
 		iterator += 1
