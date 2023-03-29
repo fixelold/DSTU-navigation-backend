@@ -1,6 +1,8 @@
 package getPathPoints
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/models"
+)
 
 // занесение точек начального пути
 func (d *data) setAudStartPoints() error {

@@ -2,7 +2,7 @@ package getPathPoints
 
 import "navigation/internal/models"
 
-func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates) error {
+func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, pointsType int) error {
 	boolean := true
 	axis := d.defenitionAxis(borderSector.Widht, borderSector.Height)
 
@@ -13,7 +13,7 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates) er
 
 			axis = d.changeAxis(axis)
 
-			points := d.preparePoints(path2Sector, axis, borderSector, d.points[iterator])
+			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
 
 			points, err := d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
 			if err != nil {
@@ -24,7 +24,7 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates) er
 			boolean = false
 		} else {
 
-			points := d.preparePoints(path2Sector, axis, borderSector, d.points[iterator])
+			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
 
 			points, err := d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
 			if err != nil {

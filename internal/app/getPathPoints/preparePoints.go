@@ -78,20 +78,21 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 			}
 		}
 
-	// case Sector2Sector:
-	// 	if axis == AxisX {
-	// 		return models.Coordinates{
-	// 			X:      path.X + path.Widht - WidhtY,
-	// 			Y:      path.Y + path.Height,
-	// 			Widht:  WidhtY,
-	// 			Height: borderPoint.Y - (path.Y + path.Height)}
-	// 	} else {
-	// 		return models.Coordinates{
-	// 			X:      path.X + path.Widht - WidhtY,
-	// 			Y:      path.Y + path.Height,
-	// 			Widht:  borderPoint.X - (path.X + path.Widht),
-	// 			Height: HeightX}
-	// 	}
+	// путь, который прокладывается между секторами
+	case sector2Sector:
+		if axis == AxisX {
+			return models.Coordinates{
+				X:      points.X + points.Widht - WidhtY,
+				Y:      points.Y + points.Height,
+				Widht:  WidhtY,
+				Height: borderPoint.Y - (points.Y + points.Height)}
+		} else {
+			return models.Coordinates{
+				X:      points.X + points.Widht - WidhtY,
+				Y:      points.Y + points.Height,
+				Widht:  borderPoint.X - (points.X + points.Widht),
+				Height: HeightX}
+		}
 	default:
 		return models.Coordinates{}
 	}
