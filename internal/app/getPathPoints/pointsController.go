@@ -63,6 +63,30 @@ func (p *pointsController) getPathPoints() error {
 		return err
 	}
 
+	// построение пути вплоть до вхождение в область точек сектора.
+	err = data.middlePoints()
+	if err != nil {
+		return err
+	}
+
+	// for i := 1; i < len(p.sectors)-1; i++ {
+
+	// 	entry, exit, err := min(p.sectors[i], p.sectors[i+1])
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	err = d.DrawPathSector2Sector(*borderSector)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
+
 	return nil
 }
 

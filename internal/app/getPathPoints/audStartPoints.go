@@ -8,6 +8,8 @@ func (d *data) setAudStartPoints() error {
 
 	axis := d.defenitionAxis(d.audBorderPoints.Widht, d.audBorderPoints.Height)
 
+	axis = d.changeAxis(axis)
+
 	err = d.audStartPoints(axis)
 	if err != nil {
 		return err

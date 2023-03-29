@@ -279,7 +279,6 @@ func (d *Path) checkPath2Sector(path models.Coordinates, axis int) bool {
 		ph := path.X + path.Widht
 		x1 := d.SectorBorderPoint.X
 		x2 := d.SectorBorderPoint.X + d.SectorBorderPoint.Widht
-		fmt.Println(path.X, path.Widht, x1, x2)
 		if x1 <= ph && ph <= x2 {
 			return true
 		} else {
