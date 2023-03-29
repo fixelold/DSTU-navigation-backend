@@ -1,4 +1,4 @@
-package drawPath
+package getPathPoints
 
 import (
 	"navigation/internal/logging"
@@ -44,7 +44,9 @@ func (h *handler) getPoints(c *gin.Context) {
 		return
 	}
 
-	response, err := h.drawPath(navObj.Start, navObj.End, navObj.Sectors)
+	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository)
+
+	response, err := p.getPathPoints()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
