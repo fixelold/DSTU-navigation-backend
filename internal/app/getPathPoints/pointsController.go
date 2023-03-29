@@ -22,7 +22,7 @@ const (
 const (
 	audStartPoints = 1 // для начального пути от границ аудитории.
 	// Auditory2Sector = 1
-	// Path2Sector     = 2
+	path2Sector     = 3
 	// Sector2Sector   = 3
 )
 

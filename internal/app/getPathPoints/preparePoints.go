@@ -3,7 +3,7 @@ package getPathPoints
 import "navigation/internal/models"
 
 // подготовка данных
-func (d *data) preparePoints(pointsType, axis int, borderPoint models.Coordinates) models.Coordinates {
+func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	switch pointsType {
 	// начальных путь от границ аудитории.
 	case audStartPoints:
@@ -52,37 +52,29 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint models.Coordinate
 	// 			Widht:  WidhtY,
 	// 			Height: HeightY}
 	// 	}
-
-	// case Path2Sector:
-	// 	if axis == AxisX {
-	// 		if borderPoint.X > path.X {
-	// 			return models.Coordinates{
-	// 				X:      path.X + path.Widht,
-	// 				Y:      d.Path[0].Y + d.Path[0].Height,
-	// 				Widht:  borderPoint.X - path.X,
-	// 				Height: HeightX}
-	// 		} else {
-	// 			return models.Coordinates{
-	// 				X:      path.X + path.Widht,
-	// 				Y:      d.Path[0].Y + d.Path[0].Height,
-	// 				Widht:  borderPoint.X - path.X,
-	// 				Height: HeightX}
-	// 		}
-	// 	} else {
-	// 		if borderPoint.Y > path.Y {
-	// 			return models.Coordinates{
-	// 				X:      path.X + path.Widht,
-	// 				Y:      path.Y + path.Height - HeightX,
-	// 				Widht:  WidhtY,
-	// 				Height: borderPoint.Y - path.Y}
-	// 		} else {
-	// 			return models.Coordinates{
-	// 				X:      path.X + path.Widht,
-	// 				Y:      path.Y + path.Height,
-	// 				Widht:  WidhtY,
-	// 				Height: borderPoint.Y - (path.Y + path.Height)}
-	// 		}
-	// 	}
+	// от начального пути до момента вхоэжение в пределы сектора
+	case path2Sector:
+		if axis == AxisX {
+			return models.Coordinates{
+				X:      points.X + points.Widht,
+				Y:      d.points[0].Y + d.points[0].Height,
+				Widht:  borderPoint.X - points.X,
+				Height: HeightX}
+		} else {
+			if borderPoint.Y > points.Y {
+				return models.Coordinates{
+					X:      points.X + points.Widht,
+					Y:      points.Y + points.Height - HeightX,
+					Widht:  WidhtY,
+					Height: borderPoint.Y - points.Y}
+			} else {
+				return models.Coordinates{
+					X:      points.X + points.Widht,
+					Y:      points.Y + points.Height,
+					Widht:  WidhtY,
+					Height: borderPoint.Y - (points.Y + points.Height)}
+			}
+		}
 
 	// case Sector2Sector:
 	// 	if axis == AxisX {

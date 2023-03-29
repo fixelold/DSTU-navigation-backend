@@ -11,18 +11,19 @@ func (d *data) middlePoints() error {
 
 	for boolean {
 		if d.checkOccurrence(d.points[iterator], axis) {
+
+			d.pathAlignment(d.sectorBorderPoints, axis)
+
 			axis = d.changeAxis(axis)
 
-			d.pathAlignment(d.SectorBorderPoint, axis)
+			points := d.preparePoints(path2Sector, axis, d.sectorBorderPoints, d.points[iterator])
 
-			p := d.prepare2(Path2Sector, axis, d.SectorBorderPoint, d.Path[iterator])
-
-			points := d.getPoints2(p, d.Path[iterator], d.SectorBorderPoint, axis)
-			if points == (models.Coordinates{}) {
-				return User000004
+			points, err := d.setPointsPath2Sector(d.sectorBorderPoints, points, d.Path[iterator], axis)
+			if err != nil {
+				return err
 			}
 
-			d.Path = append(d.Path, points)
+			d.points = append(d.points, points)
 			boolean = false
 		} else {
 
