@@ -196,3 +196,46 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error
 	// Возможно тут надо это добавить в else.
 	return true, nil
 }
+
+func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, error) {
+	r.logger.Infoln("db - check border sector")
+	request :=
+		`SELECT x, y, widht, height
+	FROM sector_border_points 
+	WHERE x <= $1 AND $1 <= (x+widht)
+	AND y <= $2 AND $2 <= (y+height)`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		r.logger.Tracef("can't start transaction: %s", err.Error())
+		return false, err
+	}
+
+	res, err := tx.Exec(
+		context.Background(),
+		request,
+		coordinates.X+coordinates.Widht,
+		coordinates.Y+coordinates.Height)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
+				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
+			r.logger.Error(newErr)
+			return false, newErr
+		}
+		r.logger.Error(err)
+		return false, err
+	}
+	_ = tx.Commit(context.Background())
+
+	if res.RowsAffected() != 0 {
+		return false, nil
+	}
+
+	return true, nil
+}

@@ -21,7 +21,7 @@ const (
 // эти константы будут использовать для рассчета данных. Они буду передаваться в switch.
 const (
 	audStartPoints = 1 // для начального пути от границ аудитории.
-	// Auditory2Sector = 1
+	auditory2Sector = 2
 	path2Sector     = 3
 	// Sector2Sector   = 3
 )

@@ -5,6 +5,7 @@ import (
 )
 
 func (d *data) middlePoints() error {
+	var err error
 	iterator := 0
 	boolean := true
 	axis := d.defenitionAxis(d.sectorBorderPoints.Widht, d.sectorBorderPoints.Height)
@@ -18,7 +19,7 @@ func (d *data) middlePoints() error {
 
 			points := d.preparePoints(path2Sector, axis, d.sectorBorderPoints, d.points[iterator])
 
-			points, err := d.setPointsPath2Sector(d.sectorBorderPoints, points, d.Path[iterator], axis)
+			points, err := d.setPointsPath2Sector(d.sectorBorderPoints, points, d.points[iterator], axis)
 			if err != nil {
 				return err
 			}
@@ -27,19 +28,19 @@ func (d *data) middlePoints() error {
 			boolean = false
 		} else {
 
-			p := d.prepare2(Auditory2Sector, axis, d.SectorBorderPoint, d.Path[iterator])
+			points := d.preparePoints(path2Sector, axis, d.sectorBorderPoints, d.points[iterator])
 
-			points := d.getPoints2(p, d.Path[iterator], d.SectorBorderPoint, axis)
-			if points == (models.Coordinates{}) {
-				return User000004
-			}
-
-			ok, err := d.Repository.checkBorderAud(points)
+			points, err := d.setPointsPath2Sector(d.sectorBorderPoints, points, d.points[iterator], axis)
 			if err != nil {
-				return User000004
+				return err
 			}
 
-			ok2, err := d.Repository.checkBorderSector(points)
+			ok, err := d.repository.checkBorderAud(points)
+			if err != nil {
+				return err
+			}
+
+			ok2, err := d.repository.checkBorderSector(points)
 			if err != nil {
 				return User000004
 			}

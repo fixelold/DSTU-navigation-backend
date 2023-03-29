@@ -29,30 +29,31 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 		}
 
 		return coordinates
-	// case Auditory2Sector:
+	case Auditory2Sector:
 
-	// 	if axis == AxisX {
-	// 		if d.Path[0].Height == HeightY || d.Path[0].Widht == WidhtX{
-	// 			return models.Coordinates{
-	// 				X:      path.X + path.Widht,
-	// 				Y:      d.Path[0].Y + d.Path[0].Height - HeightX,
-	// 				Widht:  WidhtX,
-	// 				Height: HeightX}
-	// 		} else {
-	// 			return models.Coordinates{
-	// 				X:      path.X + path.Widht,
-	// 				Y:      d.Path[0].Y + d.Path[0].Height,
-	// 				Widht:  WidhtX,
-	// 				Height: HeightX}
-	// 		}
-	// 	} else {
-	// 		return models.Coordinates{
-	// 			X:      path.X + path.Widht,
-	// 			Y:      d.Path[0].Y + d.Path[0].Height,
-	// 			Widht:  WidhtY,
-	// 			Height: HeightY}
-	// 	}
-	// от начального пути до момента вхоэжение в пределы сектора
+		if axis == AxisX {
+			if d.Path[0].Height == HeightY || d.Path[0].Widht == WidhtX{
+				return models.Coordinates{
+					X:      path.X + path.Widht,
+					Y:      d.Path[0].Y + d.Path[0].Height - HeightX,
+					Widht:  WidhtX,
+					Height: HeightX}
+			} else {
+				return models.Coordinates{
+					X:      path.X + path.Widht,
+					Y:      d.Path[0].Y + d.Path[0].Height,
+					Widht:  WidhtX,
+					Height: HeightX}
+			}
+		} else {
+			return models.Coordinates{
+				X:      path.X + path.Widht,
+				Y:      d.Path[0].Y + d.Path[0].Height,
+				Widht:  WidhtY,
+				Height: HeightY}
+		}
+
+	// соеденить путь и сектор
 	case path2Sector:
 		if axis == AxisX {
 			return models.Coordinates{
