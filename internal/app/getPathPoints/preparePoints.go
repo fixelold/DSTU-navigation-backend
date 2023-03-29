@@ -2,8 +2,10 @@ package getPathPoints
 
 import "navigation/internal/models"
 
+// подготовка данных
 func (d *data) preparePoints(pointsType, axis int, borderPoint models.Coordinates) models.Coordinates {
 	switch pointsType {
+	// начальных путь от границ аудитории.
 	case audStartPoints:
 		var coordinates models.Coordinates
 

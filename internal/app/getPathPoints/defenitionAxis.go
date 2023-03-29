@@ -1,5 +1,6 @@
 package getPathPoints
 
+// определение оси
 func (d *data) defenitionAxis(width, height int) int {
 	if width == 1 {
 		return AxisX

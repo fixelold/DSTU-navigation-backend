@@ -152,6 +152,7 @@ func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, 
 	return borderPoint, nil
 }
 
+// проверка, чтобы точки пути не находились в границах аудитории.
 func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error) {
 	r.logger.Infoln("db - check border auditory")
 	request :=
