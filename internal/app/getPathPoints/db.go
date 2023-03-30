@@ -162,7 +162,7 @@ func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, 
 }
 
 // проверка, чтобы точки пути не находились в границах аудитории.
-func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error) {
+func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError) {
 	r.logger.Infoln("db - check border auditory")
 	request :=
 		`SELECT x, y, widht, height
@@ -173,8 +173,9 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
 		_ = tx.Rollback(context.Background())
-		r.logger.Tracef("can't start transaction: %s", err.Error())
-		return false, err
+		txError.Wrap("checkBorderAud")
+		txError.Err = err
+		return false, *txError
 	}
 
 	res, err := tx.Exec(
@@ -188,22 +189,22 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, error
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
-				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return false, newErr
+			queryError.Wrap("checkBorderAud")
+			queryError.Err = pgErr
+			return false, *queryError
 		}
-		r.logger.Error(err)
-		return false, err
+		queryError.Wrap("checkBorderAud")
+			queryError.Err = err
+		return false, *queryError
 	}
 	_ = tx.Commit(context.Background())
 
 	if res.RowsAffected() != 0 {
-		return false, nil
+		return false, appError.AppError{}
 	}
 
 	// Возможно тут надо это добавить в else.
-	return true, nil
+	return true, appError.AppError{}
 }
 
 func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, error) {

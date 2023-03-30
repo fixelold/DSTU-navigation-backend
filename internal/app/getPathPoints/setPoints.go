@@ -1,11 +1,24 @@
 package getPathPoints
 
-import "navigation/internal/models"
+import (
+	"errors"
+	"fmt"
+	"navigation/internal/appError"
+	"navigation/internal/models"
+)
+
+var (
+	switchAxisError = appError.NewAppError("switch error")
+	switchSignError = appError.NewAppError("switch error")
+)
 
 // для начального пути от границ сектора
-func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (models.Coordinates, error) {
+func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (models.Coordinates, appError.AppError) {
 	var path models.Coordinates
-	var err error
+	switchAxisError.Wrap("setPointsAudStart")
+	switchSignError.Wrap("setPointsAudStart")
+	switchAxisError.Err = errors.New(fmt.Sprintf("no suitable value, expected: %d or %d received: %d", AxisX, AxisY, axis))
+	switchSignError.Err = errors.New(fmt.Sprintf("no suitable value, expected: %d or %d received: %d", plus, minus, sign))
 	switch axis {
 	case AxisX:
 		switch sign {
@@ -22,7 +35,7 @@ func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (mod
 			path.Height = points.Height
 
 		default:
-			err = nil
+			return path, *switchSignError
 		}
 	case AxisY:
 		switch sign {
@@ -39,10 +52,13 @@ func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (mod
 			path.Height = -points.Height
 
 		default:
-			err = nil
+			return path, *switchSignError
 		}
+	default:
+		return path, *switchAxisError
 	}
-	return path, err
+
+	return path, appError.AppError{}
 }
 
 // точки от начала пути до вхождение в пределы сектора

@@ -9,6 +9,6 @@ type Repository interface {
 	getAudPoints(audNumber string) (models.Coordinates, appError.AppError)
 	getAudBorderPoint(number string) (models.Coordinates, appError.AppError)
 	getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError)
-	checkBorderAud(coordinates models.Coordinates) (bool, error)
+	checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError)
 	checkBorderSector(coordinates models.Coordinates) (bool, error)
 }

@@ -64,10 +64,11 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppEr
 	}
 
 	// построение начального пути. От границы аудитории.
-	// err = data.setAudStartPoints()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err = data.setAudStartPoints()
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
 	// borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
 	// if err != nil {

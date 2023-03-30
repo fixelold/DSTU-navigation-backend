@@ -31,19 +31,19 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 				return err
 			}
 
-			ok, err := d.repository.checkBorderAud(points)
-			if err != nil {
-				return err
-			}
+			// ok, err := d.repository.checkBorderAud(points)
+			// if err != nil {
+			// 	return err
+			// }
 
-			ok2, err := d.repository.checkBorderSector(points)
-			if err != nil {
-				return err
-			}
+			// ok2, err := d.repository.checkBorderSector(points)
+			// if err != nil {
+			// 	return err
+			// }
 
-			if !ok && !ok2 {
-				//TODO написать изменения направления или типо что-то такого
-			}
+			// if !ok && !ok2 {
+			// 	//TODO написать изменения направления или типо что-то такого
+			// }
 
 			d.points = append(d.points, points)
 		}
