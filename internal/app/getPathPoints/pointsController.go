@@ -1,10 +1,12 @@
 package getPathPoints
 
 import (
-	"log"
+	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
+
+var ()
 
 const (
 	AxisX = 1 // указывает на ось x.
@@ -22,7 +24,7 @@ const (
 
 // эти константы будут использовать для рассчета данных. Они буду передаваться в switch.
 const (
-	audStartPoints = 1 // для начального пути от границ аудитории.
+	audStartPoints  = 1 // для начального пути от границ аудитории.
 	auditory2Sector = 2
 	path2Sector     = 3
 	sector2Sector   = 4
@@ -37,36 +39,35 @@ type pointsController struct {
 	sectors  []int  // массив номеров секторов
 }
 
-func NewPointsController(audStart, audEnd string, sectors[]int, logger *logging.Logger, repository Repository) *pointsController {
+func NewPointsController(audStart, audEnd string, sectors []int, logger *logging.Logger, repository Repository) *pointsController {
 	return &pointsController{
 		logger:     logger,
 		repository: repository,
-		audStart: audStart,
-		audEnd: audEnd,
-		sectors: sectors,
+		audStart:   audStart,
+		audEnd:     audEnd,
+		sectors:    sectors,
 	}
 }
 
-func (p *pointsController) getPathPoints() ([]models.Coordinates, error) {
+func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppError) {
+	var err appError.AppError
 	/* находим минимальное значение между номерами двух секторов.
 	   необходимо для внутренней логики.
 	*/
-	entry, exit, err := min(p.sectors[0], p.sectors[1])
-	if err != nil {
-		return nil, err
-	}
+	entry, exit := min(p.sectors[0], p.sectors[1])
 
 	// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
 	data, err := newData(p.audStart, entry, exit, p.sectors[1], p.logger, p.repository)
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
 		return nil, err
 	}
 
 	// построение начального пути. От границы аудитории.
-	err = data.setAudStartPoints()
-	if err != nil {
-		return nil, err
-	}
+	// err = data.setAudStartPoints()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
 	// if err != nil {
@@ -126,16 +127,13 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, error) {
 
 	// data.points = append(data.points, dataEnd.points...)
 
-	log.Println("data - ", data.points)
-	return data.points, nil
+	return data.points, err
 }
 
-// TODO: добавить ошибки, если переменные одинаковые.
-func min(a, b int) (int, int, error) {
+func min(a, b int) (int, int) {
 	if a < b {
-		return a, b, nil
-	} else if a > b {
-		return b, a, nil
+		return a, b
+	} else {
+		return b, a
 	}
-	return a, b, nil
 }
