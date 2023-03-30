@@ -59,7 +59,7 @@ func (d *data) audStartPoints(axis int) appError.AppError {
 		d.points = append(d.points, path)
 		return appError.AppError{}
 	} else {
-		path, err = d.setPointsAudStart(coordinates, axis, plus)
+		path, err = d.setPointsAudStart(coordinates, axis, minus)
 		if err.Err != nil {
 			return err
 		}

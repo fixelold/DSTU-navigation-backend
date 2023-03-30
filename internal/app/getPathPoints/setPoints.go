@@ -62,13 +62,11 @@ func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (mod
 }
 
 // точки от начала пути до вхождение в пределы сектора
-func (d *data) setPointsPath2Sector(borderPoints, points, lastPathPoint models.Coordinates, axis int) (models.Coordinates, error) {
-	var err error
-
+func (d *data) setPointsPath2Sector(borderPoints, points, lastPathPoint models.Coordinates, axis int) (models.Coordinates) {
 	p := models.Coordinates{
 		X: (points.X),
 		Y: (points.Y)}
 	p.Widht = points.Widht
 	p.Height = points.Height
-	return p, err
+	return p
 }

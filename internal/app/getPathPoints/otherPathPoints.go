@@ -1,8 +1,11 @@
 package getPathPoints
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/appError"
+	"navigation/internal/models"
+)
 
-func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, pointsType int) error {
+func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, pointsType int) appError.AppError {
 	boolean := true
 	axis := d.defenitionAxis(borderSector.Widht, borderSector.Height)
 
@@ -13,37 +16,35 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 
 			axis = d.changeAxis(axis)
 
-			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
+			d.logger.Infoln("axis - ", axis)
 
-			points, err := d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
-			if err != nil {
-				return err
-			}
+			points := d.preparePoints(path2Sector, axis, borderSector, d.points[iterator])
+
+			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
 
 			d.points = append(d.points, points)
 			boolean = false
 		} else {
 
-			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
+			points := d.preparePoints(auditory2Sector, axis, borderSector, d.points[iterator])
 
-			points, err := d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
-			if err != nil {
+			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
+
+			ok, err := d.repository.checkBorderAud(points)
+			if err.Err != nil {
+				err.Wrap("otherPathPoints")
 				return err
 			}
 
-			// ok, err := d.repository.checkBorderAud(points)
-			// if err != nil {
-			// 	return err
-			// }
+			ok2, err := d.repository.checkBorderSector(points)
+			if err.Err != nil {
+				err.Wrap("otherPathPoints")
+				return err
+			}
 
-			// ok2, err := d.repository.checkBorderSector(points)
-			// if err != nil {
-			// 	return err
-			// }
-
-			// if !ok && !ok2 {
-			// 	//TODO написать изменения направления или типо что-то такого
-			// }
+			if !ok && !ok2 {
+				//TODO написать изменения направления или типо что-то такого
+			}
 
 			d.points = append(d.points, points)
 		}
@@ -51,7 +52,7 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 		iterator += 1
 	}
 
-	return nil
+	return appError.AppError{}
 }
 
 // проверка на вхождение точек пути в пределы сектора.

@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -70,63 +71,68 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppEr
 		return nil, err
 	}
 
-	// borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// // построение пути вплоть до вхождение в область точек сектора.
-	// err = data.middlePoints(borderSector)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// построение пути вплоть до вхождение в область точек сектора.
+	err = data.middlePoints(borderSector)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// for i := 1; i < len(p.sectors)-1; i++ {
+	for i := 1; i < len(p.sectors)-1; i++ {
 
-	// 	entry, exit, err := min(p.sectors[i], p.sectors[i+1])
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
+		entry, exit = min(p.sectors[i], p.sectors[i+1])
 
-	// 	borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
+		borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return nil, err
+		}
 
-	// 	err = data.sector2Sector(borderSector)
-	// 	if err != nil {
-	// 		return nil,err
-	// 	}
-	// }
+		err = data.sector2Sector(borderSector)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return nil, err
+		}
+	}
 
-	// entry, exit, err = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
-	// if err != nil {
-	// 	return nil,  err
-	// }
+	entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
-	// // получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-	// dataEnd, err := newData(p.audStart, entry, exit, p.sectors[1], p.logger, p.repository)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
+	dataEnd, err := newData(p.audEnd, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// err = dataEnd.setAudStartPoints()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err = dataEnd.setAudStartPoints()
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// borderSector, err = p.repository.getSectorBorderPoint(entry, exit)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	borderSector, err = p.repository.getSectorBorderPoint(entry, exit)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// // построение пути вплоть до вхождение в область точек сектора.
-	// err = dataEnd.middlePoints(borderSector)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// построение пути вплоть до вхождение в область точек сектора.
+	err = dataEnd.middlePoints(borderSector)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// data.points = append(data.points, dataEnd.points...)
+	fmt.Println("data - ", data)
+	fmt.Println("dataEnd - ", dataEnd)
+	data.points = append(data.points, dataEnd.points...)
+	fmt.Println("mega mega data - ", data.points)
 
 	return data.points, err
 }
