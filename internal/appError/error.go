@@ -1,28 +1,28 @@
 package appError
 
+import "fmt"
+
 type AppError struct {
-	packageName string
-	function    string
-	message     string
-	description string
-	code        string
+	Context     string
+	Description string
+	Err         error
 }
 
-func NewError(packageName, function, message, description, code string) *AppError {
+func NewAppError(description string) *AppError {
 	return &AppError{
-		packageName: packageName,
-		function:    function,
-		message:     message,
-		description: description,
-		code:        code,
+		Context: "",
+		Description: description,
 	}
 }
 
-func (a *AppError) ChangeDescription(description string) *AppError {
-	a.description = description
-	return a
+func (a *AppError) Error() string {
+	return fmt.Sprintf("\n Context: %s\n Description: %s\n Error: %v\n", a.Context, a.Description, a.Err)
 }
 
-func (a *AppError) Error() string {
-	return a.description
+func (a *AppError) Wrap(funcName string) {
+	if a.Context == "" {
+		a.Context = funcName
+	} else {
+		a.Context = funcName + " -> " + a.Context	
+	}
 }

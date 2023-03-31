@@ -1,6 +1,8 @@
 package getPathPoints
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/models"
+)
 
 // подготовка данных
 func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Coordinates) models.Coordinates {
@@ -33,7 +35,7 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 	// от начального пути до вхождения в сектор
 	case auditory2Sector:
 		if axis == AxisX {
-			if d.points[0].Height == HeightY || d.points[0].Widht == WidhtX{
+			if d.points[0].Height == HeightY || d.points[0].Widht == WidhtX {
 				return models.Coordinates{
 					X:      points.X + points.Widht,
 					Y:      d.points[0].Y + d.points[0].Height - HeightX,

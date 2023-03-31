@@ -1,12 +1,17 @@
 package getPathPoints
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/appError"
+	"navigation/internal/models"
+)
 
-func (d *data) sector2Sector(borderSector models.Coordinates) error {
+func (d *data) sector2Sector(borderSector models.Coordinates) appError.AppError {
 	iterator := (len(d.points) - 1)
-	if err := d.otherPathPoints(iterator, borderSector, sector2Sector); err != nil {
+	err := d.otherPathPoints(iterator, borderSector, sector2Sector)
+	if err.Err != nil {
+		err.Wrap("sector2Sector")
 		return err
 	}
 
-	return nil
+	return appError.AppError{}
 }

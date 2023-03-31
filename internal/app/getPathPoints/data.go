@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
@@ -19,7 +20,8 @@ type data struct {
 	points   []models.Coordinates // массив координат. Для построения пути.
 }
 
-func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, logger *logging.Logger, repository Repository) (*data, error) {
+func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, logger *logging.Logger, repository Repository) (*data, appError.AppError) {
+	var err appError.AppError
 	data := &data{
 		audNumber:    audNumber,
 		nextSectorNumber: nextSectorNumber,
@@ -27,34 +29,38 @@ func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, lo
 		repository:   repository,
 	}
 
-	if err := data.getPoints(sectorEntry, sectorExit); err != nil {
+	err = data.getPoints(sectorEntry, sectorExit) 
+	if err.Err != nil {
+		err.Wrap("newData")
 		return nil, err
 	}
 
-	return data, nil
+	return data, err
 }
-
+ 
 // получение audPoints, audBorderPoints, sectorBorderPoints
-func (d *data) getPoints(entry, exit int) error {
-	var err error
-
+func (d *data) getPoints(entry, exit int) appError.AppError {
+	var err appError.AppError
 	// получаем координаты аудитории по ее номеру.
 	d.audPoints, err = d.repository.getAudPoints(d.audNumber)
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("getPoints")	
 		return err
 	}
 
 	// получаем координаты границ аудитории по ее номеру.
 	d.audBorderPoints, err = d.repository.getAudBorderPoint(d.audNumber)
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("getPoints")	
 		return err
 	}
 
 	// получаем координаты одной из границ сектора. По значению входа и выхода из него.
 	d.sectorBorderPoints, err = d.repository.getSectorBorderPoint(entry, exit)
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("getPoints")	
 		return err
 	}
 
-	return nil
+	return err
 }

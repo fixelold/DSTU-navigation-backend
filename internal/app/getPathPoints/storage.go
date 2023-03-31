@@ -1,11 +1,14 @@
 package getPathPoints
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/appError"
+	"navigation/internal/models"
+)
 
 type Repository interface {
-	getAudPoints(audNumber string) (models.Coordinates, error)
-	getAudBorderPoint(number string) (models.Coordinates, error)
-	getSectorBorderPoint(entry, exit int) (models.Coordinates, error)
-	checkBorderAud(coordinates models.Coordinates) (bool, error)
-	checkBorderSector(coordinates models.Coordinates) (bool, error)
+	getAudPoints(audNumber string) (models.Coordinates, appError.AppError)
+	getAudBorderPoint(number string) (models.Coordinates, appError.AppError)
+	getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError)
+	checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError)
+	checkBorderSector(coordinates models.Coordinates) (bool, appError.AppError)
 }

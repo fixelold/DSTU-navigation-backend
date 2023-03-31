@@ -1,15 +1,14 @@
 package pathBuilder
 
 import (
-	"navigation/internal/appError"
 	"strconv"
 	"strings"
 )
 
 var (
-	User000001 = appError.NewError("locationDetermination", "GetSelector", "Input does not match desired length", "-", "US-000001")
-	User000002 = appError.NewError("locationDetermination", "GetSelector", "Not convert string to int", "-", "US-000002")
-	User000003 = appError.NewError("locationDetermination", "GetSelector", "Errir in getting sector", "-", "US-000003")
+	User000001 error
+	User000002 error
+	User000003 error
 )
 
 func (h *handler) GetSector(start, end string) (int, int, error) {
@@ -28,14 +27,14 @@ func (h *handler) GetSector(start, end string) (int, int, error) {
 	sectorStart, err := h.repository.GetSector(startAud, uint(startBuild))
 	if err != nil {
 		h.logger.Errorf("the getSector function call returned %s", err.Error())
-		User000003.ChangeDescription(err.Error())
+		// User000003.ChangeDescription(err.Error())
 		return 0, 0, User000003
 	}
 
 	sectorEnd, err := h.repository.GetSector(endAud, uint(endBuild))
 	if err != nil {
 		h.logger.Errorf("the getSector function call returned %s", err.Error())
-		User000003.ChangeDescription(err.Error())
+		// User000003.ChangeDescription(err.Error())
 		return 0, 0, User000003
 	}
 
