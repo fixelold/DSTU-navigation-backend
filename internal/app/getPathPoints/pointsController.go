@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -129,10 +128,7 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppEr
 		return nil, err
 	}
 
-	fmt.Println("data - ", data)
-	fmt.Println("dataEnd - ", dataEnd)
 	data.points = append(data.points, dataEnd.points...)
-	fmt.Println("mega mega data - ", data.points)
 
 	return data.points, err
 }

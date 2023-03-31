@@ -73,7 +73,7 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 					Height: borderPoint.Y - points.Y}
 			} else {
 				return models.Coordinates{
-					X:      points.X + points.Widht - WidhtY,
+					X:      points.X + points.Widht,
 					Y:      points.Y + points.Height,
 					Widht:  WidhtY,
 					Height: borderPoint.Y - (points.Y + points.Height)}

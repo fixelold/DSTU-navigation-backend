@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"log"
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -12,13 +13,15 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 	for boolean {
 		if d.checkOccurrence(d.points[iterator], axis) {
 
+			log.Println("data 1 - ", d.points, borderSector)
 			d.pathAlignment(borderSector, axis)
+			log.Println("data 2 - ", d.points, borderSector)
 
-			axis = d.changeAxis(axis)
+			if pointsType != sector2Sector {
+				axis = d.changeAxis(axis)
+			}
 
-			d.logger.Infoln("axis - ", axis)
-
-			points := d.preparePoints(path2Sector, axis, borderSector, d.points[iterator])
+			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
 
 			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
 
