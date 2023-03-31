@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"log"
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -13,9 +12,7 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 	for boolean {
 		if d.checkOccurrence(d.points[iterator], axis) {
 
-			log.Println("data 1 - ", d.points, borderSector)
 			d.pathAlignment(borderSector, axis)
-			log.Println("data 2 - ", d.points, borderSector)
 
 			if pointsType != sector2Sector {
 				axis = d.changeAxis(axis)
