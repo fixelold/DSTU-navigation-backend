@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"navigation/internal/app/auditory"
-	"navigation/internal/app/drawPath"
+	"navigation/internal/app/getPathPoints"
 	"navigation/internal/app/pathBuilder"
 	"navigation/internal/app/user"
 	"navigation/internal/config"
@@ -30,8 +30,8 @@ func main() {
 	pathBuildingRepo := pathBuilder.NewRepository(pgConn, logger)
 	pathBuldingController := pathBuilder.NewHandler(logger, pathBuildingRepo)
 
-	drawPathRepo := drawPath.NewRepository(pgConn, logger)
-	drawPathController := drawPath.NewHandler(logger, drawPathRepo)
+	drawPathRepo := getPathPoints.NewRepository(pgConn, logger)
+	drawPathController := getPathPoints.NewHandler(logger, drawPathRepo)
 
 	// users := user.NewRepository(pgConn, logger)
 	userController := user.NewHandler(logger, middleware.UserMiddleware{Client: pgConn, Logger: logger})

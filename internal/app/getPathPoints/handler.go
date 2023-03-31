@@ -1,6 +1,7 @@
-package drawPath
+package getPathPoints
 
 import (
+	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
@@ -36,7 +37,7 @@ type navigationObject struct {
 }
 
 func (h *handler) getPoints(c *gin.Context) {
-	var err error
+	var err appError.AppError
 	var navObj navigationObject
 
 	if err := c.ShouldBindJSON(&navObj); err != nil {
@@ -44,8 +45,11 @@ func (h *handler) getPoints(c *gin.Context) {
 		return
 	}
 
-	response, err := h.drawPath(navObj.Start, navObj.End, navObj.Sectors)
-	if err != nil {
+	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository)
+
+	response, err := p.getPathPoints()
+	if err.Err != nil {
+		h.logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
