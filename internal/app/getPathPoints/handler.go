@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
