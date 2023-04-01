@@ -12,8 +12,17 @@ type coloringAuditory struct {
 	StartAuditoryPoints models.Coordinates `json:"start"`
 	EndAuditoryPoints   models.Coordinates `json:"end"`
 
-	logging    logging.Logger `json:"-"`
+	logging    *logging.Logger `json:"-"`
 	repository Repository     `json:"-"`
+}
+
+func NewColoringAudience(start, end string, logging *logging.Logger, repository Repository) *coloringAuditory {
+	return &coloringAuditory{
+		StartAuditoryNumber: start,
+		EndAuditoryNumber: end,
+		logging: logging,
+		repository: repository,
+	}
 }
 
 func (c *coloringAuditory) getAuditoryPoints() appError.AppError {

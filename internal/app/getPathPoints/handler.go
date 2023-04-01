@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
@@ -11,6 +12,10 @@ import (
 )
 
 const drawPathURL = "/draw-path"
+
+var (
+	shouldBindQueryError = appError.NewAppError("can't decode query data")
+)
 
 type handler struct {
 	logger     *logging.Logger
@@ -28,6 +33,7 @@ func (h *handler) Register(router *gin.RouterGroup) {
 	drawPath := router.Group(drawPathURL)
 	drawPath.Use(middleware.CORSMiddleware)
 	drawPath.POST("/points", h.getPoints)
+	drawPath.GET("/aud-points", h.getAuddiencePoints)
 }
 
 type navigationObject struct {
@@ -55,4 +61,35 @@ func (h *handler) getPoints(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+type request struct {
+	Start string `form:"start" binding:"required"`
+	End   string `form:"end" binding:"required"`
+}
+
+func (h *handler) getAuddiencePoints(c *gin.Context) {
+	var request request
+	var err appError.AppError
+
+	err.Err = c.ShouldBindQuery(&request)
+	if err.Err != nil {
+		shouldBindQueryError.Err = err.Err
+		shouldBindQueryError.Wrap("getAuddiencePoints")
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
+		return
+	}
+
+	audPoints := NewColoringAudience(request.Start, request.End, h.logger, h.repository)
+	err = audPoints.getAuditoryPoints()
+	if err.Err != nil {
+		err.Wrap("getAuddiencePoints")
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, audPoints)
+	return
 }
