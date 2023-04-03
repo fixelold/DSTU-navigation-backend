@@ -53,8 +53,9 @@ func separationAudidotyNumber(number string) (string, int, appError.AppError) {
 		return "", 0, *splitError
 	}
 
-	building, err := strconv.Atoi(splitText[0])
+	building, error := strconv.Atoi(splitText[0])
 	if err.Err != nil {
+		err.Err = error
 		err.Wrap("separationAudidotyNumber")
 		return "", 0, err
 	}

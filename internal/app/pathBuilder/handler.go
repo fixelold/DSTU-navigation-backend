@@ -57,7 +57,7 @@ func (h *handler) getSectors(c *gin.Context) {
 		return
 	}
 
-	start, end, err = h.GetSector(auditorys.Start, auditorys.End)
+	start, end, err := h.GetSector(auditorys.Start, auditorys.End)
 	if err.Err != nil {
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
