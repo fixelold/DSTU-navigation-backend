@@ -1,56 +1,62 @@
 package pathBuilder
 
 import (
+	"errors"
+	"navigation/internal/appError"
 	"strconv"
 	"strings"
 )
 
 var (
-	User000001 error
-	User000002 error
-	User000003 error
+	splitError = appError.NewAppError("can't split text")
 )
 
-func (h *handler) GetSector(start, end string) (int, int, error) {
-	var err error
+func (h *handler) GetSector(start, end string) (int, int, appError.AppError) {
+	var err appError.AppError
 
 	startAud, startBuild, err := separationAudidotyNumber(start)
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("file GetSector")
 		return 0, 0, err
 	}
 
 	endAud, endBuild, err := separationAudidotyNumber(end)
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("file GetSector")
 		return 0, 0, err
 	}
 
 	sectorStart, err := h.repository.GetSector(startAud, uint(startBuild))
-	if err != nil {
-		h.logger.Errorf("the getSector function call returned %s", err.Error())
-		// User000003.ChangeDescription(err.Error())
-		return 0, 0, User000003
+	if err.Err != nil {
+		err.Wrap("file GetSector")
+		return 0, 0, err
 	}
 
 	sectorEnd, err := h.repository.GetSector(endAud, uint(endBuild))
-	if err != nil {
-		h.logger.Errorf("the getSector function call returned %s", err.Error())
-		// User000003.ChangeDescription(err.Error())
-		return 0, 0, User000003
+	if err.Err != nil {
+		err.Wrap("file GetSector")
+		return 0, 0, err
 	}
 
-	return sectorStart, sectorEnd, nil
+	return sectorStart, sectorEnd, err
 }
 
-func separationAudidotyNumber(number string) (string, int, error) {
+func separationAudidotyNumber(number string) (string, int, appError.AppError) {
+	var err appError.AppError
+
 	splitText := strings.Split(number, "-")
 	if len(splitText) != 2 {
-		return "", 0, User000001
+		splitError.Err = errors.New("wrong line lenght, exected: %s, received: %s")
+		splitError.Wrap("separationAudidotyNumber")
+		return "", 0, *splitError
 	}
 
-	building, err := strconv.Atoi(splitText[0])
-	if err != nil {
-		return "", 0, User000002
+	building, error := strconv.Atoi(splitText[0])
+	if err.Err != nil {
+		err.Err = error
+		err.Wrap("separationAudidotyNumber")
+		return "", 0, err
 	}
 
-	return number, building, nil
+	return number, building, err
 }

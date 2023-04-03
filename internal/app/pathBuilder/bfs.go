@@ -1,15 +1,19 @@
 package pathBuilder
 
+import "navigation/internal/appError"
+
 // you must provide a start sector and an end sector
-func (h *handler) Builder(start, end int) ([]int, error) {
+func (h *handler) Builder(start, end int) ([]int, appError.AppError) {
+	var err appError.AppError
 	matrix, err := h.adjacencyMatrix()
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("Builder")
 		return nil, err
 	}
 
 	res := h.bfs(start, end, matrix)
 
-	return res, nil
+	return res, err
 }
 
 func (h *handler) bfs(start, end int, matrix map[int][]int) []int {
@@ -51,10 +55,11 @@ func (h *handler) bfs(start, end int, matrix map[int][]int) []int {
 	return result
 }
 
-func (h *handler) adjacencyMatrix() (map[int][]int, error) {
+func (h *handler) adjacencyMatrix() (map[int][]int, appError.AppError) {
 	matrix := make(map[int][]int)
 	sectorLink, err := h.repository.GetSectorLink()
-	if err != nil {
+	if err.Err != nil {
+		err.Wrap("adjacencyMatrix")
 		return nil, err
 	}
 
@@ -64,7 +69,7 @@ func (h *handler) adjacencyMatrix() (map[int][]int, error) {
 		matrix[sector] = append(matrix[sector], link)
 	}
 
-	return matrix, nil
+	return matrix, err
 }
 
 func (h *handler) getPath(end int, sectors map[int]int) []int {
