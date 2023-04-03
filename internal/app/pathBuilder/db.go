@@ -3,7 +3,7 @@ package pathBuilder
 import (
 	"context"
 	"errors"
-	"fmt"
+	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -16,6 +16,12 @@ type repository struct {
 	logger *logging.Logger
 }
 
+var (
+	txError    = appError.NewAppError("can't start transaction")
+	queryError = appError.NewAppError("failed to complete the request")
+	scanError  = appError.NewAppError("can't scan database response")
+)
+
 func NewRepository(client postgresql.Client, logger *logging.Logger) Repository {
 	return &repository{
 		client: client,
@@ -23,14 +29,15 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 	}
 }
 
-func (r *repository) GetSectorLink() ([]models.SectorLink, error) {
+func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 	var sectorLink []models.SectorLink
 	req := `SELECT number_sector, link FROM sector_link;`
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
 		_ = tx.Rollback(context.Background())
-		r.logger.Tracef("can't start transaction: %s", err.Error())
-		return nil, err
+		txError.Wrap("GetSectorLink")
+		txError.Err = err
+		return nil, *txError
 	}
 
 	rows, err := tx.Query(context.Background(), req)
@@ -39,30 +46,31 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, error) {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
-				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil, newErr
+			queryError.Wrap("GetSectorLink")
+			queryError.Err = pgErr
+			return nil, *queryError
 		}
-		r.logger.Error(err)
-		return nil, err
+		queryError.Wrap("GetSectorLink")
+		queryError.Err = err
+		return nil, *queryError
 	}
 
 	for rows.Next() {
 		var sl models.SectorLink
 		err := rows.Scan(&sl.NumberSector, &sl.NumberLink)
 		if err != nil {
-			r.logger.Errorf("getSectorLink function. Scan error: %s", err.Error())
-			return nil, err
+			scanError.Wrap("GetSectorLink")
+			scanError.Err = err
+			return nil, *scanError
 		}
 		sectorLink = append(sectorLink, sl)
 	}
 
 	_ = tx.Commit(context.Background())
-	return sectorLink, nil
+	return sectorLink, appError.AppError{}
 }
 
-func (r *repository) GetSector(number string, building uint) (int, error) {
+func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
 	req :=
 		`SELECT 
@@ -75,11 +83,11 @@ func (r *repository) GetSector(number string, building uint) (int, error) {
 	AND building.number = $2;`
 
 	tx, err := r.client.Begin(context.Background())
-	r.logger.Infoln("tx - ", tx)
 	if err != nil {
 		_ = tx.Rollback(context.Background())
-		r.logger.Tracef("can't start transaction: %s", err.Error())
-		return 0, err
+		txError.Wrap("db GetSector")
+		txError.Err = err
+		return 0, *txError
 	}
 
 	err = tx.QueryRow(
@@ -93,14 +101,14 @@ func (r *repository) GetSector(number string, building uint) (int, error) {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where %s, Code: %s, SQLState: %s",
-				pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return 0, newErr
+			queryError.Wrap("db GetSector")
+			queryError.Err = pgErr
+			return 0, *queryError
 		}
-		r.logger.Error(err)
-		return 0, err
+		queryError.Wrap("db GetSector")
+		queryError.Err = err
+		return 0, *queryError
 	}
 	_ = tx.Commit(context.Background())
-	return sector.Number, nil
+	return sector.Number, appError.AppError{}
 }

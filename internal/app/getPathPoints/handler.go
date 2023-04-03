@@ -45,6 +45,8 @@ func (h *handler) getPoints(c *gin.Context) {
 	var err appError.AppError
 	var navObj navigationObject
 
+	err.Wrap("getPoints")
+
 	if err := c.ShouldBindJSON(&navObj); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
 		return

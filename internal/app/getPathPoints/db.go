@@ -10,7 +10,7 @@ import (
 
 	"github.com/jackc/pgconn"
 )
-
+ 
 type repository struct {
 	client postgresql.Client
 	logger *logging.Logger

@@ -1,8 +1,11 @@
 package pathBuilder
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/appError"
+	"navigation/internal/models"
+)
 
 type Repository interface {
-	GetSectorLink() ([]models.SectorLink, error)
-	GetSector(number string, building uint) (int, error)
+	GetSectorLink() ([]models.SectorLink, appError.AppError)
+	GetSector(number string, building uint) (int, appError.AppError)
 }
