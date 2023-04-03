@@ -48,8 +48,6 @@ func (h *handler) getSectors(c *gin.Context) {
 	var auditorys auditorys
 	var response response
 
-	err.Wrap("getSectors")
-
 	if err := c.ShouldBindQuery(&auditorys); err != nil {
 		bindQueryError.Err = err
 		h.logger.Error(bindQueryError.Error())
@@ -59,6 +57,7 @@ func (h *handler) getSectors(c *gin.Context) {
 
 	start, end, err := h.GetSector(auditorys.Start, auditorys.End)
 	if err.Err != nil {
+		err.Wrap("handler getSectors")
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
@@ -67,6 +66,7 @@ func (h *handler) getSectors(c *gin.Context) {
 	// TODO сделать обработку ошибки
 	response.Sectors, err = h.Builder(start, end)
 	if err.Err != nil {
+		err.Wrap("handler getSectors")
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
