@@ -4,6 +4,7 @@ import (
 	"context"
 	"navigation/internal/app/auditory"
 	"navigation/internal/app/getPathPoints"
+	"navigation/internal/app/pathBuilder"
 	"navigation/internal/app/user"
 	"navigation/internal/config"
 	"navigation/internal/database/client/postgresql"
