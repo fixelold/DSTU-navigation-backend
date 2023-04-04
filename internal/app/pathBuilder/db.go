@@ -112,3 +112,43 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 	_ = tx.Commit(context.Background())
 	return sector.Number, appError.AppError{}
 }
+
+func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
+	var sector models.Sector
+	req :=
+		`SELECT 
+	number
+	FROM transition_sector
+	WHERE id_sector = (SELECT id FROM sector WHERE number = $1)
+	AND type_transtion_sector = $2`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap("GetTransitionSector")
+		txError.Err = err
+		return 0, *txError
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		req,
+		sectorNumber,
+		type_transtion_sector).Scan(&sector.Number)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap("GetTransitionSector")
+			queryError.Err = pgErr
+			return 0, *queryError
+		}
+		queryError.Wrap("GetTransitionSector")
+		queryError.Err = err
+		return 0, *queryError
+	}
+	_ = tx.Commit(context.Background())
+	return sector.Number, appError.AppError{}
+}

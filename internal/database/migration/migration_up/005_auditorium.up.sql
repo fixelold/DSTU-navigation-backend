@@ -18,3 +18,6 @@ INSERT INTO auditorium (number, id_sector) VALUES
 
 INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['363', '364', '365', '367', '367а', '369']), 23);
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1-464']), 31);

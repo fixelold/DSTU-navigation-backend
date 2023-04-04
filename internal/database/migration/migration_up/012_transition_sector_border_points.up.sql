@@ -1,4 +1,4 @@
-INSERT INTO aud_border_points (transition_sector_border_points, x, y, widht, height) 
+INSERT INTO transition_sector_border_points (id_transition_sector, x, y, widht, height) 
 VALUES (
     unnest(array[1,   2]),
     unnest(array[11,  437]),
