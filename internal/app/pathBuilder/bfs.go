@@ -1,7 +1,6 @@
 package pathBuilder
 
 import (
-	"fmt"
 	"navigation/internal/appError"
 )
 
@@ -38,9 +37,7 @@ func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([
 
 	for i := 0; i < len(matrix); i++ {
 		d += 1
-		fmt.Println("data - ", queue)
 		current := queue[0]
-		fmt.Println("matrix - ", matrix)
 
 		if current == end {
 			result := h.getPath(end, top)

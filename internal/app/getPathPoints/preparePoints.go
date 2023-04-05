@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"navigation/internal/models"
 )
 
@@ -49,9 +50,11 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 					Height: HeightX}
 			}
 		} else {
+			fmt.Println("omega kek")
 			return models.Coordinates{
 				X:      points.X + points.Widht,
-				Y:      d.points[0].Y + d.points[0].Height,
+				// Y:      d.points[0].Y + d.points[0].Height,
+				Y: points.Y + points.Height,
 				Widht:  WidhtY,
 				Height: HeightY}
 		}

@@ -30,7 +30,6 @@ func (d *data) setAudStartPoints() appError.AppError {
 // функция расчета начального пути от границы аудитории.
 func (d *data) audStartPoints(axis int) appError.AppError {
 	var err appError.AppError
-	err.Wrap("audStartPoints")
 	var path models.Coordinates
 
 	// подготовка точек исходя из оси, типа и границ аудитории.
@@ -39,12 +38,14 @@ func (d *data) audStartPoints(axis int) appError.AppError {
 	// получение точек для начального пути.
 	path, err = d.setPointsAudStart(coordinates, axis, plus)
 	if err.Err != nil {
+		err.Wrap("audStartPoints")
 		return err
 	}
 
 	// проверка, чтобы точки пути не находились в пределах аудиториию
 	check, err := d.repository.checkBorderAud(path)
 	if err.Err != nil {
+		err.Wrap("audStartPoints")
 		return err
 	}
 
@@ -61,11 +62,13 @@ func (d *data) audStartPoints(axis int) appError.AppError {
 	} else {
 		path, err = d.setPointsAudStart(coordinates, axis, minus)
 		if err.Err != nil {
+			err.Wrap("audStartPoints")
 			return err
 		}
 
 		check, err = d.repository.checkBorderAud(path)
 		if err.Err != nil {
+			err.Wrap("audStartPoints")
 			return err
 		}
 

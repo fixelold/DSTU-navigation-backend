@@ -11,4 +11,5 @@ type Repository interface {
 	getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError)
 	checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError)
 	checkBorderSector(coordinates models.Coordinates) (bool, appError.AppError)
+	getTransitionSectorBorderPoint(start, exit int) (models.Coordinates, appError.AppError)
 }

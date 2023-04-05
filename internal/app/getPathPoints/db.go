@@ -10,7 +10,7 @@ import (
 
 	"github.com/jackc/pgconn"
 )
- 
+
 type repository struct {
 	client postgresql.Client
 	logger *logging.Logger
@@ -248,4 +248,51 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 	}
 
 	return true, appError.AppError{}
+}
+
+func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coordinates, appError.AppError) {
+	var borderPoint models.Coordinates
+	// fmt.Println("data - ", number)
+	request :=
+		`SELECT x, y, widht, height 
+	FROM transition_sector_border_points 
+	JOIN transition_sector 
+	ON transition_sector_border_points.id_transition_sector = transition_sector.id
+	JOIN sector
+	ON transition_sector.id_sector = sector.id
+	WHERE sector.number = $1
+	AND transition_sector.number = $2;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap("getTransitionSectorBorderPoint")
+		txError.Err = err
+		return models.Coordinates{}, *txError
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		request,
+		start, exit).Scan(
+		&borderPoint.X,
+		&borderPoint.Y,
+		&borderPoint.Widht,
+		&borderPoint.Height)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap("getTransitionSectorBorderPoint")
+			queryError.Err = pgErr
+			return models.Coordinates{}, *queryError
+		}
+		queryError.Wrap("getTransitionSectorBorderPoint")
+		queryError.Err = err
+		return models.Coordinates{}, *queryError
+	}
+	_ = tx.Commit(context.Background())
+	return borderPoint, appError.AppError{}
 }

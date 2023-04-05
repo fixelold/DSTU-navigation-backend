@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -10,8 +11,10 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 	axis := d.defenitionAxis(borderSector.Widht, borderSector.Height)
 
 	for boolean {
+		fmt.Println("iterrator - ", iterator)
 		if d.checkOccurrence(d.points[iterator], axis) {
 
+			fmt.Println("Work 4")
 			d.pathAlignment(borderSector, axis)
 
 			if pointsType != sector2Sector {
@@ -29,6 +32,7 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 			points := d.preparePoints(auditory2Sector, axis, borderSector, d.points[iterator])
 
 			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
+
 
 			ok, err := d.repository.checkBorderAud(points)
 			if err.Err != nil {
@@ -57,11 +61,13 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 
 // проверка на вхождение точек пути в пределы сектора.
 func (d *data) checkOccurrence(points models.Coordinates, axis int) bool {
+	fmt.Println("points - ", points)
 	switch axis {
 	case AxisX:
 		ph := points.X + points.Widht
 		x1 := d.sectorBorderPoints.X
 		x2 := d.sectorBorderPoints.X + d.sectorBorderPoints.Widht
+		fmt.Println("datax - ", x1, ph, ph, x2)
 		if x1 <= ph && ph <= x2 {
 			return true
 		} else {
@@ -71,6 +77,7 @@ func (d *data) checkOccurrence(points models.Coordinates, axis int) bool {
 		ph := points.Y + points.Height
 		y1 := d.sectorBorderPoints.Y
 		y2 := d.sectorBorderPoints.Y + d.sectorBorderPoints.Height
+		fmt.Println("datay - ", y1, ph, ph, y2)
 		if y1 <= ph && ph <= y2 {
 			return true
 		} else {
