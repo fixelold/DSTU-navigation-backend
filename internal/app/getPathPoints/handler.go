@@ -16,6 +16,11 @@ var (
 	shouldBindQueryError = appError.NewAppError("can't decode query data")
 )
 
+const (
+	transitionYes = 1
+	transitionNo  = 2
+)
+
 type handler struct {
 	logger     *logging.Logger
 	repository Repository
@@ -67,6 +72,7 @@ func (h *handler) getPoints(c *gin.Context) {
 type request struct {
 	Start string `form:"start" binding:"required"`
 	End   string `form:"end" binding:"required"`
+	Transition int `form:"transition" binding:"required"`
 }
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {
@@ -82,8 +88,8 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	audPoints := NewColoringAudience(request.Start, request.End, h.logger, h.repository)
-	err = audPoints.getAuditoryPoints()
+	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition)
+	err = audPoints.GetColoringPoints()
 	if err.Err != nil {
 		err.Wrap("getAuddiencePoints")
 		h.logger.Error(err.Error())

@@ -6,7 +6,7 @@ import (
 	"navigation/internal/models"
 )
 
-type coloringAuditory struct {
+type coloring struct {
 	StartAuditoryNumber string             `json:"-"`
 	EndAuditoryNumber   string             `json:"-"`
 	StartAuditoryPoints models.Coordinates `json:"start"`
@@ -14,30 +14,73 @@ type coloringAuditory struct {
 
 	logging    *logging.Logger `json:"-"`
 	repository Repository     `json:"-"`
+
+	transition int
 }
 
-func NewColoringAudience(start, end string, logging *logging.Logger, repository Repository) *coloringAuditory {
-	return &coloringAuditory{
+func NewColoring(start, end string, logging *logging.Logger, repository Repository, transition int) *coloring {
+	return &coloring{
 		StartAuditoryNumber: start,
 		EndAuditoryNumber: end,
 		logging: logging,
 		repository: repository,
+		transition: transition,
 	}
 }
 
-func (c *coloringAuditory) getAuditoryPoints() appError.AppError {
+func (c *coloring) GetColoringPoints() appError.AppError {
 	var err appError.AppError
-	err.Wrap("getAuditoryPoints")
 
-	c.StartAuditoryPoints, err = c.repository.getAudPoints(c.StartAuditoryNumber)
-	if err.Err != nil {
-		return err
-	}
+	switch c.transition {
+	case transitionYes:
+		c.StartAuditoryPoints, err = c.getColoringAudPoints(c.StartAuditoryNumber)
+		if err.Err != nil {
+			err.Wrap("getAuditoryPoints")
+			return err
+		}
 
-	c.EndAuditoryPoints, err = c.repository.getAudPoints(c.EndAuditoryNumber)
-	if err.Err != nil {
-		return err
+		c.EndAuditoryPoints, err = c.getColoringTransitionPoints(c.EndAuditoryNumber)
+		if err.Err != nil {
+			err.Wrap("getAuditoryPoints")
+			return err
+		}
+	
+	case transitionNo:
+		c.StartAuditoryPoints, err = c.getColoringAudPoints(c.StartAuditoryNumber)
+		if err.Err != nil {
+			err.Wrap("getAuditoryPoints")
+			return err
+		}
+		c.EndAuditoryPoints, err = c.getColoringAudPoints(c.StartAuditoryNumber)
+		if err.Err != nil {
+			err.Wrap("getAuditoryPoints")
+			return err
+		}
 	}
 
 	return err
+}
+
+func (c *coloring) getColoringAudPoints(number string) (models.Coordinates, appError.AppError) {
+	var err appError.AppError
+
+	coordinates, err := c.repository.getAudPoints(number)
+	if err.Err != nil {
+		err.Wrap("getColoringAudPoints")
+		return models.Coordinates{}, err
+	}
+
+	return coordinates, err
+}
+
+func (c *coloring) getColoringTransitionPoints(number string) (models.Coordinates, appError.AppError) {
+	var err appError.AppError
+
+	coordinates, err := c.repository.getAudPoints(number)
+	if err.Err != nil {
+		err.Wrap("getColoringAudPoints")
+		return models.Coordinates{}, err
+	}
+
+	return coordinates, err
 }

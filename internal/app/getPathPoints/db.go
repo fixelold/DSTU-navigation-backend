@@ -252,7 +252,6 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 
 func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
-	// fmt.Println("data - ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM transition_sector_border_points 
@@ -295,4 +294,47 @@ func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coo
 	}
 	_ = tx.Commit(context.Background())
 	return borderPoint, appError.AppError{}
+}
+
+func (r *repository) getTransitionPoints(number string) (models.Coordinates, appError.AppError) {
+	var position models.Coordinates
+	request :=
+		`SELECT x, y, widht, height 
+	FROM transition_position 
+	JOIN transition 
+	ON transition_position.transition = transition.id 
+	WHERE transition.number = $1;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap("getTransitionPoints")
+		txError.Err = err
+		return models.Coordinates{}, *txError
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		request,
+		number).Scan(
+		&position.X,
+		&position.Y,
+		&position.Widht,
+		&position.Height)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap("getTransitionPoints")
+			queryError.Err = pgErr
+			return models.Coordinates{}, *queryError
+		}
+		queryError.Wrap("getTransitionPoints")
+		queryError.Err = err
+		return models.Coordinates{}, *queryError
+	}
+	_ = tx.Commit(context.Background())
+	return position, appError.AppError{}
 }
