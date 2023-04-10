@@ -16,7 +16,8 @@ type data struct {
 	audBorderPoints    models.Coordinates // координаты места отрисовки пути (одна из границ аудитории).
 	sectorBorderPoints models.Coordinates // координаты одной из границ сектора.
 
-	nextSectorNumber int    // номер сектора.
+	sectorNumber     int    // номер сектора.
+	nextSectorNumber int    // номер следующего сектора.
 	audNumber        string // номер аудитории.
 
 	logger     *logging.Logger // логирования.
@@ -29,6 +30,7 @@ func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, lo
 	var err appError.AppError
 	data := &data{
 		audNumber:        audNumber,
+		sectorNumber: sectorExit, //TODO: тут может быть ошибка. Может пердаваться не верный сектор. 
 		nextSectorNumber: nextSectorNumber,
 		logger:           logger,
 		repository:       repository,

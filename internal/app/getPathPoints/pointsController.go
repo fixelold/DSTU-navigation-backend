@@ -73,14 +73,13 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppEr
 		return nil, err
 	}
 
-	fmt.Println("Work")
 	if len(strconv.Itoa(exit)) == stairs {
+		fmt.Println("data - ", exit)
 		borderSector, err = p.repository.getTransitionSectorBorderPoint(entry, exit)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return nil, err
 		}
-		fmt.Println("Work 2")
 	} else {
 		borderSector, err = p.repository.getSectorBorderPoint(entry, exit)
 		if err.Err != nil {
@@ -149,8 +148,6 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppEr
 		err.Wrap("getPathPoints")
 		return nil, err
 	}
-
-	fmt.Println("Work 3")
 
 	return data.points, err
 }

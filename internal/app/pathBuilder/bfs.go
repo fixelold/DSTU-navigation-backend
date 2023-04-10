@@ -27,9 +27,11 @@ func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([
 	top := make(map[int]int) // top of the graph
 	d := 0
 
-	q = append(queue, start)
-	q = append(queue, transitionSector)
-	start = (start % 10) + (end / 10 * 10)
+	if transitionSector != 0 {
+		q = append(queue, start)
+		q = append(queue, transitionSector)
+		start = (start % 10) + (end / 10 * 10)
+	}
 	queue = append(queue, start)
 	visited[start] = true
 	distance[start] = 0

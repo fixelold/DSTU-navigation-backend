@@ -1,8 +1,8 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"navigation/internal/models"
+	"strconv"
 )
 
 // подготовка данных
@@ -35,6 +35,7 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 
 	// от начального пути до вхождения в сектор
 	case auditory2Sector:
+		//TODO: возможно, надо будет и тут поменять, как это сделано в блоке else.
 		if axis == AxisX {
 			if d.points[0].Height == HeightY || d.points[0].Widht == WidhtX {
 				return models.Coordinates{
@@ -50,23 +51,37 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 					Height: HeightX}
 			}
 		} else {
-			fmt.Println("omega kek")
-			return models.Coordinates{
-				X:      points.X + points.Widht,
-				// Y:      d.points[0].Y + d.points[0].Height,
-				Y: points.Y + points.Height,
-				Widht:  WidhtY,
-				Height: HeightY}
+			if len(strconv.Itoa(d.sectorNumber)) == stairs {
+				return models.Coordinates{
+					X:      d.points[0].X,
+					Y:      points.Y + points.Height,
+					Widht:  WidhtY,
+					Height: HeightY}
+			} else {
+				return models.Coordinates{
+					X:      points.X + points.Widht,
+					Y:      d.points[0].Y + d.points[0].Height,
+					Widht:  WidhtY,
+					Height: HeightY}
+			}
 		}
 
 	// соеденить путь и сектор
 	case path2Sector:
 		if axis == AxisX {
-			return models.Coordinates{
-				X:      points.X + points.Widht,
-				Y:      d.points[0].Y + d.points[0].Height,
-				Widht:  borderPoint.X - points.X,
-				Height: HeightX}
+			if len(strconv.Itoa(d.sectorNumber)) == stairs {
+				return models.Coordinates{
+					X:      d.points[0].X,
+					Y:      points.Y + points.Height,
+					Widht:  borderPoint.X - points.X,
+					Height: HeightX}
+			} else {
+				return models.Coordinates{
+					X:      points.X + points.Widht,
+					Y:      d.points[0].Y + d.points[0].Height,
+					Widht:  borderPoint.X - points.X,
+					Height: HeightX}
+			}
 		} else {
 			if borderPoint.Y > points.Y {
 				return models.Coordinates{
