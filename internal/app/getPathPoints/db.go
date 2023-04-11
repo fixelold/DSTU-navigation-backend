@@ -3,6 +3,7 @@ package getPathPoints
 import (
 	"context"
 	"errors"
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -119,6 +120,7 @@ func (r *repository) getAudBorderPoint(number string) (models.Coordinates, appEr
 
 // получаем координаты одной из границ сектора. По значению входа и выхода из него.
 func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError) {
+	fmt.Println("data - ", entry, exit)
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
@@ -253,14 +255,13 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
 	request :=
-		`SELECT x, y, widht, height 
-	FROM transition_sector_border_points 
-	JOIN transition_sector 
-	ON transition_sector_border_points.id_transition_sector = transition_sector.id
-	JOIN sector
-	ON transition_sector.id_sector = sector.id
-	WHERE sector.number = $1
-	AND transition_sector.number = $2;`
+		`SELECT x, y, widht, height
+	FROM transition_border_points
+	JOIN transition
+	ON transition_border_points.id_transition = transition.id
+	JOIN sector ON sector.id_transition = transition.id
+	WHERE sector.number = $1 
+	AND transition.number = $2`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -296,13 +297,13 @@ func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coo
 	return borderPoint, appError.AppError{}
 }
 
-func (r *repository) getTransitionPoints(number string) (models.Coordinates, appError.AppError) {
+func (r *repository) getTransitionPoints(number int) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 
 	FROM transition_position 
 	JOIN transition 
-	ON transition_position.transition = transition.id 
+	ON transition_position.id_transition = transition.id 
 	WHERE transition.number = $1;`
 
 	tx, err := r.client.Begin(context.Background())

@@ -3,6 +3,7 @@ package pathBuilder
 import (
 	"context"
 	"errors"
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -72,6 +73,7 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 
 func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
+	fmt.Println("data - ", number, building)
 	req :=
 		`SELECT 
 	sector.number
@@ -116,11 +118,11 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
 	var sector models.Sector
 	req :=
-		`SELECT 
-	number
-	FROM transition_sector
-	WHERE id_sector = (SELECT id FROM sector WHERE number = $1)
-	AND type_transtion_sector = $2`
+		`SELECT transition.number 
+	FROM transition
+	JOIN sector ON sector.id_transition = transition.id
+	WHERE sector.number = $1 
+	AND type_transition = $2`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {

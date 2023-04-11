@@ -73,13 +73,13 @@ CREATE TABLE IF NOT EXISTS "auditory_description" (
 
 CREATE TABLE IF NOT EXISTS "transition" (
   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
-  number VARCHAR,
-  type_transtion_sector INT
+  number int,
+  type_transition INT
 );
 
 CREATE TABLE IF NOT EXISTS "transition_border_points" (
   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
-  id_transition_sector INT,
+  id_transition INT,
   x INT,
   y INT,
   widht INT,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS "transition_border_points" (
 
 CREATE TABLE IF NOT EXISTS "transition_position" (
   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
-  id_transition_sector INT,
+  id_transition INT,
   x INT,
   y INT,
   widht INT,
@@ -115,8 +115,8 @@ ALTER TABLE "sector_border_points" ADD FOREIGN KEY (id_sector) REFERENCES "secto
 
 ALTER TABLE "auditory_description" ADD FOREIGN KEY (id_auditory) REFERENCES "auditorium" (id);
 
-ALTER TABLE "transition_sector" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
+ALTER TABLE "transition" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
 
-ALTER TABLE "transition_sector_border_points" ADD FOREIGN KEY (id_transition_sector) REFERENCES "transition_sector" (id);
+ALTER TABLE "transition_border_points" ADD FOREIGN KEY (id_transition) REFERENCES "transition" (id);
 
-ALTER TABLE "transition_sector_position" ADD FOREIGN KEY (id_transition_sector) REFERENCES "transition_sector" (id);
+ALTER TABLE "transition_position" ADD FOREIGN KEY (id_transition) REFERENCES "transition" (id);

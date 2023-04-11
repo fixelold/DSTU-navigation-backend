@@ -15,7 +15,7 @@ const getSectors = "/get-sectors"
 var (
 	bindQueryError = appError.NewAppError("can't decode query")
 
-	stairs = 1
+	stairs   = 1
 	elevator = 2
 )
 
@@ -38,9 +38,9 @@ func (h *handler) Register(router *gin.RouterGroup) {
 }
 
 type request struct {
-	Start string `form:"start" binding:"required"`
-	End   string `form:"end" binding:"required"`
-	TypeTranstionSector int `form:"type_transtion_sector" binding:"required"`
+	Start               string `form:"start" binding:"required"`
+	End                 string `form:"end" binding:"required"`
+	TypeTranstionSector int    `form:"type_transtion_sector" binding:"required"`
 }
 
 type response struct {

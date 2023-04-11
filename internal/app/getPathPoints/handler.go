@@ -73,6 +73,7 @@ type request struct {
 	Start string `form:"start" binding:"required"`
 	End   string `form:"end" binding:"required"`
 	Transition int `form:"transition" binding:"required"`
+	TransitionNumber int `form:"transition_number"`
 }
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {
@@ -88,7 +89,7 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition)
+	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
 	err = audPoints.GetColoringPoints()
 	if err.Err != nil {
 		err.Wrap("getAuddiencePoints")
