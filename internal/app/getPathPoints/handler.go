@@ -44,6 +44,9 @@ type navigationObject struct {
 	Start   string `json:"start" binding:"required"`
 	End     string `json:"end" binding:"required"`
 	Sectors []int  `json:"sectors" binding:"required"`
+
+	transition       int `json:"transition" binding:"required"`
+	transitionNumber int `json:"transition_number" binding:"required"`
 }
 
 func (h *handler) getPoints(c *gin.Context) {
@@ -53,11 +56,12 @@ func (h *handler) getPoints(c *gin.Context) {
 	err.Wrap("getPoints")
 
 	if err := c.ShouldBindJSON(&navObj); err != nil {
+		h.logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
 		return
 	}
 
-	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository)
+	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository, navObj.transition, navObj.transitionNumber)
 
 	response, err := p.getPathPoints()
 	if err.Err != nil {
@@ -70,10 +74,10 @@ func (h *handler) getPoints(c *gin.Context) {
 }
 
 type request struct {
-	Start string `form:"start" binding:"required"`
-	End   string `form:"end" binding:"required"`
-	Transition int `form:"transition" binding:"required"`
-	TransitionNumber int `form:"transition_number"`
+	Start            string `form:"start" binding:"required"`
+	End              string `form:"end" binding:"required"`
+	Transition       int    `form:"transition" binding:"required"`
+	TransitionNumber int    `form:"transition_number"`
 }
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {

@@ -11,6 +11,10 @@ var (
 	stairs = 4
 )
 
+var (
+	TransitionError = appError.NewAppError("not info for transition")
+)
+
 type data struct {
 	audPoints          models.Coordinates // координаты аудитории.
 	audBorderPoints    models.Coordinates // координаты места отрисовки пути (одна из границ аудитории).
@@ -24,9 +28,16 @@ type data struct {
 	repository Repository      // для обращения к базе данных.
 
 	points []models.Coordinates // массив координат. Для построения пути.
+
+	transition       int
+	transitionNumber int
 }
 
-func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, logger *logging.Logger, repository Repository) (*data, appError.AppError) {
+func newData(audNumber string, 
+	sectorEntry, sectorExit, nextSectorNumber int, 
+	logger *logging.Logger, 
+	repository Repository,
+	transition, transitionNumber int) (*data, appError.AppError) {
 	var err appError.AppError
 	data := &data{
 		audNumber:        audNumber,
@@ -34,6 +45,8 @@ func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, lo
 		nextSectorNumber: nextSectorNumber,
 		logger:           logger,
 		repository:       repository,
+		transition: transition,
+		transitionNumber: transitionNumber,
 	}
 
 	err = data.getPoints(sectorEntry, sectorExit)
@@ -49,10 +62,21 @@ func newData(audNumber string, sectorEntry, sectorExit, nextSectorNumber int, lo
 func (d *data) getPoints(entry, exit int) appError.AppError {
 	var err appError.AppError
 	// получаем координаты аудитории по ее номеру.
-	d.audPoints, err = d.repository.getAudPoints(d.audNumber)
-	if err.Err != nil {
+	if d.transition == transitionYes {
+		d.audPoints, err = d.repository.getTransitionPoints(d.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+	} else if d.transition == transitionNo {
+		d.audPoints, err = d.repository.getAudPoints(d.audNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+	} else {
+		err.Err = TransitionError
 		err.Wrap("getPoints")
-		return err
 	}
 
 	// получаем координаты границ аудитории по ее номеру.

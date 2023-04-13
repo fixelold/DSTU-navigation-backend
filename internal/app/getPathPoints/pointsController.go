@@ -38,29 +38,36 @@ type pointsController struct {
 
 	audStart string // номер начальной аудитории.
 	audEnd   string // номер конечной аудитории.
-	sectors  []int  // массив номеров секторов
+	sectors  []int  // массив номеров секторов.
+
+	transition       int
+	transitionNumber int
 }
 
-func NewPointsController(audStart, audEnd string, sectors []int, logger *logging.Logger, repository Repository) *pointsController {
+func NewPointsController(audStart, audEnd string, sectors []int, logger *logging.Logger, repository Repository, transition, transitionNumber int) *pointsController {
 	return &pointsController{
 		logger:     logger,
 		repository: repository,
 		audStart:   audStart,
 		audEnd:     audEnd,
 		sectors:    sectors,
+		transition: transition,
+		transitionNumber: transitionNumber,
 	}
 }
 
 func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppError) {
 	var err appError.AppError
 	var borderSector models.Coordinates
-	/* находим минимальное значение между номерами двух секторов.
+	/* 
+		находим минимальное значение между номерами двух секторов.
 	   необходимо для внутренней логики.
 	*/
+
 	entry, exit := min(p.sectors[0], p.sectors[1])
 
 	// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-	data, err := newData(p.audStart, entry, exit, p.sectors[1], p.logger, p.repository)
+	data, err := newData(p.audStart, entry, exit, p.sectors[1], p.logger, p.repository, p.transition, p.transitionNumber)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return nil, err
@@ -114,7 +121,7 @@ func (p *pointsController) getPathPoints() ([]models.Coordinates, appError.AppEr
 		entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
 		// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-		dataEnd, err := newData(p.audEnd, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository)
+		dataEnd, err := newData(p.audEnd, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository, p.transition, p.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return nil, err
