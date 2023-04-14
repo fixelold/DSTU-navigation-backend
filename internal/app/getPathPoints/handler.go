@@ -16,6 +16,11 @@ var (
 	shouldBindQueryError = appError.NewAppError("can't decode query data")
 )
 
+const (
+	transitionYes = 1
+	transitionNo  = 2
+)
+
 type handler struct {
 	logger     *logging.Logger
 	repository Repository
@@ -39,6 +44,9 @@ type navigationObject struct {
 	Start   string `json:"start" binding:"required"`
 	End     string `json:"end" binding:"required"`
 	Sectors []int  `json:"sectors" binding:"required"`
+
+	transition       int `json:"transition" binding:"required"`
+	transitionNumber int `json:"transition_number" binding:"required"`
 }
 
 func (h *handler) getPoints(c *gin.Context) {
@@ -48,11 +56,12 @@ func (h *handler) getPoints(c *gin.Context) {
 	err.Wrap("getPoints")
 
 	if err := c.ShouldBindJSON(&navObj); err != nil {
+		h.logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
 		return
 	}
 
-	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository)
+	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository, navObj.transition, navObj.transitionNumber)
 
 	response, err := p.getPathPoints()
 	if err.Err != nil {
@@ -65,8 +74,10 @@ func (h *handler) getPoints(c *gin.Context) {
 }
 
 type request struct {
-	Start string `form:"start" binding:"required"`
-	End   string `form:"end" binding:"required"`
+	Start            string `form:"start" binding:"required"`
+	End              string `form:"end" binding:"required"`
+	Transition       int    `form:"transition" binding:"required"`
+	TransitionNumber int    `form:"transition_number"`
 }
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {
@@ -82,8 +93,8 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	audPoints := NewColoringAudience(request.Start, request.End, h.logger, h.repository)
-	err = audPoints.getAuditoryPoints()
+	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
+	err = audPoints.GetColoringPoints()
 	if err.Err != nil {
 		err.Wrap("getAuddiencePoints")
 		h.logger.Error(err.Error())

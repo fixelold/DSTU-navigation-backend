@@ -1,9 +1,11 @@
 package pathBuilder
 
-import "navigation/internal/appError"
+import (
+	"navigation/internal/appError"
+)
 
 // you must provide a start sector and an end sector
-func (h *handler) Builder(start, end int) ([]int, appError.AppError) {
+func (h *handler) Builder(start, end, transitionSector int) ([]int, appError.AppError) {
 	var err appError.AppError
 	matrix, err := h.adjacencyMatrix()
 	if err.Err != nil {
@@ -11,18 +13,25 @@ func (h *handler) Builder(start, end int) ([]int, appError.AppError) {
 		return nil, err
 	}
 
-	res := h.bfs(start, end, matrix)
+	res, q := h.bfs(start, end, transitionSector, matrix)
 
-	return res, err
+	q = append(q, res...)
+	return q, err
 }
 
-func (h *handler) bfs(start, end int, matrix map[int][]int) []int {
+func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([]int, []int) {
 	var queue []int
+	var q []int
 	visited := make(map[int]bool)
 	distance := make(map[int]int)
 	top := make(map[int]int) // top of the graph
 	d := 0
 
+	if transitionSector != 0 {
+		q = append(queue, start)
+		q = append(queue, transitionSector)
+		start = (start % 10) + (end / 10 * 10)
+	}
 	queue = append(queue, start)
 	visited[start] = true
 	distance[start] = 0
@@ -34,7 +43,7 @@ func (h *handler) bfs(start, end int, matrix map[int][]int) []int {
 
 		if current == end {
 			result := h.getPath(end, top)
-			return reverse(result)
+			return reverse(result), q
 		}
 
 		for _, neighbor := range matrix[current] {
@@ -52,7 +61,7 @@ func (h *handler) bfs(start, end int, matrix map[int][]int) []int {
 	}
 
 	result := h.getPath(end, top)
-	return result
+	return result, q
 }
 
 func (h *handler) adjacencyMatrix() (map[int][]int, appError.AppError) {
