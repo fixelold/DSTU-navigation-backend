@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
@@ -10,15 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const drawPathURL = "/draw-path"
-
-var (
-	shouldBindQueryError = appError.NewAppError("can't decode query data")
-)
-
 const (
-	transitionYes = 1
-	transitionNo  = 2
+	urlPath = "/points" // url путь
+
+	transitionYes = 1 // переход между этажами есть
+	transitionNo  = 2 // перехода между этажами нет
+
+	file = "handler.go"
+	getPointsFuntion = "getPoints"
 )
 
 type handler struct {
@@ -34,16 +34,16 @@ func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler 
 }
 
 func (h *handler) Register(router *gin.RouterGroup) {
-	drawPath := router.Group(drawPathURL)
-	drawPath.Use(middleware.CORSMiddleware)
-	drawPath.POST("/points", h.getPoints)
-	drawPath.GET("/aud-points", h.getAuddiencePoints)
+	points := router.Group(urlPath)
+	points.Use(middleware.CORSMiddleware)
+	points.POST("/points", h.getPoints)
+	points.GET("/aud-points", h.getAuddiencePoints)
 }
 
-type navigationObject struct {
+type requestData struct {
 	Start   string `json:"start" binding:"required"`
 	End     string `json:"end" binding:"required"`
-	Sectors []int  `json:"sectors" binding:"required"`
+	Sectors []int  `json:"sectors"`
 
 	transition       int `json:"transition" binding:"required"`
 	transitionNumber int `json:"transition_number" binding:"required"`
@@ -51,19 +51,19 @@ type navigationObject struct {
 
 func (h *handler) getPoints(c *gin.Context) {
 	var err appError.AppError
-	var navObj navigationObject
+	var data requestData
 
-	err.Wrap("getPoints")
-
-	if err := c.ShouldBindJSON(&navObj); err != nil {
+	err.Err = c.ShouldBindJSON(&data)
+	if err.Err != nil {
+		err.Wrap(fmt.Sprintf("file: %s, function: %s", file, getPointsFuntion))
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
 		return
 	}
 
-	p := NewPointsController(navObj.Start, navObj.End, navObj.Sectors, h.logger, h.repository, navObj.transition, navObj.transitionNumber)
+	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.repository, data.transition, data.transitionNumber)
 
-	response, err := p.getPathPoints()
+	response, err := p.controller()
 	if err.Err != nil {
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
@@ -73,12 +73,12 @@ func (h *handler) getPoints(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-type request struct {
-	Start            string `form:"start" binding:"required"`
-	End              string `form:"end" binding:"required"`
-	Transition       int    `form:"transition" binding:"required"`
-	TransitionNumber int    `form:"transition_number"`
-}
+// type request struct {
+// 	Start            string `form:"start" binding:"required"`
+// 	End              string `form:"end" binding:"required"`
+// 	Transition       int    `form:"transition" binding:"required"`
+// 	TransitionNumber int    `form:"transition_number"`
+// }
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {
 	var request request
@@ -86,8 +86,8 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 
 	err.Err = c.ShouldBindQuery(&request)
 	if err.Err != nil {
-		shouldBindQueryError.Err = err.Err
-		shouldBindQueryError.Wrap("getAuddiencePoints")
+		bindError.Err = err.Err
+		bindError.Wrap("getAuddiencePoints")
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
