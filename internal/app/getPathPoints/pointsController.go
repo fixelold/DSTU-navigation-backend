@@ -40,44 +40,45 @@ type controller struct {
 
 	StartAuditory string // номер начальной аудитории.
 	EndAuditory   string // номер конечной аудитории.
-	sectors  []int  // массив номеров секторов.
+	sectors       []int  // массив номеров секторов.
 
 	transition       int
 	transitionNumber int
 
 	data data
-	points []models.Coordinates
+	// points []models.Coordinates
 }
 
 func NewPointsController(
-	audStart, audEnd string, 
-	sectors []int, 
-	logger *logging.Logger, 
-	repository Repository, 
-	transition, transitionNumber int) pointsController  {
+	audStart, audEnd string,
+	sectors []int,
+	logger *logging.Logger,
+	repository Repository,
+	transition, transitionNumber int) pointsController {
 	return &controller{
-		logger:     logger,
-		repository: repository,
-		StartAuditory:   audStart,
-		EndAuditory:     audEnd,
-		sectors:    sectors,
-		transition: transition,
+		logger:           logger,
+		repository:       repository,
+		StartAuditory:    audStart,
+		EndAuditory:      audEnd,
+		sectors:          sectors,
+		transition:       transition,
 		transitionNumber: transitionNumber,
 	}
 }
 
 type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
-	getPointsAuditory2Sector(entry, exit int) (appError.AppError)
-	getPointsAuditory2Transition(entry, exit int) (appError.AppError)
-	getPointsSector2Sector() (appError.AppError)
+	getPointsAuditory2Sector(entry, exit int) appError.AppError
+	getPointsAuditory2Transition(entry, exit int) appError.AppError
+	getPointsSector2Sector() appError.AppError
 }
 
 func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
+	var response []models.Coordinates
 	var err appError.AppError
-	/* 
+	/*
 		находим минимальное значение между номерами двух секторов.
-	   	необходимо для внутренней логики.
+		необходимо для внутренней логики.
 	*/
 	entry, exit := min(p.sectors[0], p.sectors[1])
 
@@ -100,13 +101,15 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		if err.Err != nil {
 			return nil, err
 		}
+
+		response = append(response, p.data.points...)
 		err = p.getPointsSector2Sector()
 		if err.Err != nil {
 			return nil, err
 		}
-
+		response = append(response, p.data.points...)
 		entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
-		
+
 		// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
 		data, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository, p.transition, p.transitionNumber)
 		if err.Err != nil {
@@ -120,23 +123,24 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		if err.Err != nil {
 			return nil, err
 		}
+		response = append(response, p.data.points...)
 		err = p.getPointsSector2Sector()
 		if err.Err != nil {
 			return nil, err
 		}
+		response = append(response, p.data.points...)
 	}
 
-	response := p.points
 	return response, err
 }
 
-/* 
-	расчет точек от аудитории до сектора
-	entry - входной сектор
-	exit - выходной сектор
-	entry всегда должен быть меньше exit
+/*
+расчет точек от аудитории до сектора
+entry - входной сектор
+exit - выходной сектор
+entry всегда должен быть меньше exit
 */
-func (p *controller) getPointsAuditory2Sector(entry, exit int) (appError.AppError) {
+func (p *controller) getPointsAuditory2Sector(entry, exit int) appError.AppError {
 
 	// построение начального пути. От границы аудитории.
 	err := p.data.setAudStartPoints()
@@ -161,7 +165,7 @@ func (p *controller) getPointsAuditory2Sector(entry, exit int) (appError.AppErro
 	return appError.AppError{}
 }
 
-func (p *controller) getPointsAuditory2Transition(entry, exit int) (appError.AppError) {
+func (p *controller) getPointsAuditory2Transition(entry, exit int) appError.AppError {
 	// построение начального пути. От границы аудитории.
 	err := p.data.setAudStartPoints()
 	if err.Err != nil {
@@ -184,7 +188,7 @@ func (p *controller) getPointsAuditory2Transition(entry, exit int) (appError.App
 	return appError.AppError{}
 }
 
-func (p *controller) getPointsSector2Sector() (appError.AppError) {
+func (p *controller) getPointsSector2Sector() appError.AppError {
 
 	for i := 1; i < len(p.sectors)-1; i++ {
 
@@ -204,7 +208,6 @@ func (p *controller) getPointsSector2Sector() (appError.AppError) {
 	}
 	return appError.AppError{}
 }
-
 
 func min(a, b int) (int, int) {
 	if a < b {

@@ -2,13 +2,14 @@ package getPathPoints
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -17,8 +18,8 @@ const (
 	transitionYes = 1 // переход между этажами есть
 	transitionNo  = 2 // перехода между этажами нет
 
-	file = "handler.go"
-	getPointsFuntion = "getPoints"
+	file                       = "handler.go"
+	getPointsFuntion           = "getPoints"
 	getAuddiencePointsFunction = "getAuddiencePoints"
 )
 
@@ -42,12 +43,12 @@ func (h *handler) Register(router *gin.RouterGroup) {
 }
 
 type requestData struct {
-	Start   string `json:"start" binding:"required"`
-	End     string `json:"end" binding:"required"`
+	Start   string `json:"start"`
+	End     string `json:"end"`
 	Sectors []int  `json:"sectors"`
 
-	transition       int `json:"transition" binding:"required"`
-	transitionNumber int `json:"transition_number" binding:"required"`
+	Transition       int `json:"transition"`
+	TransitionNumber int `json:"transition_number"`
 }
 
 func (h *handler) getPoints(c *gin.Context) {
@@ -62,7 +63,7 @@ func (h *handler) getPoints(c *gin.Context) {
 		return
 	}
 
-	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.repository, data.transition, data.transitionNumber)
+	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.repository, data.Transition, data.TransitionNumber)
 
 	response, err := p.controller()
 	if err.Err != nil {
@@ -74,15 +75,15 @@ func (h *handler) getPoints(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// type request struct {
-// 	Start            string `form:"start" binding:"required"`
-// 	End              string `form:"end" binding:"required"`
-// 	Transition       int    `form:"transition" binding:"required"`
-// 	TransitionNumber int    `form:"transition_number"`
-// }
+type request struct {
+	Start            string `form:"start" binding:"required"`
+	End              string `form:"end" binding:"required"`
+	Transition       int    `form:"transition" binding:"required"`
+	TransitionNumber int    `form:"transition_number"`
+}
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {
-	var request requestData
+	var request request
 	var err appError.AppError
 
 	err.Err = c.ShouldBindQuery(&request)
@@ -93,7 +94,9 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.transition, request.transitionNumber)
+	fmt.Println("saidojsd - ", request)
+
+	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
 	err = audPoints.GetColoringPoints()
 	if err.Err != nil {
 		err.Wrap("getAuddiencePoints")
@@ -103,5 +106,5 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, audPoints)
-	return
+	// return
 }
