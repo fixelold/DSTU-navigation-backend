@@ -19,6 +19,7 @@ const (
 
 	file = "handler.go"
 	getPointsFuntion = "getPoints"
+	getAuddiencePointsFunction = "getAuddiencePoints"
 )
 
 type handler struct {
@@ -81,19 +82,18 @@ func (h *handler) getPoints(c *gin.Context) {
 // }
 
 func (h *handler) getAuddiencePoints(c *gin.Context) {
-	var request request
+	var request requestData
 	var err appError.AppError
 
 	err.Err = c.ShouldBindQuery(&request)
 	if err.Err != nil {
-		bindError.Err = err.Err
-		bindError.Wrap("getAuddiencePoints")
+		err.Wrap(fmt.Sprintf("file: %s, function: %s", file, getAuddiencePointsFunction))
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
 
-	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
+	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.transition, request.transitionNumber)
 	err = audPoints.GetColoringPoints()
 	if err.Err != nil {
 		err.Wrap("getAuddiencePoints")

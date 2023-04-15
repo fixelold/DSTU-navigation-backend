@@ -81,7 +81,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	*/
 	entry, exit := min(p.sectors[0], p.sectors[1])
 
-	data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.transition, p.transitionNumber)
+	data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.repository, p.transition, p.transitionNumber)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return nil, err
@@ -90,18 +90,20 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	p.data = *data
 
 	if p.transition == transitionYes {
-		p.getPointsAuditory2Trasition(entry, exit)
+		err := p.getPointsAuditory2Transition(entry, exit)
+		if err.Err != nil {
+			return nil, err
+		}
+
 	} else if p.transition == transitionNo {
-		points, err := p.getPointsAuditory2Sector(entry, exit)
+		err := p.getPointsAuditory2Sector(entry, exit)
 		if err.Err != nil {
 			return nil, err
 		}
-		p.points = append(p.points, points...)
-		points, err = p.getPointsSector2Sector()
+		err = p.getPointsSector2Sector()
 		if err.Err != nil {
 			return nil, err
 		}
-		p.points = append(p.points, points...)
 
 		entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 		
@@ -114,16 +116,14 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 
 		p.data = *data
 
-		points, err = p.getPointsAuditory2Sector(entry, exit)
+		err = p.getPointsAuditory2Sector(entry, exit)
 		if err.Err != nil {
 			return nil, err
 		}
-		p.points = append(p.points, points...)
-		points, err = p.getPointsSector2Sector()
+		err = p.getPointsSector2Sector()
 		if err.Err != nil {
 			return nil, err
 		}
-		p.points = append(p.points, points...)
 	}
 
 	response := p.points
