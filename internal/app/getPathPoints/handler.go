@@ -94,8 +94,6 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("saidojsd - ", request)
-
 	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
 	err = audPoints.GetColoringPoints()
 	if err.Err != nil {
@@ -106,5 +104,4 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, audPoints)
-	// return
 }

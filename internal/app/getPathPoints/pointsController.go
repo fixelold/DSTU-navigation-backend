@@ -96,6 +96,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 			return nil, err
 		}
 
+		response = append(response, p.data.points...)
 	} else if p.transition == transitionNo {
 		err := p.getPointsAuditory2Sector(entry, exit)
 		if err.Err != nil {
