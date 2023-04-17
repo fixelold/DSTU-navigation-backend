@@ -2,6 +2,9 @@ package startApp
 
 import (
 	"context"
+
+	"github.com/gin-gonic/gin"
+
 	"navigation/internal/app/auditory"
 	"navigation/internal/app/getPathPoints"
 	"navigation/internal/app/pathBuilder"
@@ -10,8 +13,6 @@ import (
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/middleware"
-
-	"github.com/gin-gonic/gin"
 )
 
 type Router struct {
@@ -32,6 +33,8 @@ func (r *Router) prepareData() {
 	r.logger = logging.GetLogger()
 	r.router = gin.Default()
 	r.routerGroup = r.router.Group("/api/v1")
+	r.router.Use(middleware.CORSMiddleware())
+	// r.router.Use(cors.Default())
 	appConfig := config.GetConfig()
 	r.connection = postgresql.NewClient(appContext, *appConfig)
 }

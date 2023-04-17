@@ -1,13 +1,15 @@
 package auditory
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"navigation/internal/logging"
 	"navigation/internal/models"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 const auditoryPathURL = "/auditory"
@@ -27,10 +29,14 @@ func NewHandler(logger *logging.Logger, repository Repository, userMiddleware mi
 }
 
 func (h *handler) Register(router *gin.RouterGroup) {
+	jwtMiddleware := h.userMiddleware.JwtMiddleware()
 	auditory := router.Group(auditoryPathURL)
-	auditory.Use(middleware.CORSMiddleware)
+	auditory.Use(middleware.CORSMiddleware())
 	auditory.GET("", h.read)
-	auditory.POST("/update", h.update)
+	auditory.Use(jwtMiddleware.MiddlewareFunc())
+	{
+		auditory.POST("/update", h.update)
+	}
 }
 
 type audNumber struct {

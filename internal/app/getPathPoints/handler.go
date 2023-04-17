@@ -37,7 +37,7 @@ func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler 
 
 func (h *handler) Register(router *gin.RouterGroup) {
 	points := router.Group(urlPath)
-	points.Use(middleware.CORSMiddleware)
+	points.Use(middleware.CORSMiddleware())
 	points.POST("/points", h.getPoints)
 	points.GET("/aud-points", h.getAuddiencePoints)
 }
