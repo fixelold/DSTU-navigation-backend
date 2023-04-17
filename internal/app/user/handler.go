@@ -1,11 +1,11 @@
 package user
 
 import (
+	"github.com/gin-gonic/gin"
+
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
-
-	"github.com/gin-gonic/gin"
 )
 
 const userPathURL = "/user"
@@ -25,6 +25,6 @@ func NewHandler(logger *logging.Logger, userMiddleware middleware.UserMiddleware
 func (h *handler) Register(router *gin.RouterGroup) {
 	jwtMiddleware := h.userMiddleware.JwtMiddleware()
 	user := router.Group(userPathURL)
-	user.Use(middleware.CORSMiddleware)
+	user.Use(middleware.CORSMiddleware())
 	user.POST("/signin", jwtMiddleware.LoginHandler)
 }

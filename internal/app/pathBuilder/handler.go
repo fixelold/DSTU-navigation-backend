@@ -1,13 +1,14 @@
 package pathBuilder
 
 import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 const getSectors = "/get-sectors"
@@ -33,7 +34,7 @@ func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler 
 
 func (h *handler) Register(router *gin.RouterGroup) {
 	pathBuilding := router.Group(getSectors)
-	pathBuilding.Use(middleware.CORSMiddleware)
+	pathBuilding.Use(middleware.CORSMiddleware())
 	pathBuilding.GET("", h.getSectors)
 }
 
