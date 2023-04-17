@@ -1,7 +1,7 @@
 package appError
 
 import "fmt"
-
+  
 type AppError struct {
 	Context     string
 	Description string
