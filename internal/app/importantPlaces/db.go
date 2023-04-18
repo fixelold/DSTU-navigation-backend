@@ -1,10 +1,15 @@
 package importantPlaces
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
+
+	"github.com/jackc/pgconn"
 )
 
 const (
@@ -38,7 +43,40 @@ func newRepository(
 	}
 }
 
-func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {}
+func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
+	var newImportantPlaces models.ImportantPlaces
+	req := `INSERT INTO important_places(name, id_auditorium) VALUES ($1, $2) RETURNING id;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, createFunction))
+		txError.Err = err
+		return models.ImportantPlaces{}, *txError
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		req,
+		places.Name,
+		places.AuditoryID).Scan(&newImportantPlaces.ID)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, createFunction))
+			queryError.Err = pgErr
+			return models.ImportantPlaces{}, *queryError
+		}
+		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, createFunction))
+		queryError.Err = err
+		return models.ImportantPlaces{}, *queryError
+	}
+	_ = tx.Commit(context.Background())
+	return newImportantPlaces, appError.AppError{}	
+}
 
 func (r *repository) Read(id int) (models.ImportantPlaces, appError.AppError) {}
 
