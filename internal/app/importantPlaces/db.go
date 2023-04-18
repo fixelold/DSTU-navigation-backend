@@ -119,7 +119,43 @@ func (r *repository) Read(id int) (models.ImportantPlaces, appError.AppError) {
 	return importantPlaces, appError.AppError{}
 }
 
-func (r *repository) Update(oldpPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {}
+func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
+	request := `
+		UPDATE important_places
+		SET name = $1,
+		id_auditorium = $2
+		WHERE id = $3;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
+		txError.Err = err
+		return models.ImportantPlaces{}, *txError
+	}
+
+	_, err = tx.Exec(context.Background(),
+		request,
+		newPlaces.Name,
+		newPlaces.AuditoryID,
+		oldPlaces.ID)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+				pgErr = err.(*pgconn.PgError)
+				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
+				queryError.Err = err
+				return models.ImportantPlaces{}, *queryError
+		}
+		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
+		queryError.Err = err
+		return models.ImportantPlaces{}, *queryError
+	}
+	_ = tx.Commit(context.Background())
+	return newPlaces, appError.AppError{}
+}
 
 func (r *repository) Delete(id int) (appError.AppError) {}
 
