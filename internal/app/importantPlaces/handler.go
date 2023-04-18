@@ -1,12 +1,17 @@
 package importantPlaces
 
 import (
+	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
+	"navigation/internal/models"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx"
 )
 
 const (
@@ -46,12 +51,47 @@ func (h *handler) Register(router *gin.RouterGroup) {
 	}
 }
 
-func (h *handler) Create(c *gin.Context) {}
+func (h *handler) Create(c *gin.Context) {
+	var err appError.AppError
+	var places models.ImportantPlaces
+
+	err.Err = c.ShouldBindJSON(&places) 
+	if err.Err != nil {
+		err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
+		return
+	}
+
+	response, err := h.repository.Create(places)
+	if err.Err != nil && !strings.EqualFold(err.ToString(), pgx.ErrNoRows.Error()) {
+		err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	if response.ID == 0 {
+		// err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
+		// h.logger.Error(err.Error())
+		c.JSON(http.StatusConflict, gin.H{"error": "important place already exists"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+	return
+}
 
 func (h *handler) Read(c *gin.Context) {}
 
-func (h *handler) Update(c *gin.Context) {}
+func (h *handler) Update(c *gin.Context) {
+	//проверка на существования старой записи
+	//проверка на то, что новые данные не конфликтуют
+	//обновление данных
+}
 
-func (h *handler) Delete(c *gin.Context) {}
+func (h *handler) Delete(c *gin.Context) {
+	//проверка записи на существования
+}
 
 func (h *handler) List(c *gin.Context) {}

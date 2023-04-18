@@ -33,7 +33,7 @@ type repository struct {
 	logger *logging.Logger
 }
 
-func newRepository(
+func NewRepository(
 	client postgresql.Client, 
 	logger *logging.Logger,
 ) Repository {
@@ -45,7 +45,11 @@ func newRepository(
 
 func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
 	var newImportantPlaces models.ImportantPlaces
-	req := `INSERT INTO important_places(name, id_auditorium) VALUES ($1, $2) RETURNING id;`
+	req := `INSERT INTO important_places (name, id_auditorium) 
+	SELECT $1::varchar(100), $2 
+	WHERE NOT EXISTS 
+	(SELECT null FROM important_places 
+	WHERE (id_auditorium) = ($2)) RETURNING id;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -83,8 +87,14 @@ func (r *repository) Read(id int) (models.ImportantPlaces, appError.AppError) {
 	request :=
 	`SELECT *
 	FROM important_places 
-	JOIN auditorium 
 	WHERE id = $1;`
+
+	// request :=
+	// `SELECT important_places.id, important_places.name, important_places.id_auditorium
+	// FROM important_places 
+	// JOIN auditorium 
+	// ON important_places.id_auditorium = auditorium.id 
+	// WHERE auditorium.number = $1;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
