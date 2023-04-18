@@ -191,4 +191,43 @@ func (r *repository) Delete(id int) (appError.AppError) {
 	return appError.AppError{}
 }
 
-func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.ImportantPlaces, appError.AppError) {}
+func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.ImportantPlaces, appError.AppError) {
+	var places []models.ImportantPlaces
+	req := `SELECT * FROM important_places;`
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
+		txError.Err = err
+		return nil, *txError
+	}
+
+	rows, err := tx.Query(context.Background(), req)
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
+			queryError.Err = pgErr
+			return nil, *queryError
+		}
+		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
+		queryError.Err = err
+		return nil, *queryError
+	}
+
+	for rows.Next() {
+		var sl models.ImportantPlaces
+		err := rows.Scan(&sl.ID, &sl.Name, &sl.AuditoryID)
+		if err != nil {
+			scanError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
+			scanError.Err = err
+			return nil, *scanError
+		}
+		places = append(places, sl)
+	}
+
+	_ = tx.Commit(context.Background())
+	return places, appError.AppError{}
+}
