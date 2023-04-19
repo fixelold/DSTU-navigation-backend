@@ -10,5 +10,5 @@ type Repository interface {
 	Read(id int) (models.ImportantPlaces, error)
 	Update(oldpPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, error)
 	Delete(id int) (error)
-	List(numberBuild models.ImportantPlaces) ([]models.ImportantPlaces, appError.AppError)
+	List(numberBuild int) ([]models.ImportantPlaces, error)
 }

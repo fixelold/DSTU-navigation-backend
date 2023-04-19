@@ -179,4 +179,26 @@ func (h *handler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
-func (h *handler) List(c *gin.Context) {}
+type listRequest struct {
+	NumberBiuld int `form:"number_build" binding:"required"`
+}
+
+func (h *handler) List(c *gin.Context) {
+	var r listRequest
+	var places []models.ImportantPlaces
+	var err appError.AppError
+	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "List"))
+
+	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
+		// h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
+		return
+	}
+
+	places, err.Err = h.repository.List(r.NumberBiuld)
+	if err.Err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+	}
+
+	c.JSON(http.StatusOK, places)
+}

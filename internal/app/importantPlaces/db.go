@@ -195,7 +195,7 @@ func (r *repository) Delete(id int) (error) {
 	return nil
 }
 
-func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.ImportantPlaces, appError.AppError) {
+func (r *repository) List(numberBuild int) ([]models.ImportantPlaces, error) {
 	var places []models.ImportantPlaces
 	req := `SELECT * FROM important_places;`
 	tx, err := r.client.Begin(context.Background())
@@ -203,7 +203,7 @@ func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.Importan
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 		txError.Err = err
-		return nil, *txError
+		return nil, txError.Err
 	}
 
 	rows, err := tx.Query(context.Background(), req)
@@ -214,11 +214,11 @@ func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.Importan
 			pgErr = err.(*pgconn.PgError)
 			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 			queryError.Err = pgErr
-			return nil, *queryError
+			return nil, queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 		queryError.Err = err
-		return nil, *queryError
+		return nil, queryError.Err
 	}
 
 	for rows.Next() {
@@ -227,11 +227,11 @@ func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.Importan
 		if err != nil {
 			scanError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 			scanError.Err = err
-			return nil, *scanError
+			return nil, scanError.Err
 		}
 		places = append(places, sl)
 	}
 
 	_ = tx.Commit(context.Background())
-	return places, appError.AppError{}
+	return places, nil
 }
