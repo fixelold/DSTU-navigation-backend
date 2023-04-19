@@ -161,7 +161,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 	return newPlaces, nil
 }
 
-func (r *repository) Delete(id int) (appError.AppError) {
+func (r *repository) Delete(id int) (error) {
 	request := `
 	DELETE FROM important_places
 	WHERE id = $1;`
@@ -171,7 +171,7 @@ func (r *repository) Delete(id int) (appError.AppError) {
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 		txError.Err = err
-		return *txError
+		return txError.Err
 	}
 
 	_, err = tx.Exec(context.Background(),
@@ -185,14 +185,14 @@ func (r *repository) Delete(id int) (appError.AppError) {
 				pgErr = err.(*pgconn.PgError)
 				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 				queryError.Err = err
-				return *queryError
+				return queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 		queryError.Err = err
-		return *queryError
+		return queryError.Err
 	}
 	_ = tx.Commit(context.Background())
-	return appError.AppError{}
+	return nil
 }
 
 func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.ImportantPlaces, appError.AppError) {

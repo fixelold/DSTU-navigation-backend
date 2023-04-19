@@ -153,7 +153,30 @@ func (h *handler) Update(c *gin.Context) {
 }
 
 func (h *handler) Delete(c *gin.Context) {
-	//проверка записи на существования
+	var r request // тут будет хранится id записи, которую надо обновить
+	var err appError.AppError
+	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Delete"))
+	
+
+	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
+		// h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
+		return
+	}
+
+	_, err.Err = h.repository.Read(r.ID)
+	if err.Err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		return
+	}
+
+	err.Err = h.repository.Delete(r.ID)
+	if err.Err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
 func (h *handler) List(c *gin.Context) {}
