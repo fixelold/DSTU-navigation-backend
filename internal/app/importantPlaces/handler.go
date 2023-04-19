@@ -18,10 +18,6 @@ const (
 	places = "/places"
 )
 
-var (
-	bindError = appError.NewAppError("can't decode data")
-)
-
 type handler struct {
 	logger *logging.Logger
 	repository Repository
@@ -36,8 +32,12 @@ func NewHandler(logger *logging.Logger, repository Repository, um middleware.Use
 	}
 }
 
+// структура будет использоваться в методах read и delete.
+type request struct {
+	ID int `form:"id" binding:"required"`
+}
+
 func (h *handler) Register(router *gin.RouterGroup) {
-	// userMiddleware middleware.UserMiddleware
 	jwtMiddleware := h.userMiddleware.JwtMiddleware()
 	places := router.Group(places)
 	places.Use(middleware.CORSMiddleware())
@@ -59,7 +59,7 @@ func (h *handler) Create(c *gin.Context) {
 	if err.Err != nil {
 		err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
 		h.logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
 		return
 	}
 
@@ -79,10 +79,28 @@ func (h *handler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
-	return
 }
 
-func (h *handler) Read(c *gin.Context) {}
+func (h *handler) Read(c *gin.Context) {
+	var r request
+	var err appError.AppError
+	var places models.ImportantPlaces
+	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
+
+
+	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
+	}
+
+	places, err.Err = h.repository.Read(r.ID)
+	if err.Err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, places)
+}
 
 func (h *handler) Update(c *gin.Context) {
 	//проверка на существования старой записи
