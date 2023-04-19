@@ -32,7 +32,7 @@ func NewHandler(logger *logging.Logger, repository Repository, um middleware.Use
 	}
 }
 
-// структура будет использоваться в методах read и delete.
+// структура будет использоваться в методах read, update и delete.
 type request struct {
 	ID int `form:"id" binding:"required"`
 }
@@ -85,7 +85,7 @@ func (h *handler) Read(c *gin.Context) {
 	var r request
 	var err appError.AppError
 	var places models.ImportantPlaces
-	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
+	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Read"))
 
 
 	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
@@ -103,9 +103,53 @@ func (h *handler) Read(c *gin.Context) {
 }
 
 func (h *handler) Update(c *gin.Context) {
-	//проверка на существования старой записи
-	//проверка на то, что новые данные не конфликтуют
-	//обновление данных
+	var r request // тут будет хранится id записи, которую надо обновить
+	var err appError.AppError
+	var oldPlace models.ImportantPlaces // тут будет хранится запись из бд
+	var newPlace models.ImportantPlaces
+	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Update"))
+
+	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
+		// h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
+		return
+	}
+
+	if err.Err = c.ShouldBindJSON(&newPlace); err.Err != nil {
+		// h.logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
+		return
+	}
+
+	// проверка на существование данных, которые надо обновить
+	oldPlace, err.Err = h.repository.Read(r.ID)
+	if err.Err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		return
+	}
+
+	// проверка на существование новой аудитории
+	// _, err.Err = h.repository.Read(newPlace.AuditoryID)
+	// if err.Err != nil {
+	// 	fmt.Println("data - ", newPlace.AuditoryID)
+	// 	fmt.Println("error - ", err.Err)
+	// 	c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
+	// 	return
+	// }
+
+	newPlace, err.Err = h.repository.Update(oldPlace, newPlace)
+	if err.Err != nil && !strings.EqualFold(err.ToString(), pgx.ErrNoRows.Error()) {
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	if newPlace.ID == 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "important place already exists"})
+		return
+	}
+
+	c.JSON(http.StatusOK, newPlace)
 }
 
 func (h *handler) Delete(c *gin.Context) {

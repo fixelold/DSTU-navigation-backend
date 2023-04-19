@@ -122,26 +122,27 @@ func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 	return importantPlaces, nil
 }
 
-func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
+func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, error) {
 	request := `
 		UPDATE important_places
 		SET name = $1,
 		id_auditorium = $2
-		WHERE id = $3;`
+		WHERE id = $3
+		AND NOT EXISTS (SELECT null FROM important_places WHERE (id_auditorium) = ($2)) RETURNING id;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 		txError.Err = err
-		return models.ImportantPlaces{}, *txError
+		return models.ImportantPlaces{}, txError
 	}
 
-	_, err = tx.Exec(context.Background(),
+	err = tx.QueryRow(context.Background(),
 		request,
 		newPlaces.Name,
 		newPlaces.AuditoryID,
-		oldPlaces.ID)
+		oldPlaces.ID).Scan(&newPlaces.ID)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -150,14 +151,14 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 				pgErr = err.(*pgconn.PgError)
 				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 				queryError.Err = err
-				return models.ImportantPlaces{}, *queryError
+				return models.ImportantPlaces{}, queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 		queryError.Err = err
-		return models.ImportantPlaces{}, *queryError
+		return models.ImportantPlaces{}, queryError.Err
 	}
 	_ = tx.Commit(context.Background())
-	return newPlaces, appError.AppError{}
+	return newPlaces, nil
 }
 
 func (r *repository) Delete(id int) (appError.AppError) {
