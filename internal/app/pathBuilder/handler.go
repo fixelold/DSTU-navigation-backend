@@ -26,7 +26,7 @@ type handler struct {
 }
 
 func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler {
-	return &handler{
+	return &handler {
 		logger:     logger,
 		repository: repository,
 	}

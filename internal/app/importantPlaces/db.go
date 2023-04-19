@@ -33,7 +33,7 @@ type repository struct {
 	logger *logging.Logger
 }
 
-func newRepository(
+func NewRepository(
 	client postgresql.Client, 
 	logger *logging.Logger,
 ) Repository {
@@ -45,7 +45,11 @@ func newRepository(
 
 func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
 	var newImportantPlaces models.ImportantPlaces
-	req := `INSERT INTO important_places(name, id_auditorium) VALUES ($1, $2) RETURNING id;`
+	req := `INSERT INTO important_places (name, id_auditorium) 
+	SELECT $1::varchar(100), $2 
+	WHERE NOT EXISTS 
+	(SELECT null FROM important_places 
+	WHERE (id_auditorium) = ($2)) RETURNING id;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -78,12 +82,11 @@ func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlac
 	return newImportantPlaces, appError.AppError{}	
 }
 
-func (r *repository) Read(id int) (models.ImportantPlaces, appError.AppError) {
+func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 	var importantPlaces models.ImportantPlaces
 	request :=
 	`SELECT *
 	FROM important_places 
-	JOIN auditorium 
 	WHERE id = $1;`
 
 	tx, err := r.client.Begin(context.Background())
@@ -91,7 +94,7 @@ func (r *repository) Read(id int) (models.ImportantPlaces, appError.AppError) {
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, readFunction))
 		txError.Err = err
-		return models.ImportantPlaces{}, *txError
+		return models.ImportantPlaces{}, txError.Err
 	}
 
 	err = tx.QueryRow(
@@ -109,36 +112,37 @@ func (r *repository) Read(id int) (models.ImportantPlaces, appError.AppError) {
 			pgErr = err.(*pgconn.PgError)
 			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, readFunction))
 			queryError.Err = pgErr
-			return models.ImportantPlaces{}, *queryError
+			return models.ImportantPlaces{}, queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, readFunction))
 		queryError.Err = err
-		return models.ImportantPlaces{}, *queryError
+		return models.ImportantPlaces{}, queryError.Err
 	}
 	_ = tx.Commit(context.Background())
-	return importantPlaces, appError.AppError{}
+	return importantPlaces, nil
 }
 
-func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
+func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, error) {
 	request := `
 		UPDATE important_places
 		SET name = $1,
 		id_auditorium = $2
-		WHERE id = $3;`
+		WHERE id = $3
+		AND NOT EXISTS (SELECT null FROM important_places WHERE (id_auditorium) = ($2)) RETURNING id;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 		txError.Err = err
-		return models.ImportantPlaces{}, *txError
+		return models.ImportantPlaces{}, txError
 	}
 
-	_, err = tx.Exec(context.Background(),
+	err = tx.QueryRow(context.Background(),
 		request,
 		newPlaces.Name,
 		newPlaces.AuditoryID,
-		oldPlaces.ID)
+		oldPlaces.ID).Scan(&newPlaces.ID)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -147,17 +151,17 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 				pgErr = err.(*pgconn.PgError)
 				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 				queryError.Err = err
-				return models.ImportantPlaces{}, *queryError
+				return models.ImportantPlaces{}, queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 		queryError.Err = err
-		return models.ImportantPlaces{}, *queryError
+		return models.ImportantPlaces{}, queryError.Err
 	}
 	_ = tx.Commit(context.Background())
-	return newPlaces, appError.AppError{}
+	return newPlaces, nil
 }
 
-func (r *repository) Delete(id int) (appError.AppError) {
+func (r *repository) Delete(id int) (error) {
 	request := `
 	DELETE FROM important_places
 	WHERE id = $1;`
@@ -167,7 +171,7 @@ func (r *repository) Delete(id int) (appError.AppError) {
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 		txError.Err = err
-		return *txError
+		return txError.Err
 	}
 
 	_, err = tx.Exec(context.Background(),
@@ -181,17 +185,17 @@ func (r *repository) Delete(id int) (appError.AppError) {
 				pgErr = err.(*pgconn.PgError)
 				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 				queryError.Err = err
-				return *queryError
+				return queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 		queryError.Err = err
-		return *queryError
+		return queryError.Err
 	}
 	_ = tx.Commit(context.Background())
-	return appError.AppError{}
+	return nil
 }
 
-func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.ImportantPlaces, appError.AppError) {
+func (r *repository) List(numberBuild int) ([]models.ImportantPlaces, error) {
 	var places []models.ImportantPlaces
 	req := `SELECT * FROM important_places;`
 	tx, err := r.client.Begin(context.Background())
@@ -199,7 +203,7 @@ func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.Importan
 		_ = tx.Rollback(context.Background())
 		txError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 		txError.Err = err
-		return nil, *txError
+		return nil, txError.Err
 	}
 
 	rows, err := tx.Query(context.Background(), req)
@@ -210,11 +214,11 @@ func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.Importan
 			pgErr = err.(*pgconn.PgError)
 			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 			queryError.Err = pgErr
-			return nil, *queryError
+			return nil, queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 		queryError.Err = err
-		return nil, *queryError
+		return nil, queryError.Err
 	}
 
 	for rows.Next() {
@@ -223,11 +227,11 @@ func (r *repository) List(numberBuild models.ImportantPlaces) ([]models.Importan
 		if err != nil {
 			scanError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 			scanError.Err = err
-			return nil, *scanError
+			return nil, scanError.Err
 		}
 		places = append(places, sl)
 	}
 
 	_ = tx.Commit(context.Background())
-	return places, appError.AppError{}
+	return places, nil
 }
