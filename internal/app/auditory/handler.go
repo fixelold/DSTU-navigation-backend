@@ -31,6 +31,7 @@ func (h *handler) Register(router *gin.RouterGroup) {
 	jwtMiddleware := h.userMiddleware.JwtMiddleware()
 	auditory := router.Group(auditoryPathURL)
 	auditory.Use(middleware.CORSMiddleware())
+	auditory.GET("/description", h.getDescription)
 	auditory.GET("", h.read)
 	auditory.Use(jwtMiddleware.MiddlewareFunc())
 	{
@@ -54,7 +55,32 @@ type updateDescription struct {
 	JWTToken    string `json:"token"`
 }
 
+type auditory struct {
+	ID int `json:"id"`
+	Number int `json:"number"`
+	AuditoryID int `json:"auditory_id"`
+}
+
 func (h *handler) read(c *gin.Context) {
+	var auditorys audNumber
+	var auditory auditory
+	var err error
+
+	if err := c.ShouldBindQuery(&auditorys); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
+		return
+	}
+
+	auditory, err = h.repository.Read(auditorys.Start)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, auditory)
+}
+
+func (h *handler) getDescription(c *gin.Context) {
 	var auditorys audNumber
 	var response response
 	var err error
@@ -64,13 +90,13 @@ func (h *handler) read(c *gin.Context) {
 		return
 	}
 
-	response.Start, err = h.repository.Read(auditorys.Start)
+	response.Start, err = h.repository.GetDescription(auditorys.Start)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
-	response.End, err = h.repository.Read(auditorys.End)
+	response.End, err = h.repository.GetDescription(auditorys.End)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
