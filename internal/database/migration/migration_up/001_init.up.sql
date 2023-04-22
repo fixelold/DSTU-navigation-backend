@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS "transition_position" (
 CREATE TABLE IF NOT EXISTS "important_places" (
   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
   name VARCHAR,
-  id_auditorium INT
+  id_auditorium INT UNIQUE NOT NULL
 );
 
 ALTER TABLE "floor" ADD FOREIGN KEY (id_building) REFERENCES "building" (id);

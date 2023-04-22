@@ -2,16 +2,17 @@ package importantPlaces
 
 import (
 	"fmt"
-	"navigation/internal/appError"
-	"navigation/internal/logging"
-	"navigation/internal/models"
-	"navigation/internal/transport/rest/handlers"
-	"navigation/internal/transport/rest/middleware"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx"
+
+	"navigation/internal/appError"
+	"navigation/internal/logging"
+	"navigation/internal/models"
+	"navigation/internal/transport/rest/handlers"
+	"navigation/internal/transport/rest/middleware"
 )
 
 const (
@@ -19,15 +20,15 @@ const (
 )
 
 type handler struct {
-	logger *logging.Logger
-	repository Repository
+	logger         *logging.Logger
+	repository     Repository
 	userMiddleware middleware.UserMiddleware
 }
 
 func NewHandler(logger *logging.Logger, repository Repository, um middleware.UserMiddleware) handlers.Handler {
-	return &handler {
-		logger: logger,
-		repository: repository,
+	return &handler{
+		logger:         logger,
+		repository:     repository,
 		userMiddleware: um,
 	}
 }
@@ -55,7 +56,7 @@ func (h *handler) Create(c *gin.Context) {
 	var err appError.AppError
 	var places models.ImportantPlaces
 
-	err.Err = c.ShouldBindJSON(&places) 
+	err.Err = c.ShouldBindJSON(&places)
 	if err.Err != nil {
 		err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Create"))
 		h.logger.Error(err.Error())
@@ -86,7 +87,6 @@ func (h *handler) Read(c *gin.Context) {
 	var err appError.AppError
 	var places models.ImportantPlaces
 	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Read"))
-
 
 	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
 		h.logger.Error(err.Error())
@@ -144,10 +144,12 @@ func (h *handler) Update(c *gin.Context) {
 		return
 	}
 
-	if newPlace.ID == 0 {
-		c.JSON(http.StatusConflict, gin.H{"error": "important place already exists"})
-		return
-	}
+	fmt.Println("error - ", err.Err)
+
+	// if newPlace.ID == 0 {
+	// 	c.JSON(http.StatusConflict, gin.H{"error": "important place already exists"})
+	// 	return
+	// }
 
 	c.JSON(http.StatusOK, newPlace)
 }
@@ -156,7 +158,6 @@ func (h *handler) Delete(c *gin.Context) {
 	var r request // тут будет хранится id записи, которую надо обновить
 	var err appError.AppError
 	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "Delete"))
-	
 
 	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
 		// h.logger.Error(err.Error())

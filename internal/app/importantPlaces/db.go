@@ -4,28 +4,29 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/jackc/pgconn"
+
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
-
-	"github.com/jackc/pgconn"
 )
 
 const (
 	file = "db.go"
 
-	createFunction 	= "create"
-	readFunction 	= "read"
-	updateFunction 	= "update"
-	deleteFunction 	= "delete"
-	listFunction 	= "list"
+	createFunction = "create"
+	readFunction   = "read"
+	updateFunction = "update"
+	deleteFunction = "delete"
+	listFunction   = "list"
 )
 
 var (
-	txError 	= appError.NewAppError("can't start transaction")
-	queryError 	= appError.NewAppError("failed to complite the request")
-	scanError  	= appError.NewAppError("can't scan database response")
+	txError    = appError.NewAppError("can't start transaction")
+	queryError = appError.NewAppError("failed to complite the request")
+	scanError  = appError.NewAppError("can't scan database response")
 )
 
 type repository struct {
@@ -34,10 +35,10 @@ type repository struct {
 }
 
 func NewRepository(
-	client postgresql.Client, 
+	client postgresql.Client,
 	logger *logging.Logger,
 ) Repository {
-	return &repository {
+	return &repository{
 		client: client,
 		logger: logger,
 	}
@@ -79,15 +80,15 @@ func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlac
 		return models.ImportantPlaces{}, *queryError
 	}
 	_ = tx.Commit(context.Background())
-	return newImportantPlaces, appError.AppError{}	
+	return newImportantPlaces, appError.AppError{}
 }
 
 func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 	var importantPlaces models.ImportantPlaces
 	request :=
-	`SELECT *
+		`SELECT *
 	FROM important_places 
-	WHERE id = $1;`
+	WHERE id_auditorium = $1;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -127,8 +128,9 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 		UPDATE important_places
 		SET name = $1,
 		id_auditorium = $2
-		WHERE id = $3
-		AND NOT EXISTS (SELECT null FROM important_places WHERE (id_auditorium) = ($2)) RETURNING id;`
+		WHERE id = $3 RETURNING id;`
+
+	//AND NOT EXISTS (SELECT null FROM important_places WHERE (id_auditorium) = ($2)) RETURNING id;
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -138,6 +140,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 		return models.ImportantPlaces{}, txError
 	}
 
+	fmt.Println(newPlaces.Name, newPlaces.AuditoryID, oldPlaces.ID)
 	err = tx.QueryRow(context.Background(),
 		request,
 		newPlaces.Name,
@@ -148,10 +151,10 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 		_ = tx.Rollback(context.Background())
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-				pgErr = err.(*pgconn.PgError)
-				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
-				queryError.Err = err
-				return models.ImportantPlaces{}, queryError.Err
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
+			queryError.Err = err
+			return models.ImportantPlaces{}, queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, updateFunction))
 		queryError.Err = err
@@ -161,7 +164,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 	return newPlaces, nil
 }
 
-func (r *repository) Delete(id int) (error) {
+func (r *repository) Delete(id int) error {
 	request := `
 	DELETE FROM important_places
 	WHERE id = $1;`
@@ -182,10 +185,10 @@ func (r *repository) Delete(id int) (error) {
 		_ = tx.Rollback(context.Background())
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-				pgErr = err.(*pgconn.PgError)
-				queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
-				queryError.Err = err
-				return queryError.Err
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
+			queryError.Err = err
+			return queryError.Err
 		}
 		queryError.Wrap(fmt.Sprintf("file: %s, function: %s", file, deleteFunction))
 		queryError.Err = err
