@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/jackc/pgconn"
+
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
-
-	"github.com/jackc/pgconn"
 )
 
 type repository struct {

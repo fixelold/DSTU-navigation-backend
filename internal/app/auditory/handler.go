@@ -44,6 +44,10 @@ type audNumber struct {
 	End   string `form:"end" binding:"required"`
 }
 
+type readRequest struct {
+	Number string `form:"number" binding:"required"`
+}
+
 type response struct {
 	Start models.AuditoryDescription `json:"start"`
 	End   models.AuditoryDescription `json:"end"`
@@ -56,22 +60,22 @@ type updateDescription struct {
 }
 
 type auditory struct {
-	ID int `json:"id"`
-	Number int `json:"number"`
-	AuditoryID int `json:"auditory_id"`
+	ID         int    `json:"id"`
+	Number     string `json:"number"`
+	AuditoryID int    `json:"auditory_id"`
 }
 
 func (h *handler) read(c *gin.Context) {
-	var auditorys audNumber
+	var r readRequest
 	var auditory auditory
 	var err error
 
-	if err := c.ShouldBindQuery(&auditorys); err != nil {
+	if err := c.ShouldBindQuery(&r); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
 
-	auditory, err = h.repository.Read(auditorys.Start)
+	auditory, err = h.repository.Read(r.Number)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
