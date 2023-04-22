@@ -144,8 +144,6 @@ func (h *handler) Update(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("error - ", err.Err)
-
 	// if newPlace.ID == 0 {
 	// 	c.JSON(http.StatusConflict, gin.H{"error": "important place already exists"})
 	// 	return

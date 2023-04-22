@@ -140,7 +140,6 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 		return models.ImportantPlaces{}, txError
 	}
 
-	fmt.Println(newPlaces.Name, newPlaces.AuditoryID, oldPlaces.ID)
 	err = tx.QueryRow(context.Background(),
 		request,
 		newPlaces.Name,
@@ -167,7 +166,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 func (r *repository) Delete(id int) error {
 	request := `
 	DELETE FROM important_places
-	WHERE id = $1;`
+	WHERE id_auditorium = $1;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
