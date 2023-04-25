@@ -19,6 +19,10 @@ func (a *AppError) Error() string {
 	return fmt.Sprintf("\n Context: %s\n Description: %s\n Error: %v\n", a.Context, a.Description, a.Err)
 }
 
+func (a *AppError) ToString() string {
+	return fmt.Sprintf("%s", a.Err)
+}
+
 func (a *AppError) Wrap(funcName string) {
 	if a.Context == "" {
 		a.Context = funcName

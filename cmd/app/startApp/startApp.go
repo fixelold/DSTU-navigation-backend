@@ -7,6 +7,7 @@ import (
 
 	"navigation/internal/app/auditory"
 	"navigation/internal/app/getPathPoints"
+	"navigation/internal/app/importantPlaces"
 	"navigation/internal/app/pathBuilder"
 	"navigation/internal/app/user"
 	"navigation/internal/config"
@@ -55,8 +56,12 @@ func (r *Router) prepareRouter() {
 	auditoryRepo := auditory.NewRepository(r.connection, r.logger)
 	auditoryController := auditory.NewHandler(r.logger, auditoryRepo, middleware.UserMiddleware{Client: r.connection, Logger: r.logger})
 
+	placesRepo := importantPlaces.NewRepository(r.connection, r.logger)
+	placesController := importantPlaces.NewHandler(r.logger, placesRepo, middleware.UserMiddleware{Client: r.connection, Logger: r.logger})
+
 	pathBuldingController.Register(r.routerGroup)
 	drawPathController.Register(r.routerGroup)
 	userController.Register(r.routerGroup)
 	auditoryController.Register(r.routerGroup)
+	placesController.Register(r.routerGroup)
 }

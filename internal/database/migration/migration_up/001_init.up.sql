@@ -95,6 +95,12 @@ CREATE TABLE IF NOT EXISTS "transition_position" (
   height INT
 );
 
+CREATE TABLE IF NOT EXISTS "important_places" (
+  id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1  INCREMENT BY 1),
+  name VARCHAR,
+  id_auditorium INT UNIQUE NOT NULL
+);
+
 ALTER TABLE "floor" ADD FOREIGN KEY (id_building) REFERENCES "building" (id);
 
 ALTER TABLE "sector" ADD FOREIGN KEY (id_floor) REFERENCES "floor" (id);
@@ -120,3 +126,5 @@ ALTER TABLE "transition" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
 ALTER TABLE "transition_border_points" ADD FOREIGN KEY (id_transition) REFERENCES "transition" (id);
 
 ALTER TABLE "transition_position" ADD FOREIGN KEY (id_transition) REFERENCES "transition" (id);
+
+ALTER TABLE "important_places" ADD FOREIGN KEY (id_auditorium) REFERENCES "auditorium" (id);

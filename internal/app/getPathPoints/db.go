@@ -3,7 +3,6 @@ package getPathPoints
 import (
 	"context"
 	"errors"
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -120,7 +119,6 @@ func (r *repository) getAudBorderPoint(number string) (models.Coordinates, appEr
 
 // получаем координаты одной из границ сектора. По значению входа и выхода из него.
 func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError) {
-	fmt.Println("data - ", entry, exit)
 	var borderPoint models.Coordinates
 	request :=
 		`SELECT x, y, widht, height 

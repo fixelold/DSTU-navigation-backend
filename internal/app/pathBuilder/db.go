@@ -3,7 +3,6 @@ package pathBuilder
 import (
 	"context"
 	"errors"
-	"fmt"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -73,7 +72,6 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 
 func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
-	fmt.Println("data - ", number, building)
 	req :=
 		`SELECT 
 	sector.number

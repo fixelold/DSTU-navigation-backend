@@ -4,5 +4,6 @@ import "navigation/internal/models"
 
 type Repository interface {
 	Update(description, number string) error
-	Read(number string) (models.AuditoryDescription, error)
+	Read(number string) (auditory, error) 
+	GetDescription(number string) (models.AuditoryDescription, error)
 }
