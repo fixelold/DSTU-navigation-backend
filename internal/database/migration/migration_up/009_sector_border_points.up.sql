@@ -5,6 +5,6 @@
 -- (18, 1204, 1612, 1, 249, 132, 134);
 
 INSERT INTO sector_border_points (id_sector, x, y, widht, height, entry, exit) 
-VALUES 
-(7, 289, 658, 150, 1, 132, 133),
-(7, 288, 318, 152, 1, 131, 132);
+VALUES
+    (7, 189, 747, 25, 1, 132, 133),
+    (7, 189, 216, 25, 1, 131, 132);

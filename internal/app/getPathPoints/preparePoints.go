@@ -1,8 +1,9 @@
 package getPathPoints
 
 import (
-	"navigation/internal/models"
 	"strconv"
+
+	"navigation/internal/models"
 )
 
 // подготовка данных
@@ -14,8 +15,10 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 
 		XX := borderPoint.X + 1
 		YX := (borderPoint.Y + (borderPoint.Height + borderPoint.Y)) / 2
+		// YX := borderPoint.Y + 1
 
 		XY := (borderPoint.X + (borderPoint.Widht + borderPoint.X)) / 2
+		// XY := borderPoint.X + 1
 		YY := borderPoint.Y + 1
 
 		if axis == AxisX {

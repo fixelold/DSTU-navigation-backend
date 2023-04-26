@@ -1,17 +1,5 @@
-INSERT INTO transition_border_points (id_transition, x, y, widht, height) 
-VALUES (
-    unnest(array[1,   2]),
-    unnest(array[437, 437]),
-    unnest(array[145, 145]),
-    unnest(array[1,   1]),
-    unnest(array[74,  74])
-);
-
--- INSERT INTO transition_border_points (id_transition, x, y, widht, height) 
--- VALUES (
---     unnest(array[3,   4]),
---     unnest(array[437, 437]),
---     unnest(array[145, 145]),
---     unnest(array[1,   1]),
---     unnest(array[74,  74])
--- );
+INSERT INTO transition_border_points (id_transition, x, y, widht, height)
+VALUES
+    (1, 216, 137, 1, 29),
+    (2, 252, 475, 76, 1),
+    (3, 73, 810, 47, 1);
