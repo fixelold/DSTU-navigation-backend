@@ -7,6 +7,9 @@ INSERT INTO auditorium (number, id_sector) VALUES
 INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['1-331', '1-333', '1-333а', '1-336']), 11);
 
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1-305', '1-347', '1-348', '1-349', '1-350', '1-351', '1-352', '1-353', '1-399', '1-398', '1-397', '1-353а', '1-354', '1-355']), 15);
+
 -- INSERT INTO auditorium (number, id_sector) VALUES
 --     (unnest(array['1-348', '1-349', '1-350', '1-305', '1-351', '1-352', '1-353', '1-353а', '1-354', '1-355', '1-396', '1-397', '1-398', '1-399']), 20);
 

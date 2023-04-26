@@ -1,6 +1,8 @@
 package getPathPoints
 
 import (
+	"fmt"
+
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -19,6 +21,10 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 			}
 
 			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
+
+			fmt.Println("-------------------------------------------")
+			fmt.Println("old points - ", points)
+			fmt.Println("===========================================")
 
 			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
 

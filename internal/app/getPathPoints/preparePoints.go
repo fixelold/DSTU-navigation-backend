@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"strconv"
 
 	"navigation/internal/models"
@@ -40,19 +41,29 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 	case auditory2Sector:
 		//TODO: возможно, надо будет и тут поменять, как это сделано в блоке else.
 		if axis == AxisX {
-			if d.points[0].Height == HeightY || d.points[0].Widht == WidhtX {
+			if borderPoint.X < points.X {
+				fmt.Println("Work")
 				return models.Coordinates{
 					X:      points.X + points.Widht,
 					Y:      d.points[0].Y + d.points[0].Height - HeightX,
-					Widht:  WidhtX,
+					Widht:  -WidhtX,
 					Height: HeightX}
 			} else {
-				return models.Coordinates{
-					X:      points.X + points.Widht,
-					Y:      d.points[0].Y + d.points[0].Height,
-					Widht:  WidhtX,
-					Height: HeightX}
+				if d.points[0].Height == HeightY || d.points[0].Widht == WidhtX {
+					return models.Coordinates{
+						X:      points.X + points.Widht,
+						Y:      d.points[0].Y + d.points[0].Height - HeightX,
+						Widht:  WidhtX,
+						Height: HeightX}
+				} else {
+					return models.Coordinates{
+						X:      points.X + points.Widht,
+						Y:      d.points[0].Y + d.points[0].Height,
+						Widht:  WidhtX,
+						Height: HeightX}
+				}
 			}
+
 		} else {
 			if len(strconv.Itoa(d.sectorNumber)) == stairs {
 				return models.Coordinates{
