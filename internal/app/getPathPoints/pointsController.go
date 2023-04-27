@@ -13,9 +13,9 @@ const (
 	AxisY = 2 // указывает на ось y.
 
 	WidhtX  = 10 // ширина на оси x.
-	HeightX = 5 // высота на оси x.
+	HeightX = 5  // высота на оси x.
 
-	WidhtY  = 5 // ширина на оси y.
+	WidhtY  = 5  // ширина на оси y.
 	HeightY = 10 // высота на оси y.
 
 	plus  = 0 // значение будет положительным.
@@ -206,6 +206,7 @@ func (p *controller) getPointsSector2Sector() appError.AppError {
 			err.Wrap("getPathPoints")
 			return err
 		}
+
 	}
 	return appError.AppError{}
 }

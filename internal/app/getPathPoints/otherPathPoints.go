@@ -10,11 +10,25 @@ import (
 func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, pointsType int) appError.AppError {
 	boolean := true
 	axis := d.defenitionAxis(borderSector.Widht, borderSector.Height)
-
+	potomYbrat := 0
+	ybrat := 0
 	for boolean {
-		if d.checkOccurrence(d.points[iterator], axis) {
+		if ybrat == 1 {
+			axis = d.changeAxis(axis)
+		}
+		fmt.Println("pointsss - ", d.points)
+		if d.checkOccurrence(d.points[iterator], axis, borderSector) {
 
 			d.pathAlignment(borderSector, axis)
+
+			if ybrat == 1 {
+				axis = d.changeAxis(axis)
+			}
+
+			if pointsType == sector2Sector && potomYbrat > 0 {
+				axis = d.changeAxis(axis)
+				fmt.Println("work")
+			}
 
 			if pointsType != sector2Sector {
 				axis = d.changeAxis(axis)
@@ -22,17 +36,31 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 
 			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
 
-			fmt.Println("-------------------------------------------")
-			fmt.Println("old points - ", points)
-			fmt.Println("===========================================")
+			if pointsType == sector2Sector && potomYbrat > 0 {
+				fmt.Println("points do - ", points)
+			}
 
 			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
+
+			if pointsType == sector2Sector && potomYbrat > 0 {
+				fmt.Println("points posle - ", points)
+				fmt.Println("points - ", d.points)
+			}
 
 			d.points = append(d.points, points)
 			boolean = false
 		} else {
-
-			points := d.preparePoints(auditory2Sector, axis, borderSector, d.points[iterator])
+			if ybrat == 1 {
+				axis = d.changeAxis(axis)
+			}
+			if pointsType == sector2Sector {
+				if ybrat == 0 {
+					axis = d.changeAxis(axis)
+					ybrat += 1
+				}
+				potomYbrat += 1
+			}
+			points := d.preparePoints(pointsType, axis, borderSector, d.points[iterator])
 
 			points = d.setPointsPath2Sector(borderSector, points, d.points[iterator], axis)
 
@@ -52,6 +80,7 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 				//TODO написать изменения направления или типо что-то такого
 			}
 
+			fmt.Println("points mega - ", points)
 			d.points = append(d.points, points)
 		}
 
@@ -62,12 +91,12 @@ func (d *data) otherPathPoints(iterator int, borderSector models.Coordinates, po
 }
 
 // проверка на вхождение точек пути в пределы сектора.
-func (d *data) checkOccurrence(points models.Coordinates, axis int) bool {
+func (d *data) checkOccurrence(points models.Coordinates, axis int, borderSector models.Coordinates) bool {
 	switch axis {
 	case AxisX:
 		ph := points.X + points.Widht
-		x1 := d.sectorBorderPoints.X
-		x2 := d.sectorBorderPoints.X + d.sectorBorderPoints.Widht
+		x1 := borderSector.X
+		x2 := borderSector.X + borderSector.Widht
 		if x1 <= ph && ph <= x2 {
 			return true
 		} else {
@@ -75,8 +104,8 @@ func (d *data) checkOccurrence(points models.Coordinates, axis int) bool {
 		}
 	case AxisY:
 		ph := points.Y + points.Height
-		y1 := d.sectorBorderPoints.Y
-		y2 := d.sectorBorderPoints.Y + d.sectorBorderPoints.Height
+		y1 := borderSector.Y
+		y2 := borderSector.Y + borderSector.Height
 		if y1 <= ph && ph <= y2 {
 			return true
 		} else {

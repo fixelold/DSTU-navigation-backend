@@ -42,7 +42,6 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 		//TODO: возможно, надо будет и тут поменять, как это сделано в блоке else.
 		if axis == AxisX {
 			if borderPoint.X < points.X {
-				fmt.Println("Work")
 				return models.Coordinates{
 					X:      points.X + points.Widht,
 					Y:      d.points[0].Y + d.points[0].Height - HeightX,
@@ -90,11 +89,19 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 					Widht:  borderPoint.X - points.X,
 					Height: HeightX}
 			} else {
-				return models.Coordinates{
-					X:      points.X + points.Widht,
-					Y:      d.points[0].Y + d.points[0].Height,
-					Widht:  borderPoint.X - points.X,
-					Height: HeightX}
+				if borderPoint.X < points.X {
+					return models.Coordinates{
+						X:      points.X + points.Widht,
+						Y:      d.points[0].Y + d.points[0].Height,
+						Widht:  borderPoint.X - points.X,
+						Height: HeightX}
+				} else {
+					return models.Coordinates{
+						X:      points.X + points.Widht,
+						Y:      d.points[0].Y + d.points[0].Height,
+						Widht:  borderPoint.X - points.X,
+						Height: HeightX}
+				}
 			}
 		} else {
 			if borderPoint.Y > points.Y {
@@ -115,19 +122,45 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 	// путь, который прокладывается между секторами
 	case sector2Sector:
 		if axis == AxisX {
+
+			a := models.Coordinates{
+				X:      points.X + points.Widht - WidhtY,
+				Y:      points.Y + points.Height,
+				Widht:  WidhtY,
+				Height: borderPoint.Y - (points.Y + points.Height)}
+
+			fmt.Println("work!! - ", a)
+
 			return models.Coordinates{
 				X:      points.X + points.Widht - WidhtY,
 				Y:      points.Y + points.Height,
 				Widht:  WidhtY,
 				Height: borderPoint.Y - (points.Y + points.Height)}
 		} else {
+			fmt.Println("work!")
+			// 	return models.Coordinates{
+			// 		X:      points.X + points.Widht - WidhtY,
+			// 		Y:      points.Y + points.Height,
+			// 		Widht:  borderPoint.X - (points.X + points.Widht),
+			// 		Height: HeightX}
+			// }
+
+			a := models.Coordinates{
+				X:      points.X,
+				Y:      points.Y,
+				Widht:  borderPoint.X - (points.X - 10),
+				Height: HeightX}
+
+			fmt.Println("work!! - ", a)
+			
 			return models.Coordinates{
-				X:      points.X + points.Widht - WidhtY,
-				Y:      points.Y + points.Height,
-				Widht:  borderPoint.X - (points.X + points.Widht),
+				X:      points.X,
+				Y:      points.Y,
+				Widht:  borderPoint.X - (points.X - 10),
 				Height: HeightX}
 		}
 	default:
 		return models.Coordinates{}
 	}
+
 }
