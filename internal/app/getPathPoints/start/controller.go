@@ -1,7 +1,9 @@
-package getPathPoints
+package start
 
 import (
 	"errors"
+
+	"navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -10,15 +12,19 @@ var (
 	pointsError = appError.NewAppError("can't set points")
 )
 
+type startController struct {
+	points []int
+	audienceBoundaryPoints models.Coordinates
+}
+
 // занесение точек начального пути
-func (d *data) setAudStartPoints() appError.AppError {
+func (s *startController) setAudStartPoints() appError.AppError {
 	var err appError.AppError
 
-	axis := d.defenitionAxis(d.audBorderPoints.Widht, d.audBorderPoints.Height)
+	a := axis.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height)
+	a = axis.ChangeAxis(a)
 
-	axis = d.changeAxis(axis)
-
-	err = d.audStartPoints(axis)
+	// err = d.audStartPoints(axis)
 	if err.Err != nil {
 		err.Wrap("setAudStartPoints")
 		return err

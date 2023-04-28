@@ -1,6 +1,8 @@
 package getPathPoints
 
 import (
+	"fmt"
+
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
@@ -24,10 +26,10 @@ const (
 
 // эти константы будут использовать для рассчета данных. Они буду передаваться в switch.
 const (
-	audStartPoints  = 1 // для начального пути от границ аудитории.
-	auditory2Sector = 2
-	path2Sector     = 3
-	sector2Sector   = 4
+	audStartPoints  	= 1 // для начального пути от границ аудитории.
+	auditory2Sector 	= 2
+	path2Sector     	= 3
+	sector2Sector   	= 4
 )
 
 const (
@@ -104,11 +106,11 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		}
 
 		response = append(response, p.data.points...)
-		// err = p.getPointsSector2Sector()
-		// if err.Err != nil {
-		// 	return nil, err
-		// }
-		// response = append(response, p.data.points...)
+		err = p.getPointsSector2Sector()
+		if err.Err != nil {
+			return nil, err
+		}
+		response = append(response, p.data.points...)
 		// entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
 		// // получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
@@ -144,11 +146,13 @@ entry всегда должен быть меньше exit
 func (p *controller) getPointsAuditory2Sector(entry, exit int) appError.AppError {
 
 	// построение начального пути. От границы аудитории.
+	// p.logger.Logger.Infoln("===================Start 'start auditory points'===================")
 	err := p.data.setAudStartPoints()
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return err
 	}
+	// p.logger.Logger.Infoln("===================End 'start auditory points'===================")
 
 	borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
 	if err.Err != nil {
@@ -156,12 +160,15 @@ func (p *controller) getPointsAuditory2Sector(entry, exit int) appError.AppError
 		return err
 	}
 
+	// p.logger.Logger.Infoln("===================Start 'auditory to end sector'===================")
 	// построение пути вплоть до вхождение в область точек сектора.
 	err = p.data.middlePoints(borderSector)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return err
 	}
+
+	// p.logger.Logger.Infoln("===================End 'auditory to end sector'===================")
 
 	return appError.AppError{}
 }
@@ -200,12 +207,21 @@ func (p *controller) getPointsSector2Sector() appError.AppError {
 			err.Wrap("getPathPoints")
 			return err
 		}
-
+		fmt.Println("iterator - ", i)
+		if i == 2 {
+			p.data.sectorType = 1
+		}
+		p.logger.Logger.Infoln("===================Start 'sector to sector'===================")
 		err = p.data.sector2Sector(borderSector)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return err
 		}
+		p.logger.Logger.Infoln("===================End 'sector to sector'===================")
+		// if i >= 2 {
+		// 	p.data.points[len(p.data.points) - i - 1].Y -= 5
+		// 	fmt.Println("data - ", p.data.points)
+		// }
 
 	}
 	return appError.AppError{}

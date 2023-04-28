@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"strconv"
 
 	"navigation/internal/models"
@@ -44,7 +43,7 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 			if borderPoint.X < points.X {
 				return models.Coordinates{
 					X:      points.X + points.Widht,
-					Y:      d.points[0].Y + d.points[0].Height - HeightX,
+					Y:      d.points[0].Y + d.points[0].Height,
 					Widht:  -WidhtX,
 					Height: HeightX}
 			} else {
@@ -55,6 +54,7 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 						Widht:  WidhtX,
 						Height: HeightX}
 				} else {
+					// fmt.Println("This work")
 					return models.Coordinates{
 						X:      points.X + points.Widht,
 						Y:      d.points[0].Y + d.points[0].Height,
@@ -71,10 +71,10 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 					Height: HeightY}
 			} else {
 				return models.Coordinates{
-					X:      points.X + points.Widht,
-					Y:      d.points[0].Y + d.points[0].Height,
+					X:      points.X + points.Widht, // менял, чтобы 330 не съезжала
+					Y:      points.Y + points.Height,
 					Widht:  WidhtY,
-					Height: HeightY}
+					Height: borderPoint.Y - (points.Y + points.Height)}
 			}
 		}
 
@@ -88,22 +88,25 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 					Widht:  borderPoint.X - points.X,
 					Height: HeightX}
 			} else {
+				// d.logger.Logger.Infoln("path to sector: ")
 				if borderPoint.X < points.X {
+					// d.logger.Logger.Infoln("border point < points: ")
 					return models.Coordinates{
 						X:      points.X + points.Widht,
-						Y:      d.points[0].Y + d.points[0].Height,
+						Y:      points.Y + points.Height,
+						// Y: d.points[0].Y + d.points[0].Height,
 						Widht:  borderPoint.X - points.X,
 						Height: HeightX}
 				} else {
 					return models.Coordinates{
 						X:      points.X + points.Widht,
-						Y:      d.points[0].Y + d.points[0].Height,
+						// Y:      d.points[0].Y + d.points[0].Height,
+						Y:      points.Y + points.Height,
 						Widht:  borderPoint.X - points.X,
 						Height: HeightX}
 				}
 			}
 		} else {
-			fmt.Println("this axis work")
 			if borderPoint.Y > points.Y {
 				return models.Coordinates{
 					X:      points.X + points.Widht,
@@ -122,43 +125,22 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 	// путь, который прокладывается между секторами
 	case sector2Sector:
 		if axis == AxisX {
-
-			a := models.Coordinates{
-				X:      points.X + points.Widht - WidhtY,
-				Y:      points.Y + points.Height,
-				Widht:  WidhtY,
-				Height: borderPoint.Y - (points.Y + points.Height)}
-
-			fmt.Println("work!! - ", a)
-
 			return models.Coordinates{
-				X:      points.X + points.Widht - WidhtY,
-				Y:      points.Y + points.Height,
-				Widht:  WidhtY,
-				Height: borderPoint.Y - (points.Y + points.Height)}
+				X: points.X + points.Widht,
+				Y: points.Y + points.Height,
+				Widht: borderPoint.X - (points.X + points.Widht),
+				Height: HeightX,
+			}
+
 		} else {
-			fmt.Println("work!")
-			// 	return models.Coordinates{
-			// 		X:      points.X + points.Widht - WidhtY,
-			// 		Y:      points.Y + points.Height,
-			// 		Widht:  borderPoint.X - (points.X + points.Widht),
-			// 		Height: HeightX}
-			// }
-
-			a := models.Coordinates{
-				X:      points.X,
-				Y:      points.Y,
-				Widht:  borderPoint.X - (points.X - 10),
-				Height: HeightX}
-
-			fmt.Println("work!! - ", a)
-			
 			return models.Coordinates{
-				X:      points.X,
-				Y:      points.Y,
-				Widht:  borderPoint.X - (points.X - 10),
-				Height: HeightX}
+				X: points.X,
+				Y: points.Y + points.Height,
+				Widht: WidhtY,
+				Height: borderPoint.Y - (points.Y + points.Height),
+			}
 		}
+		
 	default:
 		return models.Coordinates{}
 	}

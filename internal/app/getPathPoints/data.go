@@ -1,10 +1,12 @@
 package getPathPoints
 
 import (
+	"strconv"
+
+	"navigation/internal/app/getPathPoints/db"
 	"navigation/internal/appError"
 	"navigation/internal/logging"
 	"navigation/internal/models"
-	"strconv"
 )
 
 var (
@@ -25,18 +27,20 @@ type data struct {
 	audNumber        string // номер аудитории.
 
 	logger     *logging.Logger // логирования.
-	repository Repository      // для обращения к базе данных.
+	repository db.Repository      // для обращения к базе данных.
 
 	points []models.Coordinates // массив координат. Для построения пути.
 
 	transition       int
 	transitionNumber int
+
+	sectorType int
 }
 
 func newData(audNumber string, 
 	sectorEntry, sectorExit, nextSectorNumber int, 
 	logger *logging.Logger, 
-	repository Repository,
+	repository db.Repository,
 	transition, transitionNumber int) (*data, appError.AppError) {
 	var err appError.AppError
 	data := &data{
@@ -64,6 +68,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 	// получаем координаты аудитории по ее номеру.
 	if d.transition == transitionYes {
 		d.audPoints, err = d.repository.getTransitionPoints(d.transitionNumber)
+
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
