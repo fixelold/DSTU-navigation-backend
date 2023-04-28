@@ -62,7 +62,6 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 						Height: HeightX}
 				}
 			}
-
 		} else {
 			if len(strconv.Itoa(d.sectorNumber)) == stairs {
 				return models.Coordinates{
@@ -104,6 +103,7 @@ func (d *data) preparePoints(pointsType, axis int, borderPoint, points models.Co
 				}
 			}
 		} else {
+			fmt.Println("this axis work")
 			if borderPoint.Y > points.Y {
 				return models.Coordinates{
 					X:      points.X + points.Widht,

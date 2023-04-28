@@ -104,32 +104,32 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		}
 
 		response = append(response, p.data.points...)
-		err = p.getPointsSector2Sector()
-		if err.Err != nil {
-			return nil, err
-		}
-		response = append(response, p.data.points...)
-		entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
+		// err = p.getPointsSector2Sector()
+		// if err.Err != nil {
+		// 	return nil, err
+		// }
+		// response = append(response, p.data.points...)
+		// entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
-		// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-		data, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository, p.transition, p.transitionNumber)
-		if err.Err != nil {
-			err.Wrap("getPathPoints")
-			return nil, err
-		}
+		// // получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
+		// data, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository, p.transition, p.transitionNumber)
+		// if err.Err != nil {
+		// 	err.Wrap("getPathPoints")
+		// 	return nil, err
+		// }
 
-		p.data = *data
+		// p.data = *data
 
-		err = p.getPointsAuditory2Sector(entry, exit)
-		if err.Err != nil {
-			return nil, err
-		}
-		response = append(response, p.data.points...)
-		err = p.getPointsSector2Sector()
-		if err.Err != nil {
-			return nil, err
-		}
-		response = append(response, p.data.points...)
+		// err = p.getPointsAuditory2Sector(entry, exit)
+		// if err.Err != nil {
+		// 	return nil, err
+		// }
+		// response = append(response, p.data.points...)
+		// err = p.getPointsSector2Sector()
+		// if err.Err != nil {
+		// 	return nil, err
+		// }
+		// response = append(response, p.data.points...)
 	}
 
 	return response, err
