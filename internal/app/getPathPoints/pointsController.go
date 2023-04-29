@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"navigation/internal/app/getPathPoints/middle"
 	"navigation/internal/app/getPathPoints/start"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
@@ -102,7 +103,13 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 
 		response = append(response, p.data.points...)
 	} else if p.transition == transitionNo {
+
 		err := p.start()
+		if err.Err != nil {
+			return nil, err
+		}
+
+		err = p.middle(entry, exit)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -162,7 +169,25 @@ func (p *controller) start() appError.AppError {
 	return appError.AppError{}
 }
 
-func (p *controller) middle() {}
+func (p *controller) middle(entry, exit int) appError.AppError {
+	repository := NewRepository(p.client, p.logger)
+	middle := middle.NewMiddleController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	borderSector, err := repository.getSectorBorderPoint(entry, exit)
+	if err.Err != nil {
+		err.Wrap("middle")
+		return err
+	}
+	middle.Points = append(middle.Points, p.points...)
+	
+	data, err := middle.MiddlePoints(borderSector)
+	if err.Err != nil {
+		err.Wrap("middle")
+	}
+
+	p.points = append(p.points, data...)
+
+	return appError.AppError{}
+}
 
 func (p *controller) sector2sector() {}
 
@@ -221,12 +246,12 @@ func (p *controller) sector2sector() {}
 // }
 
 // func (p *controller) getPointsSector2Sector() appError.AppError {
-
+	
 // 	for i := 1; i < len(p.sectors)-1; i++ {
 
 // 		entry, exit := min(p.sectors[i], p.sectors[i+1])
 
-// 		borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
+// 		borderSector, err := repository.getSectorBorderPoint(entry, exit)
 // 		if err.Err != nil {
 // 			err.Wrap("getPathPoints")
 // 			return err

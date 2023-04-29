@@ -19,7 +19,7 @@ type constData struct {
 }
 
 type middleController struct {
-	points []models.Coordinates
+	Points []models.Coordinates
 	constData constData
 	sectorNumber int
 
@@ -47,12 +47,12 @@ func NewMiddleController(
 	}
 }
 
-func (m *middleController) middlePoints(borderSector models.Coordinates) appError.AppError {
+func (m *middleController) MiddlePoints(borderSector models.Coordinates) ([]models.Coordinates, appError.AppError) {
 	err := m.building(borderSector)
 	if err.Err != nil {
 		err.Wrap("middlePoints")
-		return err
+		return nil, err
 	}
 
-	return appError.AppError{}
+	return m.Points, appError.AppError{}
 }

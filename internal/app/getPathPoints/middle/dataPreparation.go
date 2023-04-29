@@ -10,7 +10,7 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 	if axis == m.constData.axisX {
 		if len(strconv.Itoa(m.sectorNumber)) == 4 { //stairs
 			return models.Coordinates{
-				X:      m.points[0].X,
+				X:      m.Points[0].X,
 				Y:      points.Y + points.Height,
 				Widht:  borderPoint.X - points.X,
 				Height: m.constData.heightX}

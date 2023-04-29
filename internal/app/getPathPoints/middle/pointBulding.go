@@ -12,23 +12,23 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	repository := NewRepository(m.client, m.logger)
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 	for boolean {
-		if m.checkOccurrence(m.points[iterator], axis, borderSector) {
+		if m.checkOccurrence(m.Points[iterator], axis, borderSector) {
 
 			m.pathAlignment(borderSector, axis)
 
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 
-			points := m.preparation(axis, borderSector, m.points[iterator])
+			points := m.preparation(axis, borderSector, m.Points[iterator])
 
-			points = m.setPoints(borderSector, points, m.points[iterator], axis)
+			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
 
-			m.points = append(m.points, points)
+			m.Points = append(m.Points, points)
 			boolean = false
 		} else {
 
-			points := m.preparation(axis, borderSector, m.points[iterator])
+			points := m.preparation(axis, borderSector, m.Points[iterator])
 
-			points = m.setPoints(borderSector, points, m.points[iterator], axis)
+			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
 
 			ok, err := repository.checkBorderAud(points)
 			if err.Err != nil {
@@ -46,7 +46,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 				//TODO написать изменения направления или типо что-то такого
 			}
 
-			m.points = append(m.points, points)
+			m.Points = append(m.Points, points)
 		}
 
 		iterator += 1
@@ -94,8 +94,8 @@ func (m *middleController) checkOccurrence(points models.Coordinates, axis int, 
 
 // выравнивание пути
 func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, axis int) {
-	lenght := len(m.points)
-	path := m.points[lenght-1]
+	lenght := len(m.Points)
+	path := m.Points[lenght-1]
 	switch axis {
 	case m.constData.axisX:
 		points := models.Coordinates{
@@ -105,11 +105,11 @@ func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, a
 		if sectorPoints > path.X {
 			points.Widht = sectorPoints - path.X
 			points.Height = m.constData.heightX
-			m.points[lenght-1].Widht = points.Widht
+			m.Points[lenght-1].Widht = points.Widht
 		} else if sectorPoints < path.X {
 			points.Widht = sectorPoints - path.X
 			points.Height = m.constData.heightX
-			m.points[lenght-1].Widht = points.Widht
+			m.Points[lenght-1].Widht = points.Widht
 		}
 	case m.constData.axisY:
 		points := models.Coordinates{
@@ -119,11 +119,11 @@ func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, a
 		if sectorPoints > path.Y {
 			points.Widht = m.constData.widhtY
 			points.Height = sectorPoints - path.Y
-			m.points[lenght-1].Height = points.Height
+			m.Points[lenght-1].Height = points.Height
 		} else if sectorPoints < path.Y {
 			points.Widht = m.constData.widhtY
 			points.Height = sectorPoints - path.Y
-			m.points[lenght-1].Height = points.Height
+			m.Points[lenght-1].Height = points.Height
 		}
 	default:
 		m.logger.Errorln("Path Alignment default")
