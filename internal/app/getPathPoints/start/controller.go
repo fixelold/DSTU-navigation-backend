@@ -12,9 +12,22 @@ var (
 	pointsError = appError.NewAppError("can't set points")
 )
 
+type constData struct {
+	positiveCoordinate int
+	negativeCoordinate int
+	axisX int
+	axisY int
+	widhtX int
+	heightX int
+	widhtY int
+	heightY int
+}
+
 type startController struct {
-	points []int
+	points []models.Coordinates
 	audienceBoundaryPoints models.Coordinates
+	constData constData
+	repository Repository
 }
 
 // занесение точек начального пути
@@ -34,22 +47,22 @@ func (s *startController) setAudStartPoints() appError.AppError {
 }
 
 // функция расчета начального пути от границы аудитории.
-func (d *data) audStartPoints(axis int) appError.AppError {
+func (s *startController) audStartPoints(axis int) appError.AppError {
 	var err appError.AppError
 	var path models.Coordinates
 
 	// подготовка точек исходя из оси, типа и границ аудитории.
-	coordinates := d.preparePoints(audStartPoints, axis, d.audBorderPoints, models.Coordinates{})
+	coordinates := s.preparation(axis, s.audienceBoundaryPoints)
 
 	// получение точек для начального пути.
-	path, err = d.setPointsAudStart(coordinates, axis, plus)
+	path, err = s.pathBuilding(coordinates, axis, s.constData.positiveCoordinate)
 	if err.Err != nil {
 		err.Wrap("audStartPoints")
 		return err
 	}
 
 	// проверка, чтобы точки пути не находились в пределах аудиториию
-	check, err := d.repository.checkBorderAud(path)
+	check, err := s.repository.checkBorderAud(path)
 	if err.Err != nil {
 		err.Wrap("audStartPoints")
 		return err
@@ -63,23 +76,23 @@ func (d *data) audStartPoints(axis int) appError.AppError {
 			на оси 'x' знак '-' будет означать, что путь будет отрисовываться справа на лево.
 	*/
 	if check {
-		d.points = append(d.points, path)
+		s.points = append(s.points, path)
 		return appError.AppError{}
 	} else {
-		path, err = d.setPointsAudStart(coordinates, axis, minus)
+		path, err = s.pathBuilding(coordinates, axis, s.constData.negativeCoordinate)
 		if err.Err != nil {
 			err.Wrap("audStartPoints")
 			return err
 		}
 
-		check, err = d.repository.checkBorderAud(path)
+		check, err = s.repository.checkBorderAud(path)
 		if err.Err != nil {
 			err.Wrap("audStartPoints")
 			return err
 		}
 
 		if check {
-			d.points = append(d.points, path)
+			s.points = append(s.points, path)
 			return appError.AppError{}
 		} else {
 			pointsError.Wrap("audStartPoints")

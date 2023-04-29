@@ -2,28 +2,26 @@ package start
 
 import "navigation/internal/models"
 
-func preparation() {
+func (s *startController) preparation(axis int, borderPoint models.Coordinates) models.Coordinates {
 	var coordinates models.Coordinates
 
 	XX := borderPoint.X + 1
 	YX := (borderPoint.Y + (borderPoint.Height + borderPoint.Y)) / 2
-	// YX := borderPoint.Y + 1
 
 	XY := (borderPoint.X + (borderPoint.Widht + borderPoint.X)) / 2
-	// XY := borderPoint.X + 1
 	YY := borderPoint.Y + 1
 
-	if axis == AxisX {
+	if axis == s.constData.axisX {
 		coordinates.X = XX
 		coordinates.Y = YX
-		coordinates.Widht = WidhtX
-		coordinates.Height = HeightX
+		coordinates.Widht = s.constData.widhtX
+		coordinates.Height = s.constData.heightX
 
-	} else if axis == AxisY {
+	} else if axis == s.constData.axisY {
 		coordinates.X = XY
 		coordinates.Y = YY
-		coordinates.Widht = WidhtY
-		coordinates.Height = HeightY
+		coordinates.Widht = s.constData.widhtY
+		coordinates.Height = s.constData.heightY
 	}
 
 	return coordinates
