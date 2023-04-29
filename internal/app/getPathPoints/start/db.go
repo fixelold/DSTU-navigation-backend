@@ -8,20 +8,17 @@ import (
 
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
-	"navigation/internal/logging"
 	"navigation/internal/models"
 )
 
 
 type repository struct {
 	client postgresql.Client
-	logger *logging.Logger
 }
 
-func NewRepository(client postgresql.Client, logger *logging.Logger) Repository {
+func NewRepository(client postgresql.Client) Repository {
 	return &repository{
 		client: client,
-		logger: logger,
 	}
 }
 

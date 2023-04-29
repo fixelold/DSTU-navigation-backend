@@ -3,7 +3,9 @@ package getPathPoints
 import (
 	"fmt"
 
+	"navigation/internal/app/getPathPoints/start"
 	"navigation/internal/appError"
+	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
 )
@@ -38,7 +40,7 @@ const (
 
 type controller struct {
 	logger     *logging.Logger // логирования.
-	repository Repository      // для обращения к базе данных.
+	client postgresql.Client      // для обращения к базе данных.
 
 	StartAuditory string // номер начальной аудитории.
 	EndAuditory   string // номер конечной аудитории.
@@ -55,11 +57,11 @@ func NewPointsController(
 	audStart, audEnd string,
 	sectors []int,
 	logger *logging.Logger,
-	repository Repository,
+	client postgresql.Client,
 	transition, transitionNumber int) pointsController {
 	return &controller{
 		logger:           logger,
-		repository:       repository,
+		client:       client,
 		StartAuditory:    audStart,
 		EndAuditory:      audEnd,
 		sectors:          sectors,
@@ -83,6 +85,8 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		необходимо для внутренней логики.
 	*/
 	entry, exit := min(p.sectors[0], p.sectors[1])
+
+	start.NewStartController(models.Coordinates{}, p.repository)
 
 	data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.repository, p.transition, p.transitionNumber)
 	if err.Err != nil {

@@ -39,7 +39,7 @@ func (r *Router) prepareData() {
 	appConfig := config.GetConfig()
 	r.connection = postgresql.NewClient(appContext, *appConfig)
 }
-
+ 
 func (r *Router) prepareRouter() {
 	userPrepareRepo := user.NewRepository(r.connection, r.logger)
 	userPrepare := user.NewUser(r.logger, userPrepareRepo)
@@ -48,8 +48,8 @@ func (r *Router) prepareRouter() {
 	pathBuildingRepo := pathBuilder.NewRepository(r.connection, r.logger)
 	pathBuldingController := pathBuilder.NewHandler(r.logger, pathBuildingRepo)
 
-	drawPathRepo := getPathPoints.NewRepository(r.connection, r.logger)
-	drawPathController := getPathPoints.NewHandler(r.logger, drawPathRepo)
+	// drawPathRepo := getPathPoints.NewRepository(r.connection, r.logger)
+	drawPathController := getPathPoints.NewHandler(r.logger, r.connection)
 
 	userController := user.NewHandler(r.logger, middleware.UserMiddleware{Client: r.connection, Logger: r.logger})
 

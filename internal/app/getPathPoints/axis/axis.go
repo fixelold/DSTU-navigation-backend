@@ -1,4 +1,4 @@
-package axis
+package axes
 
 func DefenitionAxis(width, height int) int {
 	if width == 1 {

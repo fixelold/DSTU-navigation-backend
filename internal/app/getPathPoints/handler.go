@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	db "navigation/internal/app/getPathPoints/db"
 	"navigation/internal/appError"
+	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
@@ -26,13 +26,13 @@ const (
 
 type handler struct {
 	logger     *logging.Logger
-	repository db.Repository
+	client postgresql.Client
 }
 
-func NewHandler(logger *logging.Logger, repository db.Repository) handlers.Handler {
+func NewHandler(logger *logging.Logger, client postgresql.Client) handlers.Handler {
 	return &handler{
 		logger:     logger,
-		repository: repository,
+		client: client,
 	}
 }
 
