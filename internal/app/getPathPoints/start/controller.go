@@ -53,19 +53,19 @@ func NewStartController(
 	}
 
 // занесение точек начального пути
-func (s *startController) setAudStartPoints() appError.AppError {
+func (s *startController) StartPath() ([]models.Coordinates, appError.AppError) {
 	var err appError.AppError
 
-	a := axes.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height)
-	a = axes.ChangeAxis(a)
+	a := axes.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height, s.constData.axisX, s.constData.axisY)
+	a = axes.ChangeAxis(a, s.constData.axisX, s.constData.axisY)
 
-	// err = d.audStartPoints(axis)
+	err = s.audStartPoints(a)
 	if err.Err != nil {
-		err.Wrap("setAudStartPoints")
-		return err
+		err.Wrap("startPath")
+		return nil, err
 	}
 
-	return appError.AppError{}
+	return s.points, appError.AppError{}
 }
 
 // функция расчета начального пути от границы аудитории.

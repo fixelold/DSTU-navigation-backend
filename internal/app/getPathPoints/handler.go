@@ -64,7 +64,7 @@ func (h *handler) getPoints(c *gin.Context) {
 		return
 	}
 
-	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.repository, data.Transition, data.TransitionNumber)
+	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.client, data.Transition, data.TransitionNumber)
 
 	response, err := p.controller()
 	if err.Err != nil {
@@ -95,14 +95,14 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
-	err = audPoints.GetColoringPoints()
-	if err.Err != nil {
-		err.Wrap("getAuddiencePoints")
-		h.logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-		return
-	}
+	// audPoints := NewColoring(request.Start, request.End, h.logger, h.client, request.Transition, request.TransitionNumber)
+	// err = audPoints.GetColoringPoints()
+	// if err.Err != nil {
+	// 	err.Wrap("getAuddiencePoints")
+	// 	h.logger.Error(err.Error())
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+	// 	return
+	// }
 
-	c.JSON(http.StatusOK, audPoints)
+	// c.JSON(http.StatusOK, audPoints)
 }

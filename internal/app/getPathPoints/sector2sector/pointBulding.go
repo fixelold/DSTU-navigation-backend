@@ -9,13 +9,13 @@ import (
 func (s *sectorToSectorController) building(iterator int, borderSector models.Coordinates) appError.AppError {
 	boolean := true
 	repository := NewRepository(s.client, s.logger)
-	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height)
+	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
 	for boolean {
 		if s.checkOccurrence(s.points[iterator], axis, borderSector) {
 
 			s.pathAlignment(borderSector, axis)
 
-			axis = axes.ChangeAxis(axis)
+			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 
 			points := s.preparation(axis, borderSector, s.points[iterator])
 

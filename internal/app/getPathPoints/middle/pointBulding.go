@@ -10,13 +10,13 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	boolean := true
 	iterator := 0
 	repository := NewRepository(m.client, m.logger)
-	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height)
+	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 	for boolean {
 		if m.checkOccurrence(m.points[iterator], axis, borderSector) {
 
 			m.pathAlignment(borderSector, axis)
 
-			axis = axes.ChangeAxis(axis)
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 
 			points := m.preparation(axis, borderSector, m.points[iterator])
 
