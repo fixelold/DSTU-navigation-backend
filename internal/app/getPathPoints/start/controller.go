@@ -56,8 +56,8 @@ func NewStartController(
 func (s *startController) setAudStartPoints() appError.AppError {
 	var err appError.AppError
 
-	a := axis.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height)
-	a = axis.ChangeAxis(a)
+	a := axes.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height)
+	a = axes.ChangeAxis(a)
 
 	// err = d.audStartPoints(axis)
 	if err.Err != nil {
