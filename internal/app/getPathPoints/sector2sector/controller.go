@@ -19,9 +19,11 @@ type constData struct {
 }
 
 type sectorToSectorController struct {
-	points []models.Coordinates
+	Points []models.Coordinates
+	LastSector bool
 	constData constData
 	sectorNumber int
+	OldAxis int
 
 	client postgresql.Client
 	logger *logging.Logger
@@ -47,13 +49,13 @@ func NewSectorToSectorController(
 	}
 }
 
-func (s *sectorToSectorController) sector2Sector(borderSector models.Coordinates) appError.AppError {
-	iterator := (len(s.points) - 1)
+func (s *sectorToSectorController) Sector2SectorPoints(borderSector models.Coordinates, lenPoint int) ([]models.Coordinates,appError.AppError) {
+	iterator := lenPoint
 	err := s.building(iterator, borderSector)
 	if err.Err != nil {
 		err.Wrap("sector2Sector")
-		return err
+		return nil, err
 	}
 
-	return appError.AppError{}
+	return s.Points, appError.AppError{}
 }

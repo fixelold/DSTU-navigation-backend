@@ -2,6 +2,7 @@ package getPathPoints
 
 import (
 	"navigation/internal/app/getPathPoints/middle"
+	sectorToSector "navigation/internal/app/getPathPoints/sector2sector"
 	"navigation/internal/app/getPathPoints/start"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
@@ -73,6 +74,7 @@ func NewPointsController(
 type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
 	start() appError.AppError
+	middle(entry, exit int) appError.AppError
 	// getPointsAuditory2Sector(entry, exit int) appError.AppError
 	// getPointsAuditory2Transition(entry, exit int) appError.AppError
 	// getPointsSector2Sector() appError.AppError
@@ -114,6 +116,11 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 			return nil, err
 		}
 
+		err = p.sector2sector()
+		if err.Err != nil {
+			return nil, err
+		}
+
 		// err := p.getPointsAuditory2Sector(entry, exit)
 		// if err.Err != nil {
 		// 	return nil, err
@@ -125,16 +132,27 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		// 	return nil, err
 		// }
 		// response = append(response, p.data.points...)
-		// entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
+		entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
-		// // получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-		// data, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.repository, p.transition, p.transitionNumber)
-		// if err.Err != nil {
-		// 	err.Wrap("getPathPoints")
-		// 	return nil, err
-		// }
+		// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
+		newData, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return nil, err
+		}
+ 
+		p.data = *newData
+		response = append(response, p.points...)
+		p.points = []models.Coordinates{}
+		err = p.start()
+		if err.Err != nil {
+			return nil, err
+		}
 
-		// p.data = *data
+		err = p.middle(entry, exit)
+		if err.Err != nil {
+			return nil, err
+		}
 
 		// err = p.getPointsAuditory2Sector(entry, exit)
 		// if err.Err != nil {
@@ -146,9 +164,11 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		// 	return nil, err
 		// }
 		// response = append(response, p.data.points...)
+
+		response = append(response, p.points...)
 	}
 
-	return p.points, err
+	return response, err
 }
 
 /*
@@ -189,7 +209,43 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 	return appError.AppError{}
 }
 
-func (p *controller) sector2sector() {}
+func (p *controller) sector2sector() appError.AppError {
+	repository := NewRepository(p.client, p.logger)
+	sector2sector := sectorToSector.NewSectorToSectorController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	sector2sector.Points = append(sector2sector.Points, p.points...)
+	sector2sector.OldAxis = 3 // delete
+	for i := 1; i < len(p.sectors)-1; i++ {
+
+		entry, exit := min(p.sectors[i], p.sectors[i+1])
+
+		borderSector, err := repository.getSectorBorderPoint(entry, exit)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return err
+		}
+
+		// if i >= 2 {
+		// 	sector2sector.LastSector = false
+		// 	// p.data.sectorType = 1
+		// } else {
+		// 	sector2sector.LastSector = true
+		// }
+
+		data, err := sector2sector.Sector2SectorPoints(borderSector, len(p.points) - 1)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return err
+		}
+
+		p.points = append(p.points, data...)
+		sector2sector.Points = append(sector2sector.Points, data...)
+		if i == 2 {
+			break
+		}
+	}
+
+	return appError.AppError{}
+}
 
 
 // func (p *controller) getPointsAuditory2Sector(entry, exit int) appError.AppError {

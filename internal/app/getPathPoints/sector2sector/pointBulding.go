@@ -10,24 +10,39 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 	boolean := true
 	repository := NewRepository(s.client, s.logger)
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
+	lastPathSector := false
 	for boolean {
-		if s.checkOccurrence(s.points[iterator], axis, borderSector) {
-
+		if s.checkOccurrence(s.Points[iterator], axis, borderSector) {
+			var points models.Coordinates
 			s.pathAlignment(borderSector, axis)
 
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 
-			points := s.preparation(axis, borderSector, s.points[iterator])
+			// if s.OldAxis == axis {
+			// 	s.LastSector = false
+			// } else {
+			// 	s.LastSector = true
+			// }
 
-			points = s.setPoints(borderSector, points, s.points[iterator], axis)
+			if lastPathSector == true {
+				points = s.preparation(axis, borderSector, s.Points[iterator], true)
+			} else {
+				points = s.preparation(axis, borderSector, s.Points[iterator], false)
+			}
 
-			s.points = append(s.points, points)
+			points = s.setPoints(borderSector, points, s.Points[iterator], axis)
+
+			s.Points = append(s.Points, points)
+
+			// s.logger.Logger.Infof("\n iterator: %d\n points: %d all points: %d\n", iterator, points, s.Points)
+			s.OldAxis = axis
 			boolean = false
 		} else {
+			lastPathSector = true
+			// s.logger.Logger.Infof("\n iterator: %d\n border: %d\n", iterator, borderSector)
+			points := s.preparation(axis, borderSector, s.Points[iterator], false)
 
-			points := s.preparation(axis, borderSector, s.points[iterator])
-
-			points = s.setPoints(borderSector, points, s.points[iterator], axis)
+			points = s.setPoints(borderSector, points, s.Points[iterator], axis)
 
 			ok, err := repository.checkBorderAud(points)
 			if err.Err != nil {
@@ -44,7 +59,7 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 				//TODO написать изменения направления или типо что-то такого
 			}
 
-			s.points = append(s.points, points)
+			s.Points = append(s.Points, points)
 		}
 
 		iterator += 1
@@ -92,8 +107,8 @@ func (s *sectorToSectorController) checkOccurrence(points models.Coordinates, ax
 
 // выравнивание пути
 func (s *sectorToSectorController) pathAlignment(sectorBorderPoint models.Coordinates, axis int) {
-	lenght := len(s.points)
-	path := s.points[lenght-1]
+	lenght := len(s.Points)
+	path := s.Points[lenght-1]
 	switch axis {
 	case s.constData.axisX:
 		points := models.Coordinates{
@@ -103,11 +118,11 @@ func (s *sectorToSectorController) pathAlignment(sectorBorderPoint models.Coordi
 		if sectorPoints > path.X {
 			points.Widht = sectorPoints - path.X
 			points.Height = s.constData.heightX
-			s.points[lenght-1].Widht = points.Widht
+			s.Points[lenght-1].Widht = points.Widht
 		} else if sectorPoints < path.X {
 			points.Widht = sectorPoints - path.X
 			points.Height = s.constData.heightX
-			s.points[lenght-1].Widht = points.Widht
+			s.Points[lenght-1].Widht = points.Widht
 		}
 	case s.constData.axisY:
 		points := models.Coordinates{
@@ -117,11 +132,11 @@ func (s *sectorToSectorController) pathAlignment(sectorBorderPoint models.Coordi
 		if sectorPoints > path.Y {
 			points.Widht = s.constData.widhtY
 			points.Height = sectorPoints - path.Y
-			s.points[lenght-1].Height = points.Height
+			s.Points[lenght-1].Height = points.Height
 		} else if sectorPoints < path.Y {
 			points.Widht = s.constData.widhtY
 			points.Height = sectorPoints - path.Y
-			s.points[lenght-1].Height = points.Height
+			s.Points[lenght-1].Height = points.Height
 		}
 	default:
 		s.logger.Errorln("Path Alignment default")
