@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"navigation/internal/appError"
+	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
@@ -25,13 +26,13 @@ const (
 
 type handler struct {
 	logger     *logging.Logger
-	repository Repository
+	client postgresql.Client
 }
 
-func NewHandler(logger *logging.Logger, repository Repository) handlers.Handler {
+func NewHandler(logger *logging.Logger, client postgresql.Client) handlers.Handler {
 	return &handler{
 		logger:     logger,
-		repository: repository,
+		client: client,
 	}
 }
 
@@ -63,7 +64,7 @@ func (h *handler) getPoints(c *gin.Context) {
 		return
 	}
 
-	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.repository, data.Transition, data.TransitionNumber)
+	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.client, data.Transition, data.TransitionNumber)
 
 	response, err := p.controller()
 	if err.Err != nil {
@@ -94,14 +95,14 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	audPoints := NewColoring(request.Start, request.End, h.logger, h.repository, request.Transition, request.TransitionNumber)
-	err = audPoints.GetColoringPoints()
-	if err.Err != nil {
-		err.Wrap("getAuddiencePoints")
-		h.logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-		return
-	}
+	// audPoints := NewColoring(request.Start, request.End, h.logger, h.client, request.Transition, request.TransitionNumber)
+	// err = audPoints.GetColoringPoints()
+	// if err.Err != nil {
+	// 	err.Wrap("getAuddiencePoints")
+	// 	h.logger.Error(err.Error())
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+	// 	return
+	// }
 
-	c.JSON(http.StatusOK, audPoints)
+	// c.JSON(http.StatusOK, audPoints)
 }

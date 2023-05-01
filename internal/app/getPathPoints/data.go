@@ -1,10 +1,12 @@
 package getPathPoints
 
 import (
+	"strconv"
+
 	"navigation/internal/appError"
+	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
-	"strconv"
 )
 
 var (
@@ -25,18 +27,20 @@ type data struct {
 	audNumber        string // номер аудитории.
 
 	logger     *logging.Logger // логирования.
-	repository Repository      // для обращения к базе данных.
+	client postgresql.Client      // для обращения к базе данных.
 
 	points []models.Coordinates // массив координат. Для построения пути.
 
 	transition       int
 	transitionNumber int
+
+	sectorType int
 }
 
 func newData(audNumber string, 
 	sectorEntry, sectorExit, nextSectorNumber int, 
 	logger *logging.Logger, 
-	repository Repository,
+	client postgresql.Client,
 	transition, transitionNumber int) (*data, appError.AppError) {
 	var err appError.AppError
 	data := &data{
@@ -44,7 +48,7 @@ func newData(audNumber string,
 		sectorNumber: sectorExit, //TODO: тут может быть ошибка. Может пердаваться не верный сектор. 
 		nextSectorNumber: nextSectorNumber,
 		logger:           logger,
-		repository:       repository,
+		client:       client,
 		transition: transition,
 		transitionNumber: transitionNumber,
 	}
@@ -61,15 +65,17 @@ func newData(audNumber string,
 // получение audPoints, audBorderPoints, sectorBorderPoints
 func (d *data) getPoints(entry, exit int) appError.AppError {
 	var err appError.AppError
+	repository := NewRepository(d.client, d.logger)
 	// получаем координаты аудитории по ее номеру.
 	if d.transition == transitionYes {
-		d.audPoints, err = d.repository.getTransitionPoints(d.transitionNumber)
+		d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
+
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
 		}
 	} else if d.transition == transitionNo {
-		d.audPoints, err = d.repository.getAudPoints(d.audNumber)
+		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
@@ -80,7 +86,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 	}
 
 	// получаем координаты границ аудитории по ее номеру.
-	d.audBorderPoints, err = d.repository.getAudBorderPoint(d.audNumber)
+	d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
 	if err.Err != nil {
 		err.Wrap("getPoints")
 		return err
@@ -88,13 +94,13 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 
 	// получаем координаты одной из границ сектора. По значению входа и выхода из него.
 	if len(strconv.Itoa(exit)) == stairs {
-		d.sectorBorderPoints, err = d.repository.getTransitionSectorBorderPoint(entry, exit)
+		d.sectorBorderPoints, err = repository.getTransitionSectorBorderPoint(entry, exit)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
 		}
 	} else {
-		d.sectorBorderPoints, err = d.repository.getSectorBorderPoint(entry, exit)
+		d.sectorBorderPoints, err = repository.getSectorBorderPoint(entry, exit)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err

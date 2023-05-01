@@ -1,8 +1,9 @@
-package getPathPoints
+package start
 
 import (
 	"errors"
 	"fmt"
+
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -13,22 +14,22 @@ var (
 )
 
 // для начального пути от границ сектора
-func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (models.Coordinates, appError.AppError) {
+func (s *startController) pathBuilding(points models.Coordinates, axis, sign int) (models.Coordinates, appError.AppError) {
 	var path models.Coordinates
 	switchAxisError.Wrap("setPointsAudStart")
 	switchSignError.Wrap("setPointsAudStart")
-	switchAxisError.Err = errors.New(fmt.Sprintf("no suitable value, expected: %d or %d received: %d", AxisX, AxisY, axis))
-	switchSignError.Err = errors.New(fmt.Sprintf("no suitable value, expected: %d or %d received: %d", plus, minus, sign))
+	switchAxisError.Err = errors.New(fmt.Sprintf("no suitable value, expected: %d or %d received: %d", s.constData.axisX, s.constData.axisY, axis))
+	switchSignError.Err = errors.New(fmt.Sprintf("no suitable value, expected: %d or %d received: %d", s.constData.positiveCoordinate, s.constData.negativeCoordinate, sign))
 	switch axis {
-	case AxisX:
+	case s.constData.axisX:
 		switch sign {
-		case plus:
+		case s.constData.positiveCoordinate:
 			path.X = points.X
 			path.Y = points.Y
 			path.Widht = points.Widht
 			path.Height = points.Height
 
-		case minus:
+		case s.constData.negativeCoordinate:
 			path.X = points.X
 			path.Y = points.Y
 			path.Widht = -points.Widht
@@ -37,15 +38,15 @@ func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (mod
 		default:
 			return path, *switchSignError
 		}
-	case AxisY:
+	case s.constData.axisY:
 		switch sign {
-		case plus:
+		case s.constData.positiveCoordinate:
 			path.X = points.X
 			path.Y = points.Y
 			path.Widht = points.Widht
 			path.Height = points.Height
 
-		case minus:
+		case s.constData.negativeCoordinate:
 			path.X = points.X
 			path.Y = points.Y
 			path.Widht = points.Widht
@@ -59,14 +60,4 @@ func (d *data) setPointsAudStart(points models.Coordinates, axis, sign int) (mod
 	}
 
 	return path, appError.AppError{}
-}
-
-// точки от начала пути до вхождение в пределы сектора
-func (d *data) setPointsPath2Sector(borderPoints, points, lastPathPoint models.Coordinates, axis int) (models.Coordinates) {
-	p := models.Coordinates{
-		X: (points.X),
-		Y: (points.Y)}
-	p.Widht = points.Widht
-	p.Height = points.Height
-	return p
 }
