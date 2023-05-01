@@ -1,6 +1,8 @@
 package sectorToSector
 
 import (
+	"fmt"
+
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -51,6 +53,7 @@ func NewSectorToSectorController(
 
 func (s *sectorToSectorController) Sector2SectorPoints(borderSector models.Coordinates, lenPoint int) ([]models.Coordinates,appError.AppError) {
 	iterator := lenPoint
+	fmt.Println("iterator: ", iterator)
 	err := s.building(iterator, borderSector)
 	if err.Err != nil {
 		err.Wrap("sector2Sector")

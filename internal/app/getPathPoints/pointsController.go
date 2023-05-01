@@ -1,6 +1,8 @@
 package getPathPoints
 
 import (
+	"fmt"
+
 	"navigation/internal/app/getPathPoints/middle"
 	sectorToSector "navigation/internal/app/getPathPoints/sector2sector"
 	"navigation/internal/app/getPathPoints/start"
@@ -145,6 +147,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		p.data = *newData
 		response = append(response, p.points...)
 		p.points = []models.Coordinates{}
+
 		err = p.start()
 		if err.Err != nil {
 			return nil, err
@@ -216,7 +219,6 @@ func (p *controller) sector2sector() appError.AppError {
 	sector2sector.Points = append(sector2sector.Points, p.points...)
 	sector2sector.OldAxis = 3 // delete
 	for i := 1; i < len(p.sectors)-1; i++ {
-
 		entry, exit := min(p.sectors[i], p.sectors[i+1])
 
 		borderSector, err := repository.getSectorBorderPoint(entry, exit)
@@ -225,25 +227,26 @@ func (p *controller) sector2sector() appError.AppError {
 			return err
 		}
 
-		// if i >= 2 {
-		// 	sector2sector.LastSector = false
-		// 	// p.data.sectorType = 1
-		// } else {
-		// 	sector2sector.LastSector = true
+		fmt.Println("==========iteration ", i,"==========")
+		// if i == 3 {
+		// 	break
 		// }
-
-		data, err := sector2sector.Sector2SectorPoints(borderSector, len(p.points) - 1)
+		data, err := sector2sector.Sector2SectorPoints(borderSector, len(sector2sector.Points) - 1)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return err
 		}
 
-		p.points = append(p.points, data...)
-		sector2sector.Points = append(sector2sector.Points, data...)
-		if i == 2 {
-			break
-		}
+		// fmt.Println("return data: ", data)
+
+		// p.points = append(p.points, data...)
+		sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
+
 	}
+
+	p.points = append(p.points, sector2sector.Points...)
+
+	fmt.Println("final result: ", p.points)
 
 	return appError.AppError{}
 }
