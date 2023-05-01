@@ -75,6 +75,7 @@ type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
 	start() appError.AppError
 	middle(entry, exit int) appError.AppError
+	sector2sector() appError.AppError
 	// getPointsAuditory2Sector(entry, exit int) appError.AppError
 	// getPointsAuditory2Transition(entry, exit int) appError.AppError
 	// getPointsSector2Sector() appError.AppError
