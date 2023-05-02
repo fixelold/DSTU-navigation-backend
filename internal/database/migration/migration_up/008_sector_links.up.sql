@@ -1,9 +1,3 @@
--- INSERT INTO sector_link (number_sector, link, id_sector, id_link)
--- VALUES (unnest(array[131, 132, 132, 133]), 
---         unnest(array[132, 131, 133, 132]),
---         unnest(array[3,    7,   7,   11]),
---         unnest(array[7,    3,   11,   7]));
-
 INSERT INTO sector_link (number_sector, link, id_sector, id_link)
 VALUES
         (131, 132, 3, 7),
@@ -15,4 +9,10 @@ VALUES
         (134, 135, 15, 19),
         (135, 134, 19, 15),
         (135, 136, 19, 23),
-        (136, 135, 23, 19);
+        (136, 135, 23, 19),
+        (135, 137, 19, 27),
+        (137, 135, 27, 19),
+        (141, 142, 4, 8),
+        (142, 141, 8, 4),
+        (142, 143, 8, 12),
+        (143, 142, 12, 8);
