@@ -2,8 +2,9 @@ package start
 
 import (
 	"errors"
+	"fmt"
 
-	"navigation/internal/app/getPathPoints/axis"
+	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/models"
@@ -118,6 +119,7 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 			s.points = append(s.points, path)
 			return appError.AppError{}
 		} else {
+			fmt.Println("data error: ", path)
 			pointsError.Wrap("audStartPoints")
 			pointsError.Err = errors.New("the dots are in the audience area")
 			return *pointsError
