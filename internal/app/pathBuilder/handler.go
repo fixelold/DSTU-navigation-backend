@@ -61,7 +61,7 @@ func (h *handler) getSectors(c *gin.Context) {
 		return
 	}
 
-	start, end, err := h.GetSector(request.Start, request.End)
+	start, end, err := h.GetSector(request.Start, request.End, request.TypeTranstionSector)
 	if err.Err != nil {
 		err.Wrap("handler getSectors")
 		h.logger.Error(err.Error())
@@ -69,6 +69,11 @@ func (h *handler) getSectors(c *gin.Context) {
 		return
 	}
 
+	if start == end {
+		response.Sectors = append(response.Sectors, start)
+		c.JSON(http.StatusOK, response)
+		return
+	}
 	if request.TypeTranstionSector == stairs {
 		transitionSector, err = h.stairs(start)
 		if err.Err != nil {

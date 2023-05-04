@@ -3,6 +3,7 @@ package pathBuilder
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -117,12 +118,54 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 
 func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
 	var sector models.Sector
+	fmt.Println("data - ", sectorNumber, type_transtion_sector)
 	req :=
 		`SELECT transition.number 
 	FROM transition
 	JOIN sector ON sector.id_transition = transition.id
 	WHERE sector.number = $1 
 	AND type_transition = $2`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap("GetTransitionSector")
+		txError.Err = err
+		return 0, *txError
+	}
+
+	err = tx.QueryRow(
+		context.Background(),
+		req,
+		sectorNumber,
+		type_transtion_sector).Scan(&sector.Number)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			queryError.Wrap("GetTransitionSector")
+			queryError.Err = pgErr
+			return 0, *queryError
+		}
+		queryError.Wrap("GetTransitionSector")
+		queryError.Err = err
+		return 0, *queryError
+	}
+	_ = tx.Commit(context.Background())
+	return sector.Number, appError.AppError{}
+}
+
+func (r *repository) GetTransitionSector2(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
+	var sector models.Sector
+	fmt.Println("data - ", sectorNumber, type_transtion_sector)
+	req :=
+		`SELECT sector.number
+		FROM transition
+		JOIN sector ON sector.id_transition = transition.id
+		WHERE transition.number = $1
+		AND type_transition = $2;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {

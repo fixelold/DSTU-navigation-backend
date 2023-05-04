@@ -53,6 +53,10 @@ func newData(audNumber string,
 		transitionNumber: transitionNumber,
 	}
 
+	if data.transition == transitionYes {
+		sectorEntry, sectorExit = sectorExit, sectorEntry
+	}
+
 	err = data.getPoints(sectorEntry, sectorExit)
 	if err.Err != nil {
 		err.Wrap("newData")
@@ -68,11 +72,17 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 	repository := NewRepository(d.client, d.logger)
 	// получаем координаты аудитории по ее номеру.
 	if d.transition == transitionYes {
-		d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
+		if len(strconv.Itoa(entry)) == stairs {
+			d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
 
-		if err.Err != nil {
-			err.Wrap("getPoints")
-			return err
+			return appError.AppError{}
+		} else {
+			d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
+
+			if err.Err != nil {
+				err.Wrap("getPoints")
+				return err
+			}
 		}
 	} else if d.transition == transitionNo {
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
@@ -94,12 +104,20 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 
 	// получаем координаты одной из границ сектора. По значению входа и выхода из него.
 	if len(strconv.Itoa(exit)) == stairs {
-		d.sectorBorderPoints, err = repository.getTransitionSectorBorderPoint(entry, exit)
+		d.sectorBorderPoints, err = repository.getTransitionSectorBorderPoint(entry)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
 		}
 	} else {
+
+		// if d.transition == transitionYes {
+		// 	fmt.Println("fweiofjiowejfowjfioewjf - ", entry, exit)
+		// 	entry, exit = exit, entry
+		// 	fmt.Println("fweiofjiowejfowjfioewjf - ", entry, exit)
+		// }
+
+
 		d.sectorBorderPoints, err = repository.getSectorBorderPoint(entry, exit)
 		if err.Err != nil {
 			err.Wrap("getPoints")

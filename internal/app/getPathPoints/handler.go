@@ -18,6 +18,7 @@ const (
 
 	transitionYes = 1 // переход между этажами есть
 	transitionNo  = 2 // перехода между этажами нет
+	transitionToAud = 3
 
 	file                       = "handler.go"
 	getPointsFuntion           = "getPoints"

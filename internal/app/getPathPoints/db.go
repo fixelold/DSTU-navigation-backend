@@ -3,6 +3,7 @@ package getPathPoints
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -122,6 +123,7 @@ func (r *repository) getAudBorderPoint(number string) (models.Coordinates, appEr
 // получаем координаты одной из границ сектора. По значению входа и выхода из него.
 func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
+	fmt.Println("sector border point - ", entry, exit)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM sector_border_points 
@@ -252,16 +254,24 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 	return true, appError.AppError{}
 }
 
-func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coordinates, appError.AppError) {
+func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
+	fmt.Println("duhaishda - ", start)
+	// request :=
+	// 	`SELECT x, y, widht, height
+	// FROM transition_border_points
+	// JOIN transition
+	// ON transition_border_points.id_transition = transition.id
+	// JOIN sector ON sector.id_transition = transition.id
+	// WHERE sector.number = $1 
+	// AND transition.number = $2`
+
 	request :=
 		`SELECT x, y, widht, height
-	FROM transition_border_points
-	JOIN transition
-	ON transition_border_points.id_transition = transition.id
-	JOIN sector ON sector.id_transition = transition.id
-	WHERE sector.number = $1 
-	AND transition.number = $2`
+		FROM transition_border_points
+		JOIN transition
+		ON transition_border_points.id_transition = transition.id
+		WHERE  transition.number = $1`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -274,7 +284,7 @@ func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coo
 	err = tx.QueryRow(
 		context.Background(),
 		request,
-		start, exit).Scan(
+		start).Scan(
 		&borderPoint.X,
 		&borderPoint.Y,
 		&borderPoint.Widht,

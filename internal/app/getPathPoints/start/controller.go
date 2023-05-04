@@ -2,6 +2,7 @@ package start
 
 import (
 	"errors"
+	"fmt"
 
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
@@ -56,7 +57,7 @@ func NewStartController(
 	}
 
 // занесение точек начального пути
-func (s *startController) StartPath() ([]models.Coordinates, appError.AppError) {
+func (s *startController) StartPath(typeTransition int) ([]models.Coordinates, appError.AppError) {
 	var err appError.AppError
 
 	a := axes.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height, s.constData.axisX, s.constData.axisY)
@@ -78,7 +79,7 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 
 	// подготовка точек исходя из оси, типа и границ аудитории.
 	coordinates := s.preparation(axis, s.audienceBoundaryPoints)
-
+	fmt.Println("coordinates - ", coordinates, axis, s.audienceBoundaryPoints)
 	// получение точек для начального пути.
 	path, err = s.pathBuilding(coordinates, axis, s.constData.positiveCoordinate)
 	if err.Err != nil {

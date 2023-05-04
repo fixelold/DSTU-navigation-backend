@@ -73,12 +73,9 @@ func NewPointsController(
 
 type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
-	start(audNumber string) appError.AppError
+	start(audNumber string, typeTransition int) appError.AppError
 	middle(entry, exit int) appError.AppError
 	sector2sector() appError.AppError
-	// getPointsAuditory2Sector(entry, exit int) appError.AppError
-	// getPointsAuditory2Transition(entry, exit int) appError.AppError
-	// getPointsSector2Sector() appError.AppError
 }
 
 func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
@@ -88,8 +85,8 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		находим минимальное значение между номерами двух секторов.
 		необходимо для внутренней логики.
 	*/
-	entry, exit := min(p.sectors[0], p.sectors[1])
 
+	entry, exit := min(p.sectors[0], p.sectors[1])
 	data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
@@ -99,15 +96,34 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	p.data = *data
 
 	if p.transition == transitionYes {
-		// err := p.getPointsAuditory2Transition(entry, exit)
-		// if err.Err != nil {
-		// 	return nil, err
+		entry, exit := p.sectors[0], p.sectors[1]
+		err := p.start(p.StartAuditory, transitionYes)
+		if err.Err != nil {
+			return nil, err
+		}
+
+		err = p.middleToTransition(entry, exit)
+		if err.Err != nil {
+			return nil, err
+		}
+
+		response = append(response, p.points...)
+	} else if p.transition == transitionToAud {
+		// if len(p.sectors) == 1 {
+		// 	entry, exit := p.sectors[0], p.sectors[0]
+		// } else {
+		// 	entry, exit := p.sectors[0], p.sectors[1]
 		// }
 
-		response = append(response, p.data.points...)
+
+		err = p.start(p.StartAuditory, transitionToAud)
+		if err.Err != nil {
+			return nil, err
+		}
+
 	} else if p.transition == transitionNo {
 
-		err := p.start(p.StartAuditory)
+		err = p.start(p.StartAuditory, transitionNo)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -122,17 +138,6 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 			return nil, err
 		}
 
-		// err := p.getPointsAuditory2Sector(entry, exit)
-		// if err.Err != nil {
-		// 	return nil, err
-		// }
-
-		// response = append(response, p.data.points...)
-		// err = p.getPointsSector2Sector()
-		// if err.Err != nil {
-		// 	return nil, err
-		// }
-		// response = append(response, p.data.points...)
 		entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
 		// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
@@ -146,7 +151,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		response = append(response, p.points...)
 		p.points = []models.Coordinates{}
 
-		err = p.start(p.EndAuditory)
+		err = p.start(p.EndAuditory, transitionNo)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -155,17 +160,6 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		if err.Err != nil {
 			return nil, err
 		}
-
-		// err = p.getPointsAuditory2Sector(entry, exit)
-		// if err.Err != nil {
-		// 	return nil, err
-		// }
-		// response = append(response, p.data.points...)
-		// err = p.getPointsSector2Sector()
-		// if err.Err != nil {
-		// 	return nil, err
-		// }
-		// response = append(response, p.data.points...)
 
 		response = append(response, p.points...)
 	}
@@ -179,9 +173,14 @@ entry - входной сектор
 exit - выходной сектор
 entry всегда должен быть меньше exit
 */
-func (p *controller) start(audNumber string) appError.AppError {
+
+// func (p *controller) transitionStart(audNumber string) appError.AppError {
+	
+// }
+
+func (p *controller) start(audNumber string, typeTransition int) appError.AppError {
 	start := start.NewStartController(p.data.audBorderPoints, p.client, audNumber, plus, minus, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY)
-	data, err := start.StartPath()
+	data, err := start.StartPath(typeTransition)
 	if err.Err != nil {
 		err.Wrap("start")
 		return err
@@ -197,6 +196,27 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 	borderSector, err := repository.getSectorBorderPoint(entry, exit)
 	if err.Err != nil {
 		err.Wrap("middle")
+		return err
+	}
+	middle.Points = append(middle.Points, p.points...)
+	
+	data, err := middle.MiddlePoints(borderSector)
+	if err.Err != nil {
+		err.Wrap("middle")
+	}
+
+	p.points = append(p.points, data...)
+
+	return appError.AppError{}
+}
+
+func (p *controller) middleToTransition(entry, exit int) appError.AppError {
+	// entry, exit = exit, entry
+	repository := NewRepository(p.client, p.logger)
+	middle := middle.NewMiddleController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	borderSector, err := repository.getTransitionSectorBorderPoint(entry)
+	if err.Err != nil {
+		err.Wrap("middle to transition")
 		return err
 	}
 	middle.Points = append(middle.Points, p.points...)
@@ -242,35 +262,6 @@ func (p *controller) sector2sector() appError.AppError {
 }
 
 
-// func (p *controller) getPointsAuditory2Sector(entry, exit int) appError.AppError {
-
-// 	// построение начального пути. От границы аудитории.
-// 	// p.logger.Logger.Infoln("===================Start 'start auditory points'===================")
-// 	err := p.data.setAudStartPoints()
-// 	if err.Err != nil {
-// 		err.Wrap("getPathPoints")
-// 		return err
-// 	}
-// 	// p.logger.Logger.Infoln("===================End 'start auditory points'===================")
-
-// 	borderSector, err := p.repository.getSectorBorderPoint(entry, exit)
-// 	if err.Err != nil {
-// 		err.Wrap("getPathPoints")
-// 		return err
-// 	}
-
-// 	// p.logger.Logger.Infoln("===================Start 'auditory to end sector'===================")
-// 	// построение пути вплоть до вхождение в область точек сектора.
-// 	err = p.data.middlePoints(borderSector)
-// 	if err.Err != nil {
-// 		err.Wrap("getPathPoints")
-// 		return err
-// 	}
-
-// 	// p.logger.Logger.Infoln("===================End 'auditory to end sector'===================")
-
-// 	return appError.AppError{}
-// }
 
 // func (p *controller) getPointsAuditory2Transition(entry, exit int) appError.AppError {
 // 	// построение начального пути. От границы аудитории.
@@ -280,11 +271,11 @@ func (p *controller) sector2sector() appError.AppError {
 // 		return err
 // 	}
 
-// 	borderSector, err := p.repository.getTransitionSectorBorderPoint(entry, exit)
-// 	if err.Err != nil {
-// 		err.Wrap("getPathPoints")
-// 		return err
-// 	}
+	// borderSector, err := p.repository.getTransitionSectorBorderPoint(entry, exit)
+	// if err.Err != nil {
+	// 	err.Wrap("getPathPoints")
+	// 	return err
+	// }
 
 // 	err = p.data.middlePoints(borderSector)
 // 	if err.Err != nil {
