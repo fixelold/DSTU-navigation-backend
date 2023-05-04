@@ -6,7 +6,6 @@ import (
 
 func (s *sectorToSectorController) preparation(axis int, borderPoint, points models.Coordinates, lastPathSector bool) models.Coordinates {
 	if lastPathSector {
-		// fmt.Println("final: ", points)
 		if axis == s.constData.axisX {
 			return models.Coordinates{
 				X: points.X + points.Widht,
@@ -24,7 +23,6 @@ func (s *sectorToSectorController) preparation(axis int, borderPoint, points mod
 			}
 		}
 	} else {
-		// fmt.Println("not final: ", points)
 		if axis == s.constData.axisX {
 			return models.Coordinates{
 				X: points.X + points.Widht,

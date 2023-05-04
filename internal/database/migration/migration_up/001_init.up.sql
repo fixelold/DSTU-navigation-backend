@@ -105,7 +105,7 @@ ALTER TABLE "floor" ADD FOREIGN KEY (id_building) REFERENCES "building" (id);
 
 ALTER TABLE "sector" ADD FOREIGN KEY (id_floor) REFERENCES "floor" (id);
 
-ALTER TABLE "transition" ADD FOREIGN KEY (id_sectors) REFERENCES "sector" (id);
+--ALTER TABLE "transition" ADD FOREIGN KEY (id_sectors) REFERENCES "sector" (id);
 
 ALTER TABLE "auditorium" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
 
@@ -121,7 +121,7 @@ ALTER TABLE "sector_border_points" ADD FOREIGN KEY (id_sector) REFERENCES "secto
 
 ALTER TABLE "auditory_description" ADD FOREIGN KEY (id_auditory) REFERENCES "auditorium" (id);
 
-ALTER TABLE "transition" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
+--ALTER TABLE "transition" ADD FOREIGN KEY (id_sector) REFERENCES "sector" (id);
 
 ALTER TABLE "transition_border_points" ADD FOREIGN KEY (id_transition) REFERENCES "transition" (id);
 

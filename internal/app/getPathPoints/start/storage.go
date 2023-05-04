@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError)
+	checkBorderAud(coordinates models.Coordinates, audNumber string) (bool, appError.AppError)
 }

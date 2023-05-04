@@ -1,8 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
-
 	"navigation/internal/app/getPathPoints/middle"
 	sectorToSector "navigation/internal/app/getPathPoints/sector2sector"
 	"navigation/internal/app/getPathPoints/start"
@@ -75,7 +73,7 @@ func NewPointsController(
 
 type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
-	start() appError.AppError
+	start(audNumber string) appError.AppError
 	middle(entry, exit int) appError.AppError
 	sector2sector() appError.AppError
 	// getPointsAuditory2Sector(entry, exit int) appError.AppError
@@ -109,7 +107,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		response = append(response, p.data.points...)
 	} else if p.transition == transitionNo {
 
-		err := p.start()
+		err := p.start(p.StartAuditory)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -148,7 +146,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		response = append(response, p.points...)
 		p.points = []models.Coordinates{}
 
-		err = p.start()
+		err = p.start(p.EndAuditory)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -181,8 +179,8 @@ entry - входной сектор
 exit - выходной сектор
 entry всегда должен быть меньше exit
 */
-func (p *controller) start() appError.AppError {
-	start := start.NewStartController(p.data.audBorderPoints, p.client, plus, minus, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY)
+func (p *controller) start(audNumber string) appError.AppError {
+	start := start.NewStartController(p.data.audBorderPoints, p.client, audNumber, plus, minus, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY)
 	data, err := start.StartPath()
 	if err.Err != nil {
 		err.Wrap("start")
@@ -227,17 +225,11 @@ func (p *controller) sector2sector() appError.AppError {
 			return err
 		}
 
-		fmt.Println("==========iteration ", i,"==========")
-		// if i == 3 {
-		// 	break
-		// }
 		data, err := sector2sector.Sector2SectorPoints(borderSector, len(sector2sector.Points) - 1)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return err
 		}
-
-		// fmt.Println("return data: ", data)
 
 		// p.points = append(p.points, data...)
 		sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
@@ -245,8 +237,6 @@ func (p *controller) sector2sector() appError.AppError {
 	}
 
 	p.points = append(p.points, sector2sector.Points...)
-
-	fmt.Println("final result: ", p.points)
 
 	return appError.AppError{}
 }

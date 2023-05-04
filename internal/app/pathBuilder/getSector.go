@@ -2,9 +2,10 @@ package pathBuilder
 
 import (
 	"errors"
-	"navigation/internal/appError"
 	"strconv"
 	"strings"
+
+	"navigation/internal/appError"
 )
 
 var (
@@ -13,7 +14,7 @@ var (
 
 func (h *handler) GetSector(start, end string) (int, int, appError.AppError) {
 	var err appError.AppError
-
+	
 	startAud, startBuild, err := separationAudidotyNumber(start)
 	if err.Err != nil {
 		err.Wrap("file GetSector")

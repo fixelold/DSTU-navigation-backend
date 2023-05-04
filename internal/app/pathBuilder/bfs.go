@@ -1,8 +1,6 @@
 package pathBuilder
 
 import (
-	"fmt"
-
 	"navigation/internal/appError"
 )
 
@@ -16,13 +14,11 @@ func (h *handler) Builder(start, end, transitionSector int) ([]int, appError.App
 	}
 
 	res, q := h.bfs(start, end, transitionSector, matrix)
-	fmt.Println("matrix - ", matrix)
 	q = append(q, res...)
 	return q, err
 }
 
 func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([]int, []int) {
-	fmt.Println("fohiowejfiowejfiowejfiow")
 	var queue []int
 	var q []int
 	visited := make(map[int]bool)
@@ -46,8 +42,6 @@ func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([
 
 		if current == end {
 			result := h.getPath(end, top)
-			fmt.Println("result - ", result, end, top)
-			fmt.Println("q - ", q)
 			return reverse(result), q
 		}
 

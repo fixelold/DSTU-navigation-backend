@@ -2,7 +2,6 @@ package start
 
 import (
 	"errors"
-	"fmt"
 
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
@@ -29,17 +28,20 @@ type startController struct {
 	points []models.Coordinates
 	audienceBoundaryPoints models.Coordinates
 	constData constData
+	audNumber string
 	client postgresql.Client
 }
 
 func NewStartController(
 	audienceBoundaryPoints models.Coordinates,
 	client postgresql.Client,
+	audNumber string,
 	positiveCoordinate, negativeCoordinate int,
 	axisX, axisY, widhtX, heightX, widhtY, heightY int) *startController {
 		return &startController{
 			audienceBoundaryPoints: audienceBoundaryPoints,
 			client: client,
+			audNumber: audNumber,
 			constData: constData{
 				positiveCoordinate: positiveCoordinate,
 				negativeCoordinate: negativeCoordinate,
@@ -86,7 +88,7 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 
 	// проверка, чтобы точки пути не находились в пределах аудиториию
 	repository := NewRepository(s.client)
-	check, err := repository.checkBorderAud(path)
+	check, err := repository.checkBorderAud(path, s.audNumber)
 	if err.Err != nil {
 		err.Wrap("audStartPoints")
 		return err
@@ -109,7 +111,7 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 			return err
 		}
 
-		check, err = repository.checkBorderAud(path)
+		check, err = repository.checkBorderAud(path, s.audNumber)
 		if err.Err != nil {
 			err.Wrap("audStartPoints")
 			return err
@@ -119,7 +121,6 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 			s.points = append(s.points, path)
 			return appError.AppError{}
 		} else {
-			fmt.Println("data error: ", path)
 			pointsError.Wrap("audStartPoints")
 			pointsError.Err = errors.New("the dots are in the audience area")
 			return *pointsError

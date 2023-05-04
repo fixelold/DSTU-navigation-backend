@@ -3,7 +3,6 @@ package getPathPoints
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -35,7 +34,6 @@ var (
 func (r *repository) getAudPoints(number string) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
 
-	fmt.Println("data - ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM auditorium_position 

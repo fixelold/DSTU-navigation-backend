@@ -29,12 +29,13 @@ var (
 )
 
 // проверка, чтобы точки пути не находились в границах аудитории.
-func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError) {
+func (r *repository) checkBorderAud(coordinates models.Coordinates, audNumber string) (bool, appError.AppError) {
 	request :=
 		`SELECT x, y, widht, height
 	FROM auditorium_position 
 	WHERE x <= $1 AND $1 <= (x+widht)
-	AND y <= $2 AND $2 <= (y+height)`
+	AND y <= $2 AND $2 <= (y+height) 
+	AND id_auditorium = (SELECT id FROM auditorium WHERE number = $3)`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -48,7 +49,8 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appEr
 		context.Background(),
 		request,
 		coordinates.X+coordinates.Widht,
-		coordinates.Y+coordinates.Height)
+		coordinates.Y+coordinates.Height,
+		audNumber)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())

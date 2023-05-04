@@ -27,7 +27,6 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 			s.Points = append(s.Points, points)
 	
 			s.OldAxis = axis
-			// fmt.Println("all points: ", s.Points)
 			boolean = false
 		} else {
 			lastPathSector = true

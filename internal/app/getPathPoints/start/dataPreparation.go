@@ -5,11 +5,11 @@ import "navigation/internal/models"
 func (s *startController) preparation(axis int, borderPoint models.Coordinates) models.Coordinates {
 	var coordinates models.Coordinates
 
-	XX := borderPoint.X + 1
+	XX := borderPoint.X
 	YX := (borderPoint.Y + (borderPoint.Height + borderPoint.Y)) / 2
 
 	XY := (borderPoint.X + (borderPoint.Widht + borderPoint.X)) / 2
-	YY := borderPoint.Y + 1
+	YY := borderPoint.Y
 
 	if axis == s.constData.axisX {
 		coordinates.X = XX
