@@ -1,6 +1,9 @@
 package getPathPoints
 
 import (
+	"fmt"
+	"strconv"
+
 	"navigation/internal/app/getPathPoints/middle"
 	sectorToSector "navigation/internal/app/getPathPoints/sector2sector"
 	"navigation/internal/app/getPathPoints/start"
@@ -86,18 +89,24 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		необходимо для внутренней логики.
 	*/
 
-	entry, exit := min(p.sectors[0], p.sectors[1])
-	data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
-	if err.Err != nil {
-		err.Wrap("getPathPoints")
-		return nil, err
+	if len(p.sectors) != 1 {
+		if len(strconv.Itoa(p.sectors[0])) == 4 && p.transition == transitionToAud{
+			temp := p.sectors[1:]
+			p.sectors = temp
+		}
+		entry, exit := min(p.sectors[0], p.sectors[1])
+		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return nil, err
+		}
+		p.data = *data
 	}
-
-	p.data = *data
 
 	if p.transition == transitionYes {
 		entry, exit := p.sectors[0], p.sectors[1]
-		err := p.start(p.StartAuditory, transitionYes)
+
+		err = p.start(p.StartAuditory, transitionYes)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -108,20 +117,92 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		}
 
 		response = append(response, p.points...)
+
+
 	} else if p.transition == transitionToAud {
-		// if len(p.sectors) == 1 {
-		// 	entry, exit := p.sectors[0], p.sectors[0]
-		// } else {
-		// 	entry, exit := p.sectors[0], p.sectors[1]
-		// }
+		fmt.Println("wklemflwef sectors - ", p.sectors[0])
+		if len(p.sectors) == 1 {
+			p.transition = transitionYes
+			entry := p.sectors[0]
+			data, err := newData(p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
+			if err.Err != nil {
+				err.Wrap("getPathPoints")
+				return nil, err
+			}
+			p.data = *data
+	
+	
+			err = p.start(p.EndAuditory, transitionNo)
+			if err.Err != nil {
+				return nil, err
+			}
+
+			err = p.middleToTransition(p.transitionNumber, p.transitionNumber)
+			if err.Err != nil {
+				return nil, err
+			}
+	
+			response = append(response, p.points...)
+
+		} else {
+			// это сделано т.к с фронта возвращается не (143, 142, 141), а (1043, 143, 142, 141)
+			entry, exit := min(p.sectors[0], p.sectors[1])
+			data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
+			if err.Err != nil {
+				err.Wrap("getPathPoints")
+				return nil, err
+			}
+			p.data = *data
+
+			err = p.start(p.StartAuditory, transitionNo)
+			if err.Err != nil {
+				return nil, err
+			}
+
+			err = p.middle(entry, exit)
+			if err.Err != nil {
+				return nil, err
+			}
+
+			err = p.sector2sector()
+			if err.Err != nil {
+				return nil, err
+			}
+
+			entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
+
+			// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
+			p.transition = transitionNo
+			newData, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
+			if err.Err != nil {
+				err.Wrap("getPathPoints")
+				return nil, err
+			}
+	 
+			p.data = *newData
+			response = append(response, p.points...)
+			p.points = []models.Coordinates{}
+	
+			fmt.Println("start aud", p.EndAuditory)
+			err = p.start(p.EndAuditory, transitionNo)
+			if err.Err != nil {
+				return nil, err
+			}
+	
+			err = p.middle(entry, exit)
+			if err.Err != nil {
+				return nil, err
+			}
+	
+			response = append(response, p.points...)
 
 
-		err = p.start(p.StartAuditory, transitionToAud)
-		if err.Err != nil {
-			return nil, err
 		}
 
+
+
 	} else if p.transition == transitionNo {
+		entry, exit := min(p.sectors[0], p.sectors[1])
 
 		err = p.start(p.StartAuditory, transitionNo)
 		if err.Err != nil {
@@ -223,7 +304,7 @@ func (p *controller) middleToTransition(entry, exit int) appError.AppError {
 	
 	data, err := middle.MiddlePoints(borderSector)
 	if err.Err != nil {
-		err.Wrap("middle")
+		err.Wrap("middle to transition")
 	}
 
 	p.points = append(p.points, data...)

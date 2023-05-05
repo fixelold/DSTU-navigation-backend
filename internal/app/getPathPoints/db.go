@@ -256,7 +256,6 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 
 func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
-	fmt.Println("duhaishda - ", start)
 	// request :=
 	// 	`SELECT x, y, widht, height
 	// FROM transition_border_points

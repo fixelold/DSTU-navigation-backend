@@ -78,8 +78,8 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 	var path models.Coordinates
 
 	// подготовка точек исходя из оси, типа и границ аудитории.
+	fmt.Println("datatda sd - ", s.audienceBoundaryPoints)
 	coordinates := s.preparation(axis, s.audienceBoundaryPoints)
-	fmt.Println("coordinates - ", coordinates, axis, s.audienceBoundaryPoints)
 	// получение точек для начального пути.
 	path, err = s.pathBuilding(coordinates, axis, s.constData.positiveCoordinate)
 	if err.Err != nil {

@@ -1,7 +1,7 @@
 package getPathPoints
 
 import (
-	"strconv"
+	"fmt"
 
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
@@ -72,57 +72,60 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 	repository := NewRepository(d.client, d.logger)
 	// получаем координаты аудитории по ее номеру.
 	if d.transition == transitionYes {
-		if len(strconv.Itoa(entry)) == stairs {
-			d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
-
-			return appError.AppError{}
-		} else {
-			d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
-
-			if err.Err != nil {
-				err.Wrap("getPoints")
-				return err
-			}
+		d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
 		}
+
+		d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
 	} else if d.transition == transitionNo {
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
 		}
-	} else {
-		err.Err = TransitionError
-		err.Wrap("getPoints")
-	}
 
-	// получаем координаты границ аудитории по ее номеру.
-	d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
-	if err.Err != nil {
-		err.Wrap("getPoints")
-		return err
-	}
-
-	// получаем координаты одной из границ сектора. По значению входа и выхода из него.
-	if len(strconv.Itoa(exit)) == stairs {
-		d.sectorBorderPoints, err = repository.getTransitionSectorBorderPoint(entry)
+		d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
 		}
-	} else {
-
-		// if d.transition == transitionYes {
-		// 	fmt.Println("fweiofjiowejfowjfioewjf - ", entry, exit)
-		// 	entry, exit = exit, entry
-		// 	fmt.Println("fweiofjiowejfowjfioewjf - ", entry, exit)
-		// }
-
 
 		d.sectorBorderPoints, err = repository.getSectorBorderPoint(entry, exit)
 		if err.Err != nil {
 			err.Wrap("getPoints")
 			return err
 		}
+
+	} else if d.transition == transitionToAud {
+		d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+		d.audBorderPoints, err = repository.getTransitionSectorBorderPoint(d.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+		fmt.Println("entry, exit: ", entry, exit)
+		d.sectorBorderPoints, err = repository.getSectorBorderPoint(entry, exit)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+	} else {
+		err.Err = TransitionError
+		err.Wrap("getPoints")
 	}
 
 	return err
