@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"strconv"
 
 	"navigation/internal/app/getPathPoints/middle"
@@ -120,7 +119,6 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 
 
 	} else if p.transition == transitionToAud {
-		fmt.Println("wklemflwef sectors - ", p.sectors[0])
 		if len(p.sectors) == 1 {
 			p.transition = transitionYes
 			entry := p.sectors[0]
@@ -183,7 +181,6 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 			response = append(response, p.points...)
 			p.points = []models.Coordinates{}
 	
-			fmt.Println("start aud", p.EndAuditory)
 			err = p.start(p.EndAuditory, transitionNo)
 			if err.Err != nil {
 				return nil, err

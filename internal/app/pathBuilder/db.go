@@ -73,7 +73,6 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 
 func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
-
 	req :=
 		`SELECT 
 	sector.number

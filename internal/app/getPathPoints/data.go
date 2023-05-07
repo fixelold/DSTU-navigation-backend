@@ -1,8 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
-
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -116,7 +114,6 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
-		fmt.Println("entry, exit: ", entry, exit)
 		d.sectorBorderPoints, err = repository.getSectorBorderPoint(entry, exit)
 		if err.Err != nil {
 			err.Wrap("getPoints")

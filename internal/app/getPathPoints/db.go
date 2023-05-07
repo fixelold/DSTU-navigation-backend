@@ -34,7 +34,7 @@ var (
 // получаем координаты аудитории по ее номеру.
 func (r *repository) getAudPoints(number string) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
-
+	fmt.Println("get aud - ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM auditorium_position 
@@ -123,7 +123,6 @@ func (r *repository) getAudBorderPoint(number string) (models.Coordinates, appEr
 // получаем координаты одной из границ сектора. По значению входа и выхода из него.
 func (r *repository) getSectorBorderPoint(entry, exit int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
-	fmt.Println("sector border point - ", entry, exit)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM sector_border_points 
@@ -308,6 +307,7 @@ func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinat
 
 func (r *repository) getTransitionPoints(number int) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
+	fmt.Println("number transition: ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM transition_position 

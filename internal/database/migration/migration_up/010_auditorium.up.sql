@@ -2,7 +2,7 @@ INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['1-319а', '1-319', '1-317а', '1-317', '1-319б', '1-320', '1-321', '1-321а', '1-315']), 3);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1-313', '1-323', '1-325', '1-326', '1-326а', '1-326в', '1-326б', '1-327а', '1-327', '1-328', '1-330', '1-338а', '1-340', '1-341', '1-343', '1-344', '1-346', '1-347а', '1-305а', '1-309', '1-310']), 7);
+    (unnest(array['1-313', '1-323', '1-325', '1-326', '1-326а', '1-326в', '1-326б', '1-327а', '1-327', '1-328', '1-330', '1-338а', '1-340', '1-341', '1-343', '1-344', '1-346', '1-347а', '1-305а', '1-309', '1-310']), 9);
 
 INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['1-331', '1-333', '1-333а', '1-336']), 11);
@@ -23,10 +23,30 @@ INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['1-421а', '1-419', '1-418', '1-416', '1-422', '1-420а', '1-420', '1-415']), 4);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1-423', '1-424', '1-425', '1-426', '1-427', '1-428', '1-429', '1-437а', '1-438', '1-440', '1-441', '1-442', '1-443', '1-444', '1-445', '1-446', '1-447а', '1-405', '1-406', '1-407', '1-408', '1-410', '1-413']), 8);
+    (unnest(array['1-423', '1-424', '1-425', '1-426', '1-427', '1-428', '1-429', '1-437а', '1-438', '1-440', '1-441', '1-442', '1-443', '1-444', '1-445', '1-446', '1-447а', '1-405', '1-406', '1-407', '1-408', '1-410', '1-413']), 11);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1-430', '1-431', '1-433', '1-433а', '1-436', '1-437']), 12);
+    (unnest(array['1-430', '1-431', '1-433', '1-433а', '1-436', '1-437']), 16);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1043']), 12);
+    (unnest(array['1-447', '1-448', '1-449', '1-450', '1-451', '1-453', '1-453а', '1-454', '1-455', '1-455а', '1-456', '1-404', '1-403', '1-402', '1-401', '1-499', '1-498', '1-496', '1-493']), 20);
+
+-- сектора --
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1043']), 16);
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1041']), 4);
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1042']), 11);
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1031']), 3);
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1032']), 9);
+
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1033']), 15);

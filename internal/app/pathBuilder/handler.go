@@ -74,6 +74,7 @@ func (h *handler) getSectors(c *gin.Context) {
 		c.JSON(http.StatusOK, response)
 		return
 	}
+
 	if request.TypeTranstionSector == stairs {
 		transitionSector, err = h.stairs(start)
 		if err.Err != nil {
