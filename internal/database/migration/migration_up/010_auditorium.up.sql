@@ -82,6 +82,18 @@ INSERT INTO auditorium (number, id_sector) VALUES
 INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['1-290', '1-289', '1-288', '1-287', '1-286', '1-284', '1-284а', '1-283', '1-283а', '1-282']), 34);
 
+--111--
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1-116', '1-119', '1-118', '1-117', '1-115', '1-120', '1-121', '1-122']), 1);
+
+--112--
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1-123', '1-124', '1-125', '1-126а', '1-126', '1-127', '1-128', '1-129', '1-130а', '1-140', '1-141', '1-142', '1-143', '1-108', '1-109', '1-110', '1-113']), 6);
+
+--113--
+INSERT INTO auditorium (number, id_sector) VALUES
+    (unnest(array['1-130', '1-133б', '1-133а', '1-139']), 13);
+
 -- сектора --
 
 INSERT INTO auditorium (number, id_sector) VALUES
