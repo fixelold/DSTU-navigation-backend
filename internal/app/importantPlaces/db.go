@@ -46,8 +46,8 @@ func NewRepository(
 
 func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
 	var newImportantPlaces models.ImportantPlaces
-	req := `INSERT INTO important_places (name, id_auditorium) 
-	SELECT $1::varchar(100), $2 
+	req := `INSERT INTO important_places (name, id_auditorium, auditory_number) 
+	SELECT $1::varchar(100), $2, $3 
 	WHERE NOT EXISTS 
 	(SELECT null FROM important_places 
 	WHERE (id_auditorium) = ($2)) RETURNING id;`
@@ -64,7 +64,8 @@ func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlac
 		context.Background(),
 		req,
 		places.Name,
-		places.AuditoryID).Scan(&newImportantPlaces.ID)
+		places.AuditoryID,
+		places.AuditoryNumber).Scan(&newImportantPlaces.ID)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -225,7 +226,7 @@ func (r *repository) List(numberBuild int) ([]models.ImportantPlaces, error) {
 
 	for rows.Next() {
 		var sl models.ImportantPlaces
-		err := rows.Scan(&sl.ID, &sl.Name, &sl.AuditoryID)
+		err := rows.Scan(&sl.ID, &sl.Name, &sl.AuditoryID, &sl.AuditoryNumber)
 		if err != nil {
 			scanError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 			scanError.Err = err
