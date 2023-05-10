@@ -14,7 +14,6 @@ func (h *handler) Builder(start, end, transitionSector int) ([]int, appError.App
 	}
 
 	res, q := h.bfs(start, end, transitionSector, matrix)
-
 	q = append(q, res...)
 	return q, err
 }

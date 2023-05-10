@@ -11,6 +11,7 @@ services:
       PGTZ: Europe/Moscow
     volumes:
       - ./db/:/var/lib/postgresql/data:rw
+      - ./internal/database/migration/migration_up/:/docker-entrypoint-initdb.d
     ports:
       - "3308:5432"
     restart: unless-stopped

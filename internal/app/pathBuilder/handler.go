@@ -61,11 +61,17 @@ func (h *handler) getSectors(c *gin.Context) {
 		return
 	}
 
-	start, end, err := h.GetSector(request.Start, request.End)
+	start, end, err := h.GetSector(request.Start, request.End, request.TypeTranstionSector)
 	if err.Err != nil {
 		err.Wrap("handler getSectors")
 		h.logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
+
+	if start == end {
+		response.Sectors = append(response.Sectors, start)
+		c.JSON(http.StatusOK, response)
 		return
 	}
 

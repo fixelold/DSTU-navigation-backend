@@ -18,31 +18,20 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 
-			// if s.OldAxis == axis {
-			// 	s.LastSector = false
-			// } else {
-			// 	s.LastSector = true
-			// }
-
 			if lastPathSector == true {
 				points = s.preparation(axis, borderSector, s.Points[iterator], true)
 			} else {
 				points = s.preparation(axis, borderSector, s.Points[iterator], false)
 			}
 
-			points = s.setPoints(borderSector, points, s.Points[iterator], axis)
-
 			s.Points = append(s.Points, points)
-
-			// s.logger.Logger.Infof("\n iterator: %d\n points: %d all points: %d\n", iterator, points, s.Points)
+	
 			s.OldAxis = axis
 			boolean = false
 		} else {
 			lastPathSector = true
-			// s.logger.Logger.Infof("\n iterator: %d\n border: %d\n", iterator, borderSector)
+		
 			points := s.preparation(axis, borderSector, s.Points[iterator], false)
-
-			points = s.setPoints(borderSector, points, s.Points[iterator], axis)
 
 			ok, err := repository.checkBorderAud(points)
 			if err.Err != nil {
@@ -69,14 +58,6 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 }
 
 // точки от начала пути до вхождение в пределы сектора
-func (s *sectorToSectorController) setPoints(borderPoints, points, lastPathPoint models.Coordinates, axis int) (models.Coordinates) {
-	p := models.Coordinates{
-		X: (points.X),
-		Y: (points.Y)}
-	p.Widht = points.Widht
-	p.Height = points.Height
-	return p
-}
 
 
 // проверка на вхождение точек пути в пределы сектора.

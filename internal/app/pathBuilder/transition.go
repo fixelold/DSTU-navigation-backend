@@ -1,6 +1,8 @@
 package pathBuilder
 
-import "navigation/internal/appError"
+import (
+	"navigation/internal/appError"
+)
 
 func (h *handler) stairs(sector int) (int, appError.AppError) {
 	transitionSector, err := h.repository.GetTransitionSector(sector, stairs)

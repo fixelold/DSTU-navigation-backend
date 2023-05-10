@@ -34,8 +34,6 @@ var (
 // получаем координаты аудитории по ее номеру.
 func (r *repository) getAudPoints(number string) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
-
-	fmt.Println("data - ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM auditorium_position 
@@ -254,16 +252,23 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 	return true, appError.AppError{}
 }
 
-func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coordinates, appError.AppError) {
+func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
+	// request :=
+	// 	`SELECT x, y, widht, height
+	// FROM transition_border_points
+	// JOIN transition
+	// ON transition_border_points.id_transition = transition.id
+	// JOIN sector ON sector.id_transition = transition.id
+	// WHERE sector.number = $1 
+	// AND transition.number = $2`
+
 	request :=
 		`SELECT x, y, widht, height
-	FROM transition_border_points
-	JOIN transition
-	ON transition_border_points.id_transition = transition.id
-	JOIN sector ON sector.id_transition = transition.id
-	WHERE sector.number = $1 
-	AND transition.number = $2`
+		FROM transition_border_points
+		JOIN transition
+		ON transition_border_points.id_transition = transition.id
+		WHERE  transition.number = $1`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -276,7 +281,7 @@ func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coo
 	err = tx.QueryRow(
 		context.Background(),
 		request,
-		start, exit).Scan(
+		start).Scan(
 		&borderPoint.X,
 		&borderPoint.Y,
 		&borderPoint.Widht,
@@ -301,6 +306,7 @@ func (r *repository) getTransitionSectorBorderPoint(start, exit int) (models.Coo
 
 func (r *repository) getTransitionPoints(number int) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
+	fmt.Println("number transition: ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM transition_position 
