@@ -113,19 +113,37 @@ INSERT INTO auditorium (number, id_sector) VALUES
 -- сектора --
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1043']), 16);
+    ('1011', 1),
+    ('1012', 6),
+    ('1013', 13),
+    ('1014', 17),
+    ('1015', 22),
+    ('1016', 29),
+    ('1017', 33);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1041']), 4);
+    ('1021', 2),
+    ('1022', 8),
+    ('1023', 14),
+    ('1024', 18),
+    ('1025', 24),
+    ('1026', 30),
+    ('1027', 34);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1042']), 11);
+    ('1031', 3),
+    ('1032', 10),
+    ('1033', 15),
+    ('1034', 19),
+    ('1035', 26),
+    ('1036', 31),
+    ('1037', 34);
 
 INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1031']), 3);
-
-INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1032']), 9);
-
-INSERT INTO auditorium (number, id_sector) VALUES
-    (unnest(array['1033']), 15);
+    ('1041', 4),
+    ('1042', 12),
+    ('1043', 16),
+    ('1044', 20),
+    ('1045', 28),
+    ('1046', 32),
+    ('1047', 26);

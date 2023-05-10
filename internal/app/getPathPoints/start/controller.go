@@ -2,7 +2,6 @@ package start
 
 import (
 	"errors"
-	"fmt"
 
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
@@ -78,7 +77,6 @@ func (s *startController) audStartPoints(axis int) appError.AppError {
 	var path models.Coordinates
 
 	// подготовка точек исходя из оси, типа и границ аудитории.
-	fmt.Println("datatda sd - ", s.audienceBoundaryPoints)
 	coordinates := s.preparation(axis, s.audienceBoundaryPoints)
 	// получение точек для начального пути.
 	path, err = s.pathBuilding(coordinates, axis, s.constData.positiveCoordinate)

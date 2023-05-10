@@ -3,7 +3,6 @@ package pathBuilder
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -74,7 +73,6 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 
 func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
-	fmt.Println("number: ", number)
 	req :=
 		`SELECT 
 	sector.number
@@ -117,7 +115,7 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 }
 
 func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
-	var sector models.Sector
+	var sector models.Sector 
 	req :=
 		`SELECT transition.number 
 	FROM transition
