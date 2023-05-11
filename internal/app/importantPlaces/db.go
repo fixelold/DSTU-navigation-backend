@@ -105,7 +105,8 @@ func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 		id).Scan(
 		&importantPlaces.ID,
 		&importantPlaces.Name,
-		&importantPlaces.AuditoryID)
+		&importantPlaces.AuditoryID,
+		&importantPlaces.AuditoryNumber)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -128,8 +129,9 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 	request := `
 		UPDATE important_places
 		SET name = $1,
-		id_auditorium = $2
-		WHERE id = $3 RETURNING id;`
+		id_auditorium = $2,
+		auditory_number = $3
+		WHERE id = $4 RETURNING id;`
 
 	//AND NOT EXISTS (SELECT null FROM important_places WHERE (id_auditorium) = ($2)) RETURNING id;
 
@@ -145,6 +147,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 		request,
 		newPlaces.Name,
 		newPlaces.AuditoryID,
+		newPlaces.AuditoryNumber,
 		oldPlaces.ID).Scan(&newPlaces.ID)
 
 	if err != nil {
