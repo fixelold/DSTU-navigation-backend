@@ -46,8 +46,8 @@ func NewRepository(
 
 func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
 	var newImportantPlaces models.ImportantPlaces
-	req := `INSERT INTO important_places (name, id_auditorium) 
-	SELECT $1::varchar(100), $2 
+	req := `INSERT INTO important_places (name, id_auditorium, auditory_number) 
+	SELECT $1::varchar(100), $2, $3 
 	WHERE NOT EXISTS 
 	(SELECT null FROM important_places 
 	WHERE (id_auditorium) = ($2)) RETURNING id;`
@@ -64,7 +64,8 @@ func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlac
 		context.Background(),
 		req,
 		places.Name,
-		places.AuditoryID).Scan(&newImportantPlaces.ID)
+		places.AuditoryID,
+		places.AuditoryNumber).Scan(&newImportantPlaces.ID)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -104,7 +105,8 @@ func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 		id).Scan(
 		&importantPlaces.ID,
 		&importantPlaces.Name,
-		&importantPlaces.AuditoryID)
+		&importantPlaces.AuditoryID,
+		&importantPlaces.AuditoryNumber)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())
@@ -127,8 +129,9 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 	request := `
 		UPDATE important_places
 		SET name = $1,
-		id_auditorium = $2
-		WHERE id = $3 RETURNING id;`
+		id_auditorium = $2,
+		auditory_number = $3
+		WHERE id = $4 RETURNING id;`
 
 	//AND NOT EXISTS (SELECT null FROM important_places WHERE (id_auditorium) = ($2)) RETURNING id;
 
@@ -144,6 +147,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 		request,
 		newPlaces.Name,
 		newPlaces.AuditoryID,
+		newPlaces.AuditoryNumber,
 		oldPlaces.ID).Scan(&newPlaces.ID)
 
 	if err != nil {
@@ -225,7 +229,7 @@ func (r *repository) List(numberBuild int) ([]models.ImportantPlaces, error) {
 
 	for rows.Next() {
 		var sl models.ImportantPlaces
-		err := rows.Scan(&sl.ID, &sl.Name, &sl.AuditoryID)
+		err := rows.Scan(&sl.ID, &sl.Name, &sl.AuditoryID, &sl.AuditoryNumber)
 		if err != nil {
 			scanError.Wrap(fmt.Sprintf("file: %s, function: %s", file, listFunction))
 			scanError.Err = err

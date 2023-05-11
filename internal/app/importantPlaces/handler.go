@@ -188,12 +188,13 @@ func (h *handler) List(c *gin.Context) {
 	var err appError.AppError
 	err.Wrap(fmt.Sprintf("package: %s, file: %s, function: %s", "importantPlaces", "handler.go", "List"))
 
-	if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
-		// h.logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
-		return
-	}
+	// if err.Err = c.ShouldBindQuery(&r); err.Err != nil {
+	// 	// h.logger.Error(err.Error())
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode data"})
+	// 	return
+	// }
 
+	r.NumberBiuld = 1
 	places, err.Err = h.repository.List(r.NumberBiuld)
 	if err.Err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
