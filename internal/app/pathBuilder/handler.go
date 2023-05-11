@@ -16,8 +16,9 @@ const getSectors = "/get-sectors"
 var (
 	bindQueryError = appError.NewAppError("can't decode query")
 
-	stairs   = 1
-	elevator = 2
+	noTransition = 1
+	stairs   = 2
+	elevator = 3
 )
 
 type handler struct {
@@ -75,13 +76,20 @@ func (h *handler) getSectors(c *gin.Context) {
 		return
 	}
 
-	if request.TypeTranstionSector == stairs {
-		transitionSector, err = h.stairs(start)
-		if err.Err != nil {
-			err.Wrap("getSector")
-			h.logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-			return
+	if request.TypeTranstionSector != noTransition {
+
+		if request.TypeTranstionSector == stairs {
+			transitionSector, err = h.stairs(start)
+			if err.Err != nil {
+				err.Wrap("getSector")
+				h.logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+				return
+			}
+		}
+
+		if request.TypeTranstionSector == elevator {
+			
 		}
 	}
 
