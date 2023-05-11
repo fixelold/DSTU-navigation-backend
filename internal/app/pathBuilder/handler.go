@@ -53,7 +53,7 @@ func (h *handler) getSectors(c *gin.Context) {
 	var err appError.AppError
 	var request request
 	var response response
-	var transitionSector int
+	var transitionNumber int
 
 	if err := c.ShouldBindQuery(&request); err != nil {
 		bindQueryError.Err = err
@@ -79,7 +79,7 @@ func (h *handler) getSectors(c *gin.Context) {
 	if request.TypeTranstionSector != noTransition {
 
 		if request.TypeTranstionSector == stairs {
-			transitionSector, err = h.stairs(start)
+			transitionNumber, err = h.stairs(start)
 			if err.Err != nil {
 				err.Wrap("getSector")
 				h.logger.Error(err.Error())
@@ -89,12 +89,17 @@ func (h *handler) getSectors(c *gin.Context) {
 		}
 
 		if request.TypeTranstionSector == elevator {
-			
+			transitionNumber, err = h.elevator(start)
+			if err.Err != nil {
+				h.logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+				return
+			}
 		}
 	}
 
 	// TODO сделать обработку ошибки
-	response.Sectors, err = h.Builder(start, end, transitionSector)
+	response.Sectors, err = h.Builder(start, end, transitionNumber, request.TypeTranstionSector)
 	if err.Err != nil {
 		err.Wrap("handler getSectors")
 		h.logger.Error(err.Error())

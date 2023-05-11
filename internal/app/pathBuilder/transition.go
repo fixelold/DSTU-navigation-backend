@@ -14,7 +14,7 @@ func (h *handler) stairs(sector int) (int, appError.AppError) {
 	return transitionSector, err
 }
 
-func (h *handler) elevator(start, sector int) (int, appError.AppError) {
+func (h *handler) elevator(start int) (int, appError.AppError) {
 	sectorNumber :=  start % 10
 	var transitionNumber int
 
