@@ -242,7 +242,6 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 
 	if p.transition == stair {
 		entry, exit := p.sectors[0], p.sectors[1]
-		fmt.Println("transition number: ", p.transitionNumber)
 		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
@@ -251,7 +250,6 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		p.data = *data
 		// entry, exit := p.sectors[0], p.sectors[1]
 
-		fmt.Println("start auditory: ", p.StartAuditory)
 		err = p.start(p.StartAuditory)
 		if err.Err != nil {
 			return nil, err
@@ -265,6 +263,49 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		response = append(response, p.points...)
 
 	} else if p.transition == elevator {
+		entry, exit := min(p.sectors[0], p.sectors[1])
+		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, noTransition, p.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return nil, err
+		}
+		p.data = *data
+		// entry, exit := p.sectors[0], p.sectors[1]
+
+		err = p.start(p.StartAuditory)
+		if err.Err != nil {
+			return nil, err
+		}
+
+		err = p.middle(entry, exit)
+		if err.Err != nil {
+			return nil, err
+		}
+
+		// это сделано т.к с фронта возвращается не (143, 142, 141), а (1043, 143, 142, 141)
+		entry, exit = min(p.sectors[0], p.sectors[1])
+		//p.transition = stair возможно, надо будет это раскоментить или что-то сделать!!!
+		p.transitionNumber = p.sectors[len(p.sectors) - 1]
+		data, err = newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, transitionToAud, p.transitionNumber)
+		if err.Err != nil {
+			err.Wrap("getPathPoints")
+			return nil, err
+		}
+		p.data = *data
+		response = append(response, p.points...)
+		p.points = []models.Coordinates{}
+
+		err = p.start(p.StartAuditory)
+		if err.Err != nil {
+			return nil, err
+		}
+
+		err = p.middle(entry, exit)
+		if err.Err != nil {
+			return nil, err
+		}
+
+		response = append(response, p.points...)
 
 	} else if p.transition == transitionToAud {
 		if len(strconv.Itoa(p.sectors[0])) == 4{
@@ -345,7 +386,6 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 				return nil, err
 			}
 	
-			fmt.Println("response: ", response)
 			response = append(response, p.points...)
 		}
 	}
