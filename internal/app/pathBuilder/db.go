@@ -116,6 +116,7 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 
 func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
 	var sector models.Sector 
+	type_transtion_sector = 1 // вообще это из базы можно будет убрать
 	req :=
 		`SELECT transition.number 
 	FROM transition

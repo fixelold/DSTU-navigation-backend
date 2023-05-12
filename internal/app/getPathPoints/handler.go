@@ -9,6 +9,7 @@ import (
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
+	"navigation/internal/models"
 	"navigation/internal/transport/rest/handlers"
 	"navigation/internal/transport/rest/middleware"
 )
@@ -16,9 +17,14 @@ import (
 const (
 	urlPath = "/points" // url путь
 
-	transitionYes = 1 // переход между этажами есть
-	transitionNo  = 2 // перехода между этажами нет
-	transitionToAud = 3
+	// transitionYes = 1 // переход между этажами есть
+	// transitionNo  = 2 // перехода между этажами нет
+	// transitionToAud = 3
+
+	noTransition = 1
+	stair   = 2
+	elevator = 3
+	transitionToAud = 4
 
 	file                       = "handler.go"
 	getPointsFuntion           = "getPoints"
@@ -56,6 +62,7 @@ type requestData struct {
 func (h *handler) getPoints(c *gin.Context) {
 	var err appError.AppError
 	var data requestData
+	var response []models.Coordinates
 
 	err.Err = c.ShouldBindJSON(&data)
 	if err.Err != nil {
@@ -67,11 +74,20 @@ func (h *handler) getPoints(c *gin.Context) {
 
 	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.client, data.Transition, data.TransitionNumber)
 
-	response, err := p.controller()
-	if err.Err != nil {
-		h.logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-		return
+	if data.Transition != noTransition {
+		response, err = p.transitionController()
+		if err.Err != nil {
+			h.logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+			return
+		}
+	} else {
+		response, err = p.controller()
+		if err.Err != nil {
+			h.logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, response)

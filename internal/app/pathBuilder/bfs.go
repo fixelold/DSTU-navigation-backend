@@ -1,8 +1,6 @@
 package pathBuilder
 
 import (
-	"fmt"
-
 	"navigation/internal/appError"
 )
 
@@ -17,7 +15,9 @@ func (h *handler) Builder(start, end, transitionSector int, TypeTranstionSector 
 
 	res, q := h.bfs(start, end, transitionSector, matrix, TypeTranstionSector)
 	q = append(q, res...)
-	q = append(q, transitionSector)
+	if TypeTranstionSector == elevator {
+		q = append(q, transitionSector)
+	}
 	return q, err
 }
 
@@ -36,13 +36,14 @@ func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int, Ty
 	// }
 
 	if TypeTranstionSector == stairs {
-		q = append(queue, start)
-		q = append(queue, transitionSector)
-		start = (start % 10) + (end / 10 * 10)
+		q = append(q, start)
+		q = append(q, transitionSector)
+		return q, nil 
+		// start = (start % 10) + (end / 10 * 10)
+		// fmt.Println("posle: ", q, start, queue)
 	} else if TypeTranstionSector == elevator {
 		end = 100 + transitionSector % 100
 	}
-	fmt.Println("data: ", transitionSector, end)
 	queue = append(queue, start)
 	visited[start] = true
 	distance[start] = 0
