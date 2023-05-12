@@ -3,7 +3,6 @@ package getPathPoints
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -306,7 +305,6 @@ func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinat
 
 func (r *repository) getTransitionPoints(number int) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
-	fmt.Println("number transition: ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM transition_position 
