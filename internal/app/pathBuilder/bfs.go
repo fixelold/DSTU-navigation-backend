@@ -5,7 +5,7 @@ import (
 )
 
 // you must provide a start sector and an end sector
-func (h *handler) Builder(start, end, transitionSector int) ([]int, appError.AppError) {
+func (h *handler) Builder(start, end, transitionSector int, TypeTranstionSector int) ([]int, appError.AppError) {
 	var err appError.AppError
 	matrix, err := h.adjacencyMatrix()
 	if err.Err != nil {
@@ -13,12 +13,15 @@ func (h *handler) Builder(start, end, transitionSector int) ([]int, appError.App
 		return nil, err
 	}
 
-	res, q := h.bfs(start, end, transitionSector, matrix)
+	res, q := h.bfs(start, end, transitionSector, matrix, TypeTranstionSector)
 	q = append(q, res...)
+	if TypeTranstionSector == elevator {
+		q = append(q, transitionSector)
+	}
 	return q, err
 }
 
-func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([]int, []int) {
+func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int, TypeTranstionSector int) ([]int, []int) {
 	var queue []int
 	var q []int
 	visited := make(map[int]bool)
@@ -26,10 +29,20 @@ func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int) ([
 	top := make(map[int]int) // top of the graph
 	d := 0
 
-	if transitionSector != 0 {
-		q = append(queue, start)
-		q = append(queue, transitionSector)
-		start = (start % 10) + (end / 10 * 10)
+	// if transitionSector != 0 {
+	// 	q = append(queue, start)
+	// 	q = append(queue, transitionSector)
+	// 	start = (start % 10) + (end / 10 * 10)
+	// }
+
+	if TypeTranstionSector == stairs {
+		q = append(q, start)
+		q = append(q, transitionSector)
+		return q, nil 
+		// start = (start % 10) + (end / 10 * 10)
+		// fmt.Println("posle: ", q, start, queue)
+	} else if TypeTranstionSector == elevator {
+		end = 100 + transitionSector % 100
 	}
 	queue = append(queue, start)
 	visited[start] = true

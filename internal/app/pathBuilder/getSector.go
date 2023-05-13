@@ -27,6 +27,7 @@ func (h *handler) GetSector(start, end string, typeTransition int) (int, int, ap
 		if errConv != nil {
 			log.Fatalln("тута тебе надо переделать. Это в GetSector")
 		}
+		
 		sectorStart, err := h.repository.GetTransitionSector2(startAud, typeTransition)
 		if err.Err != nil {
 			err.Wrap("file GetSector")

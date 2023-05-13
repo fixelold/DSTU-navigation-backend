@@ -51,7 +51,7 @@ func newData(audNumber string,
 		transitionNumber: transitionNumber,
 	}
 
-	if data.transition == transitionYes {
+	if data.transition == stair {
 		sectorEntry, sectorExit = sectorExit, sectorEntry
 	}
 
@@ -69,7 +69,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 	var err appError.AppError
 	repository := NewRepository(d.client, d.logger)
 	// получаем координаты аудитории по ее номеру.
-	if d.transition == transitionYes {
+	if d.transition == stair {
 		d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
@@ -82,7 +82,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
-	} else if d.transition == transitionNo {
+	} else if d.transition == noTransition {
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")

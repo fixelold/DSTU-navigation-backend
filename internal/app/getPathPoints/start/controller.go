@@ -56,7 +56,7 @@ func NewStartController(
 	}
 
 // занесение точек начального пути
-func (s *startController) StartPath(typeTransition int) ([]models.Coordinates, appError.AppError) {
+func (s *startController) StartPath() ([]models.Coordinates, appError.AppError) {
 	var err appError.AppError
 
 	a := axes.DefenitionAxis(s.audienceBoundaryPoints.Widht, s.audienceBoundaryPoints.Height, s.constData.axisX, s.constData.axisY)
