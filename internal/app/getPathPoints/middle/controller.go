@@ -22,17 +22,20 @@ type middleController struct {
 	Points []models.Coordinates
 	constData constData
 	sectorNumber int
+	thisSectorNumber int
 
 	client postgresql.Client
 	logger *logging.Logger
 }
 
 func NewMiddleController(
+	thisSectorNumber int,
 	sectorNumber int, 
 	client postgresql.Client, 
 	axisX, axisY, widhtX, heightX, widhtY, heightY int, 
 	logger *logging.Logger) *middleController {
 	return &middleController{
+		thisSectorNumber: thisSectorNumber,
 		sectorNumber: sectorNumber,
 		client: client,
 		logger: logger,

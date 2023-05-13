@@ -3,6 +3,7 @@ package middle
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -30,12 +31,31 @@ var (
 )
 
 // проверка, чтобы точки пути не находились в границах аудитории.
-func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appError.AppError) {
+func (r *repository) checkBorderAud(coordinates models.Coordinates, sectorNumber int) (bool, appError.AppError) {
+	//TODO: тут бы немного подправить. 
+	//TODO: Т.к неособо уверен, что $1 и $2 правильно расчитываются. 
+	//TODO: И работают для всех случаев.
 	request :=
-		`SELECT x, y, widht, height
-	FROM auditorium_position 
-	WHERE x <= $1 AND $1 <= (x+widht)
-	AND y <= $2 AND $2 <= (y+height)`
+	`SELECT x, y, widht, height
+	FROM auditorium_position
+	JOIN auditorium
+	ON auditorium.id = auditorium_position.id_auditorium
+	JOIN sector
+	ON sector.id = auditorium.id_sector
+	WHERE ($1 <= x AND (x+widht) <= $2
+	AND y <= $3 AND $4 <= (y+height)
+	AND sector.number = $5);`
+
+	// request2 :=
+	// 	`SELECT x, y, widht, height
+	// FROM auditorium_position
+	// JOIN auditorium
+	// ON auditorium.id = auditorium_position.id_auditorium
+	// JOIN sector
+	// ON sector.id = auditorium.id_sector
+	// WHERE $1 <= x AND (x+widht) <= $2
+	// AND y <= $3 AND $4 <= (y+height)
+	// AND sector.number = $5;`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
@@ -48,8 +68,144 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appEr
 	res, err := tx.Exec(
 		context.Background(),
 		request,
-		coordinates.X+coordinates.Widht,
-		coordinates.Y+coordinates.Height)
+		coordinates.X,
+		coordinates.Widht,
+		coordinates.Y,
+		coordinates.Height,
+		sectorNumber)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			execError.Wrap("checkBorderAud")
+			execError.Err = pgErr
+			return false, *execError
+		}
+		execError.Wrap("checkBorderAud")
+		execError.Err = err
+		return false, *execError
+	}
+	_ = tx.Commit(context.Background())
+
+	if res.RowsAffected() != 0 {
+		return false, appError.AppError{}
+	}
+
+	// Возможно тут надо это добавить в else.
+	return true, appError.AppError{}
+}
+
+func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumber int) (bool, appError.AppError) {
+	//TODO: тут бы немного подправить. 
+	//TODO: Т.к неособо уверен, что $1 и $2 правильно расчитываются. 
+	//TODO: И работают для всех случаев.
+	fmt.Println("Workhjgygh - ", coordinates)
+	request :=
+	`SELECT x, y, widht, height
+	FROM auditorium_position
+	JOIN auditorium
+	ON auditorium.id = auditorium_position.id_auditorium
+	JOIN sector
+	ON sector.id = auditorium.id_sector
+	WHERE $1 <= x AND (x+widht) >= $2 
+	AND y <= $3 AND $4 <= (y+height)
+	AND sector.number = $5;`
+
+	// request2 :=
+	// 	`SELECT x, y, widht, height
+	// 	FROM auditorium_position
+	// 	JOIN auditorium
+	// 	ON auditorium.id = auditorium_position.id_auditorium
+	// 	JOIN sector
+	// 	ON sector.id = auditorium.id_sector
+	// 	WHERE 201 <= x AND (x+widht) >= 223
+	// 	AND y <= 487 AND 493 <= (y+height)
+	// 	AND sector.number = 132;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap("checkBorderAud")
+		txError.Err = err
+		return false, *txError
+	}
+
+	res, err := tx.Exec(
+		context.Background(),
+		request,
+		coordinates.X,
+		coordinates.Widht,
+		coordinates.Y,
+		coordinates.Height,
+		sectorNumber)
+
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			execError.Wrap("checkBorderAud")
+			execError.Err = pgErr
+			return false, *execError
+		}
+		execError.Wrap("checkBorderAud")
+		execError.Err = err
+		return false, *execError
+	}
+	_ = tx.Commit(context.Background())
+
+	if res.RowsAffected() != 0 {
+		return false, appError.AppError{}
+	}
+
+	// Возможно тут надо это добавить в else.
+	return true, appError.AppError{}
+}
+
+func (r *repository) checkBorderAudY(coordinates models.Coordinates, sectorNumber int) (bool, appError.AppError) {
+	//TODO: тут бы немного подправить. 
+	//TODO: Т.к неособо уверен, что $1 и $2 правильно расчитываются. 
+	//TODO: И работают для всех случаев.
+	request :=
+	`SELECT x, y, widht, height
+	FROM auditorium_position
+	JOIN auditorium
+	ON auditorium.id = auditorium_position.id_auditorium
+	JOIN sector
+	ON sector.id = auditorium.id_sector
+	WHERE $1 <= y AND (y+height) <= $2
+	AND x <= $3 AND $4 <= (x+widht)
+	AND sector.number = $5;`
+
+	// request2 :=
+	// 	`SELECT x, y, widht, height
+	// FROM auditorium_position
+	// JOIN auditorium
+	// ON auditorium.id = auditorium_position.id_auditorium
+	// JOIN sector
+	// ON sector.id = auditorium.id_sector
+	// WHERE $1 <= x AND (x+widht) <= $2
+	// AND y <= $3 AND $4 <= (y+height)
+	// AND sector.number = $5;`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		txError.Wrap("checkBorderAud")
+		txError.Err = err
+		return false, *txError
+	}
+
+	res, err := tx.Exec(
+		context.Background(),
+		request,
+		coordinates.Y,
+		coordinates.Height,
+		coordinates.X,
+		coordinates.Widht,
+		sectorNumber)
 
 	if err != nil {
 		_ = tx.Rollback(context.Background())

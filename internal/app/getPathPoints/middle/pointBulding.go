@@ -1,6 +1,8 @@
 package middle
 
 import (
+	"fmt"
+
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/models"
@@ -11,14 +13,19 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	iterator := 0
 	repository := NewRepository(m.client, m.logger)
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
+	var ok bool
+	var err appError.AppError
 	for boolean {
+		// if iterator == 2 {
+		// 	break
+		// }
 		if m.checkOccurrence(m.Points[iterator], axis, borderSector) {
 
 			m.pathAlignment(borderSector, axis)
 
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 
-			points := m.preparation(axis, borderSector, m.Points[iterator])
+			points := m.preparation(axis, borderSector, m.Points[iterator], 0)
 
 			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
 
@@ -26,14 +33,52 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 			boolean = false
 		} else {
 
-			points := m.preparation(axis, borderSector, m.Points[iterator])
+			points := m.preparation(axis, borderSector, m.Points[iterator], 0)
 
 			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
 
-			ok, err := repository.checkBorderAud(points)
-			if err.Err != nil {
-				err.Wrap("otherPathPoints")
-				return err
+
+			if points.Widht < 0 || points.Height < 0 {
+				chechPoints := models.Coordinates{
+					X: (points.X + points.Widht),
+					Y: points.Y,
+					Widht: points.X,
+					Height: points.Y + points.Height,
+				}
+				ok, err = repository.checkBorderAud(chechPoints, m.thisSectorNumber)
+				if err.Err != nil {
+					err.Wrap("otherPathPoints")
+					return err
+				}
+			} else {
+				if axis == m.constData.axisY {
+					fmt.Println("Woooork")
+					ok, err = repository.checkBorderAudY(points, m.thisSectorNumber)
+					if err.Err != nil {
+						err.Wrap("otherPathPoints")
+						return err
+					}
+				} else {
+					chechPoints := models.Coordinates{
+						X: points.X ,
+						Y: points.Y,
+						Widht: points.X + points.Widht,
+						Height: points.Y + points.Height,
+					}
+					ok, err = repository.checkBorderAud(chechPoints, m.thisSectorNumber)
+					if err.Err != nil {
+						err.Wrap("otherPathPoints")
+						return err
+					}
+
+					if ok {
+						ok, err = repository.checkBorderAud2(chechPoints, m.thisSectorNumber)
+						if err.Err != nil {
+							err.Wrap("otherPathPoints")
+							return err
+						}
+					}
+				}
 			}
 
 			ok2, err := repository.checkBorderSector(points)
@@ -44,6 +89,18 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 
 			if !ok && !ok2 {
 				//TODO написать изменения направления или типо что-то такого
+			}
+
+			if !ok {
+				fmt.Println("Work and axis: ", axis)
+				// tmp := m.Points[0]
+				// m.Points = append(m.Points[0:], tmp)
+				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+
+				points = m.preparation(axis, borderSector, m.Points[iterator], m.constData.heightY)
+				points = m.setPoints(borderSector, points, m.Points[iterator], axis)
+
+				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 			}
 
 			m.Points = append(m.Points, points)

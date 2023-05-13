@@ -6,11 +6,11 @@ import (
 	"navigation/internal/models"
 )
 
-func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
+func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates, temp int) models.Coordinates {
 	if axis == m.constData.axisX {
 		if len(strconv.Itoa(m.sectorNumber)) == 4 { //stairs
 			return models.Coordinates{
-				X:      m.Points[0].X,
+				X:      points.X + points.Widht,
 				Y:      points.Y + points.Height,
 				Widht:  borderPoint.X - points.X,
 				Height: m.constData.heightX}
@@ -35,7 +35,7 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 				X:      points.X + points.Widht,
 				Y:      points.Y + points.Height - m.constData.heightX,
 				Widht:  m.constData.widhtY,
-				Height: borderPoint.Y - points.Y}
+				Height: borderPoint.Y - points.Y + temp}
 		} else {
 			return models.Coordinates{
 				X:      points.X + points.Widht,

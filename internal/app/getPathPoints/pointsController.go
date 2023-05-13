@@ -166,7 +166,7 @@ func (p *controller) start(audNumber string) appError.AppError {
 
 func (p *controller) middle(entry, exit int) appError.AppError {
 	repository := NewRepository(p.client, p.logger)
-	middle := middle.NewMiddleController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	middle := middle.NewMiddleController(p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
 	borderSector, err := repository.getSectorBorderPoint(entry, exit)
 	if err.Err != nil {
 		err.Wrap("middle")
@@ -187,7 +187,7 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 func (p *controller) middleToTransition(entry, exit int) appError.AppError {
 	// entry, exit = exit, entry
 	repository := NewRepository(p.client, p.logger)
-	middle := middle.NewMiddleController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	middle := middle.NewMiddleController(p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
 	borderSector, err := repository.getTransitionSectorBorderPoint(exit)
 	if err.Err != nil {
 		err.Wrap("middle to transition")
