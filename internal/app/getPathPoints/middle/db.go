@@ -100,6 +100,13 @@ func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumbe
 	//TODO: тут бы немного подправить. 
 	//TODO: Т.к неособо уверен, что $1 и $2 правильно расчитываются. 
 	//TODO: И работают для всех случаев.
+	if coordinates.Widht < 0 {
+		temp := coordinates
+		coordinates.X = temp.X + temp.Widht
+		coordinates.Y = temp.Y
+		coordinates.Widht = temp.X - (temp.X + temp.Widht)
+		coordinates.Height = temp.Height
+	}
 	request :=
 	`SELECT x, y, widht, height
 	FROM auditorium_position
@@ -107,9 +114,13 @@ func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumbe
 	ON auditorium.id = auditorium_position.id_auditorium
 	JOIN sector
 	ON sector.id = auditorium.id_sector
-	WHERE $1 <= x AND (x+widht) >= $2 
-	AND y <= $3 AND $4 <= (y+height)
-	AND sector.number = $5;`
+	WHERE ($1 <= x AND x <= $2
+	AND $3 >= y AND $4 <= (y+height)
+	AND sector.number = $5)
+	OR (
+		$1 <= x AND (x+widht) <= $2 
+		AND $3 >= y AND $4 <= (y+height) 
+		AND sector.number = $5);`
 
 	// request2 :=
 	// 	`SELECT x, y, widht, height
@@ -118,9 +129,10 @@ func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumbe
 	// 	ON auditorium.id = auditorium_position.id_auditorium
 	// 	JOIN sector
 	// 	ON sector.id = auditorium.id_sector
-	// 	WHERE 208 <= x AND (x+widht) >= 218
-	// 	AND y <= 686 AND 691 <= (y+height)
-	// 	AND sector.number = 132;`
+	// 	WHERE (100 < x AND x <= 201
+	// 	AND 135 >= y AND 140 <= (y+height)
+	// 	AND sector.number = 131)
+	// 	OR (100 < x AND (x+widht) <= 201 AND 135 >= y AND 140 <= (y+height) AND sector.number = 131);`
 
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {

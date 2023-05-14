@@ -1,6 +1,8 @@
 package middle
 
 import (
+	"fmt"
+
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/models"
@@ -12,12 +14,17 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 
 	for i := 0; true; i++ {
-		if i == 1 {
-			break
-		}
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
-			// TODO: отрисовка пути прямо до границ секторного перехода
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			
+			// расчет точек пути
+			points, err := m.preparation(axis, borderSector, m.Points[i])
+			if err.Err != nil {
+				err.Wrap("building")
+				return err
+			}
+			m.Points = append(m.Points, points)
 			break
 		}
 
@@ -27,30 +34,24 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 			err.Wrap("building")
 			return err
 		}
+		fmt.Println("prepare points: ", points)
 
-		// проверка точек на вхождение в пределы аудитории
-		ok, err := repository.checkBorderAud(points, m.thisSectorNumber)
-		if err.Err != nil {
-			err.Wrap("building")
-			return err
-		}
-
-		ok2, err := repository.checkBorderAud(points, m.thisSectorNumber)
+		ok2, err := repository.checkBorderAud2(points, m.thisSectorNumber)
 		if err.Err != nil {
 			err.Wrap("building")
 			return err
 		}
 
 		// изменения оси построения, если точки входят в пределы аудитории
-		if !ok || !ok2 {
+		if !ok2 {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 			points, err = m.preparation(axis, borderSector, m.Points[i])
 			if err.Err != nil {
 				err.Wrap("building")
 				return err
 			}
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 		}
-
 		m.Points = append(m.Points, points)
 	}
 

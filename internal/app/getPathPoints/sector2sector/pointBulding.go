@@ -101,7 +101,7 @@ func (s *sectorToSectorController) pathAlignment(sectorBorderPoint models.Coordi
 			points.Height = s.constData.heightX
 			s.Points[lenght-1].Widht = points.Widht
 		} else if sectorPoints < path.X {
-			points.Widht = sectorPoints - path.X
+			points.Widht = (sectorBorderPoint.X + (sectorBorderPoint.Widht / 2)) - (path.X)
 			points.Height = s.constData.heightX
 			s.Points[lenght-1].Widht = points.Widht
 		}
