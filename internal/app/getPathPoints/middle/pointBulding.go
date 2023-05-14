@@ -1,8 +1,6 @@
 package middle
 
 import (
-	"fmt"
-
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/models"
@@ -14,13 +12,14 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 
 	for i := 0; true; i++ {
+		// if i == 1 {
+		// 	break
+		// }
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			m.pathAlignment(borderSector, axis)
-			fmt.Println("=======================", m.thisSectorNumber, "================================")
 
-			// axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			m.pathAlignment(borderSector, axis)
 			
 			// расчет точек пути
 			points, err := m.preparation(axis, borderSector, m.Points[i])
@@ -91,53 +90,13 @@ func (m *middleController) checkOccurrence(points models.Coordinates, axis int, 
 // выравнивание пути
 func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, axis int) {
 	lenght := len(m.Points)
-	path := m.Points[lenght-1]
 	switch axis {
 	case m.constData.axisX:
-	// 	points := models.Coordinates{
-	// 		X: (path.X),
-	// 		Y: (path.Y)}
-	// 	sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
-	// 	if sectorPoints > path.X {
-	// 		fmt.Println("Work 1")
-	// 		points.Widht = sectorPoints - path.X
-	// 		points.Height = m.constData.heightX
-	// 		m.Points[lenght-1].Widht = points.Widht
-	// 	} else if sectorPoints < path.X {
-	// 		fmt.Println("Work 2")
-	// 		points.Widht = sectorPoints - path.X
-	// 		points.Height = m.constData.heightX
-	// 		m.Points[lenght-1].Widht = points.Widht
-	// 	}
 	case m.constData.axisY:
-		// points := models.Coordinates{
-		// 	X: (path.X),
-		// 	Y: (path.Y)}
-		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		if m.typeTransition >= 2 {
-			if sectorPoints > path.Y {
-				// points.Widht = m.constData.widhtY
-				// points.Height = sectorPoints - path.Y
-				// m.Points[lenght-1].Height = points.Height
-			} else if sectorPoints < path.Y  {
-				// points.Widht = m.constData.widhtY
-				// points.Height = sectorPoints - path.Y
-				// m.Points[lenght-1].Height = points.Height
-			} else {
-				m.Points[lenght-2].Height = m.Points[lenght-2].Height + 10 // TODO: тута надо сделать обратку и для - 10
-				m.Points[lenght-1].Y = m.Points[lenght-1].Y + 10 // TODO: тоже самое
-			}
-		} else {
-			if sectorPoints > path.Y {
-				// points.Widht = m.constData.widhtY
-				// points.Height = sectorPoints - path.Y
-				// m.Points[lenght-1].Height = points.Height
-			} else if sectorPoints < path.Y {
-				// points.Widht = m.constData.widhtY
-				// points.Height = sectorPoints - path.Y
-				// m.Points[lenght-1].Height = points.Height
-			}
-		}
+		if m.typeTransition >= 2 && sectorBorderPoint.Y == m.Points[lenght-1].Y {
+			m.Points[lenght-2].Height = m.Points[lenght-2].Height + 10 // TODO: тута надо сделать обратку и для - 10
+			m.Points[lenght-1].Y = m.Points[lenght-1].Y + 10 // TODO: тоже самое
+		} 
 	default:
 		m.logger.Errorln("Path Alignment default")
 	}

@@ -1,6 +1,7 @@
 package getPathPoints
 
 import (
+	"fmt"
 	"strconv"
 
 	"navigation/internal/app/getPathPoints/middle"
@@ -244,6 +245,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		_, exit = min(p.sectors[0], p.sectors[1])
 	}
 	if p.transition == stair || len(strconv.Itoa(exit)) == 4 {
+		fmt.Println("Works")
 		entry, exit := p.sectors[0], p.sectors[1]
 		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)
 		if err.Err != nil {
@@ -324,6 +326,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		}
 
 		if len(p.sectors) == 1 {
+			
 			p.transition = stair
 			entry := p.sectors[0]
 			data, err := newData(p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
