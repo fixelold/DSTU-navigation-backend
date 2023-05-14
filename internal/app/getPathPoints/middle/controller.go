@@ -23,18 +23,21 @@ type middleController struct {
 	constData constData
 	sectorNumber int
 	thisSectorNumber int
+	typeTransition int
 
 	client postgresql.Client
 	logger *logging.Logger
 }
 
 func NewMiddleController(
+	typeTransition int,
 	thisSectorNumber int,
 	sectorNumber int, 
 	client postgresql.Client, 
 	axisX, axisY, widhtX, heightX, widhtY, heightY int, 
 	logger *logging.Logger) *middleController {
 	return &middleController{
+		typeTransition: typeTransition,
 		thisSectorNumber: thisSectorNumber,
 		sectorNumber: sectorNumber,
 		client: client,

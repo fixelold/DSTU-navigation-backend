@@ -3,7 +3,6 @@ package middle
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -101,7 +100,6 @@ func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumbe
 	//TODO: тут бы немного подправить. 
 	//TODO: Т.к неособо уверен, что $1 и $2 правильно расчитываются. 
 	//TODO: И работают для всех случаев.
-	fmt.Println("Workhjgygh - ", coordinates)
 	request :=
 	`SELECT x, y, widht, height
 	FROM auditorium_position
@@ -120,8 +118,8 @@ func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumbe
 	// 	ON auditorium.id = auditorium_position.id_auditorium
 	// 	JOIN sector
 	// 	ON sector.id = auditorium.id_sector
-	// 	WHERE 201 <= x AND (x+widht) >= 223
-	// 	AND y <= 487 AND 493 <= (y+height)
+	// 	WHERE 208 <= x AND (x+widht) >= 218
+	// 	AND y <= 686 AND 691 <= (y+height)
 	// 	AND sector.number = 132;`
 
 	tx, err := r.client.Begin(context.Background())
@@ -136,9 +134,9 @@ func (r *repository) checkBorderAud2(coordinates models.Coordinates, sectorNumbe
 		context.Background(),
 		request,
 		coordinates.X,
-		coordinates.Widht,
+		coordinates.X + coordinates.Widht,
 		coordinates.Y,
-		coordinates.Height,
+		coordinates.Y + coordinates.Height,
 		sectorNumber)
 
 	if err != nil {

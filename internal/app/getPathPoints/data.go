@@ -1,6 +1,8 @@
 package getPathPoints
 
 import (
+	"strconv"
+
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -101,6 +103,33 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
+	} else if d.transition == elevator {
+		d.audPoints, err = repository.getAudPoints(d.audNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+		d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+		if len(strconv.Itoa(exit)) == 4 {
+			d.audBorderPoints, err = repository.getTransitionSectorBorderPoint(d.transitionNumber)
+			if err.Err != nil {
+				err.Wrap("getPoints")
+				return err
+			}
+		} else {
+			d.sectorBorderPoints, err = repository.getSectorBorderPoint(entry, exit)
+			if err.Err != nil {
+				err.Wrap("getPoints")
+				return err
+			}
+		}
+		
 	} else if d.transition == transitionToAud {
 		d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
 		if err.Err != nil {
