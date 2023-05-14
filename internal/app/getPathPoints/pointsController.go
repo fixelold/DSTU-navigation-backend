@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"strconv"
 
 	"navigation/internal/app/getPathPoints/middle"
@@ -210,7 +209,6 @@ func (p *controller) sector2sector() appError.AppError {
 	sector2sector := sectorToSector.NewSectorToSectorController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
 	sector2sector.Points = append(sector2sector.Points, p.points...)
 	sector2sector.OldAxis = 3 // delete
-	fmt.Println("sectors: ", p.sectors)
 	for i := 1; i < len(p.sectors)-1; i++ {
 		entry, exit := min(p.sectors[i], p.sectors[i+1])
 

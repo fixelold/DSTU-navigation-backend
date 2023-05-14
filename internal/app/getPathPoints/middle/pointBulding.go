@@ -17,6 +17,10 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			m.pathAlignment(borderSector, axis)
+			fmt.Println("=======================", m.thisSectorNumber, "================================")
+
+			// axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 			
 			// расчет точек пути
 			points, err := m.preparation(axis, borderSector, m.Points[i])
@@ -34,7 +38,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 			err.Wrap("building")
 			return err
 		}
-		fmt.Println("prepare points: ", points)
+
 
 		ok2, err := repository.checkBorderAud2(points, m.thisSectorNumber)
 		if err.Err != nil {
@@ -57,117 +61,6 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 
 	return appError.AppError{}
 }
-
-// func (m *middleController) building(borderSector models.Coordinates) appError.AppError {
-// 	boolean := true
-// 	iterator := 0
-// 	repository := NewRepository(m.client, m.logger)
-// 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
-// 	ok := true
-// 	var err appError.AppError
-// 	for boolean {
-// 		if m.checkOccurrence(m.Points[iterator], axis, borderSector) {
-
-// 			m.pathAlignment(borderSector, axis)
-
-// 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-
-// 			points := m.preparation(axis, borderSector, m.Points[iterator], 0)
-
-// 			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
-
-// 			m.Points = append(m.Points, points)
-// 			boolean = false
-// 		} else {
-
-// 			points := m.preparation(axis, borderSector, m.Points[iterator], 0)
-
-// 			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
-
-// 			if m.typeTransition == 2 {
-// 				if points.Widht < 0 || points.Height < 0 {
-// 					chechPoints := models.Coordinates{
-// 						X: (points.X + points.Widht),
-// 						Y: points.Y,
-// 						Widht: points.X,
-// 						Height: points.Y + points.Height,
-// 					}
-// 					ok, err = repository.checkBorderAud(chechPoints, m.thisSectorNumber)
-// 					if err.Err != nil {
-// 						err.Wrap("otherPathPoints")
-// 						return err
-// 					}
-// 				} else {
-// 					if axis == m.constData.axisY {
-// 						ok, err = repository.checkBorderAudY(points, m.thisSectorNumber)
-// 						if err.Err != nil {
-// 							err.Wrap("otherPathPoints")
-// 							return err
-// 						}
-// 					} else {
-// 						chechPoints := models.Coordinates{
-// 							X: points.X ,
-// 							Y: points.Y,
-// 							Widht: points.X + points.Widht,
-// 							Height: points.Y + points.Height,
-// 						}
-// 						ok, err = repository.checkBorderAud(chechPoints, m.thisSectorNumber)
-// 						if err.Err != nil {
-// 							err.Wrap("otherPathPoints")
-// 							return err
-// 						}
-	
-// 						if ok {
-// 							ok, err = repository.checkBorderAud2(chechPoints, m.thisSectorNumber)
-// 							if err.Err != nil {
-// 								err.Wrap("otherPathPoints")
-// 								return err
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-
-// 			ok2, err := repository.checkBorderSector(points)
-// 			if err.Err != nil {
-// 				err.Wrap("otherPathPoints")
-// 				return err
-// 			}
-
-// 			if !ok && !ok2 {
-// 				//TODO написать изменения направления или типо что-то такого
-// 			}
-
-// 			if !ok {
-// 				// tmp := m.Points[0]
-// 				// m.Points = append(m.Points[0:], tmp)
-// 				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-
-// 				points = m.preparation(axis, borderSector, m.Points[iterator], m.constData.heightY)
-// 				points = m.setPoints(borderSector, points, m.Points[iterator], axis)
-
-// 				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-// 			}
-
-// 			m.Points = append(m.Points, points)
-// 		}
-
-// 		iterator += 1
-// 	}
-
-// 	return appError.AppError{}
-// }
-
-// // точки от начала пути до вхождение в пределы сектора
-// func (m *middleController) setPoints(borderPoints, points, lastPathPoint models.Coordinates, axis int) (models.Coordinates) {
-// 	p := models.Coordinates{
-// 		X: (points.X),
-// 		Y: (points.Y)}
-// 	p.Widht = points.Widht
-// 	p.Height = points.Height
-// 	return p
-// }
-
 
 // проверка на вхождение точек пути в пределы сектора.
 func (m *middleController) checkOccurrence(points models.Coordinates, axis int, borderSector models.Coordinates) bool {
@@ -201,32 +94,49 @@ func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, a
 	path := m.Points[lenght-1]
 	switch axis {
 	case m.constData.axisX:
-		points := models.Coordinates{
-			X: (path.X),
-			Y: (path.Y)}
-		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
-		if sectorPoints > path.X {
-			points.Widht = sectorPoints - path.X
-			points.Height = m.constData.heightX
-			m.Points[lenght-1].Widht = points.Widht
-		} else if sectorPoints < path.X {
-			points.Widht = sectorPoints - path.X
-			points.Height = m.constData.heightX
-			m.Points[lenght-1].Widht = points.Widht
-		}
+	// 	points := models.Coordinates{
+	// 		X: (path.X),
+	// 		Y: (path.Y)}
+	// 	sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
+	// 	if sectorPoints > path.X {
+	// 		fmt.Println("Work 1")
+	// 		points.Widht = sectorPoints - path.X
+	// 		points.Height = m.constData.heightX
+	// 		m.Points[lenght-1].Widht = points.Widht
+	// 	} else if sectorPoints < path.X {
+	// 		fmt.Println("Work 2")
+	// 		points.Widht = sectorPoints - path.X
+	// 		points.Height = m.constData.heightX
+	// 		m.Points[lenght-1].Widht = points.Widht
+	// 	}
 	case m.constData.axisY:
-		points := models.Coordinates{
-			X: (path.X),
-			Y: (path.Y)}
+		// points := models.Coordinates{
+		// 	X: (path.X),
+		// 	Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		if sectorPoints > path.Y {
-			points.Widht = m.constData.widhtY
-			points.Height = sectorPoints - path.Y
-			m.Points[lenght-1].Height = points.Height
-		} else if sectorPoints < path.Y {
-			points.Widht = m.constData.widhtY
-			points.Height = sectorPoints - path.Y
-			m.Points[lenght-1].Height = points.Height
+		if m.typeTransition >= 2 {
+			if sectorPoints > path.Y {
+				// points.Widht = m.constData.widhtY
+				// points.Height = sectorPoints - path.Y
+				// m.Points[lenght-1].Height = points.Height
+			} else if sectorPoints < path.Y  {
+				// points.Widht = m.constData.widhtY
+				// points.Height = sectorPoints - path.Y
+				// m.Points[lenght-1].Height = points.Height
+			} else {
+				m.Points[lenght-2].Height = m.Points[lenght-2].Height + 10 // TODO: тута надо сделать обратку и для - 10
+				m.Points[lenght-1].Y = m.Points[lenght-1].Y + 10 // TODO: тоже самое
+			}
+		} else {
+			if sectorPoints > path.Y {
+				// points.Widht = m.constData.widhtY
+				// points.Height = sectorPoints - path.Y
+				// m.Points[lenght-1].Height = points.Height
+			} else if sectorPoints < path.Y {
+				// points.Widht = m.constData.widhtY
+				// points.Height = sectorPoints - path.Y
+				// m.Points[lenght-1].Height = points.Height
+			}
 		}
 	default:
 		m.logger.Errorln("Path Alignment default")
