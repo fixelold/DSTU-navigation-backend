@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"strconv"
 
 	"navigation/internal/app/getPathPoints/middle"
@@ -19,11 +18,11 @@ const (
 	AxisX = 1 // указывает на ось x.
 	AxisY = 2 // указывает на ось y.
 
-	WidhtX  = 15 // ширина на оси x.
+	WidhtX  = 10 // ширина на оси x.
 	HeightX = 5  // высота на оси x.
 
 	WidhtY  = 5  // ширина на оси y.
-	HeightY = 15 // высота на оси y.
+	HeightY = 10 // высота на оси y.
 
 	plus  = 0 // значение будет положительным.
 	minus = 1 // значение будет отрицательным.
@@ -173,12 +172,11 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 		return err
 	}
 	middle.Points = append(middle.Points, p.points...)
-	
 	data, err := middle.MiddlePoints(borderSector)
 	if err.Err != nil {
 		err.Wrap("middle")
 	}
-
+	p.points = []models.Coordinates{}
 	p.points = append(p.points, data...)
 
 	return appError.AppError{}
@@ -206,10 +204,12 @@ func (p *controller) middleToTransition(entry, exit int) appError.AppError {
 }
 
 func (p *controller) sector2sector() appError.AppError {
+	var data []models.Coordinates
 	repository := NewRepository(p.client, p.logger)
 	sector2sector := sectorToSector.NewSectorToSectorController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	sector2sector.Points = append(sector2sector.Points, p.points...)
+	data = append(data, p.points...)
 	sector2sector.OldAxis = 3 // delete
+	sector2sector.Points = append(sector2sector.Points, data[1:]...)
 	for i := 1; i < len(p.sectors)-1; i++ {
 		entry, exit := min(p.sectors[i], p.sectors[i+1])
 
@@ -219,14 +219,15 @@ func (p *controller) sector2sector() appError.AppError {
 			return err
 		}
 
-		data, err := sector2sector.Sector2SectorPoints(borderSector, len(sector2sector.Points) - 1)
+		_, err = sector2sector.Sector2SectorPoints(borderSector, len(sector2sector.Points) - 1)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return err
 		}
 
 		// p.points = append(p.points, data...)
-		sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
+		// fmt.Println("data - ",  data[len(data) - 1])
+		// sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
 
 	}
 
@@ -245,7 +246,6 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		_, exit = min(p.sectors[0], p.sectors[1])
 	}
 	if p.transition == stair || len(strconv.Itoa(exit)) == 4 {
-		fmt.Println("Works")
 		entry, exit := p.sectors[0], p.sectors[1]
 		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)
 		if err.Err != nil {
@@ -388,12 +388,11 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			p.data = *newData
 			response = append(response, p.points...)
 			p.points = []models.Coordinates{}
-	
 			err = p.start(p.EndAuditory)
 			if err.Err != nil {
 				return nil, err
 			}
-	
+
 			err = p.middle(entry, exit)
 			if err.Err != nil {
 				return nil, err

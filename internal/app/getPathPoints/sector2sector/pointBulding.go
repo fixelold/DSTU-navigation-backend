@@ -5,16 +5,24 @@ import (
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
-
+ 
 func (s *sectorToSectorController) building(iterator int, borderSector models.Coordinates) appError.AppError {
 	boolean := true
+	temp := 0
 	repository := NewRepository(s.client, s.logger)
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
 	lastPathSector := false
 	for boolean {
+		// fmt.Println("old data - ", s.Points[iterator])
+		// if iterator == 2 {
+		// 	boolean = false
+		// 	break
+		// }
 		if s.checkOccurrence(s.Points[iterator], axis, borderSector) {
 			var points models.Coordinates
-			s.pathAlignment(borderSector, axis)
+			if temp != 0 {
+				s.pathAlignment(borderSector, axis)
+			} 
 
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 
@@ -29,8 +37,8 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 			s.OldAxis = axis
 			boolean = false
 		} else {
+			temp += 1
 			lastPathSector = true
-		
 			points := s.preparation(axis, borderSector, s.Points[iterator], false)
 
 			ok, err := repository.checkBorderAud(points)
@@ -97,28 +105,40 @@ func (s *sectorToSectorController) pathAlignment(sectorBorderPoint models.Coordi
 			Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
 		if sectorPoints > path.X {
+			// if temo == 0 {
+			// 	s.Points[lenght-2] = 
+			// }
 			points.Widht = sectorPoints - path.X
 			points.Height = s.constData.heightX
 			s.Points[lenght-1].Widht = points.Widht
 		} else if sectorPoints < path.X {
-			points.Widht = (sectorBorderPoint.X + (sectorBorderPoint.Widht / 2)) - (path.X)
+			points.Widht = (sectorBorderPoint.X + (sectorBorderPoint.Widht / 2)) - (path.X + s.constData.widhtY)
 			points.Height = s.constData.heightX
 			s.Points[lenght-1].Widht = points.Widht
 		}
 	case s.constData.axisY:
-		points := models.Coordinates{
-			X: (path.X),
-			Y: (path.Y)}
+		// если расскоментировать, то надо смотреть на путь от лифта сектора 5 до ауд 1-333а
+		// points := models.Coordinates{
+		// 	X: (path.X),
+		// 	Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		if sectorPoints > path.Y {
-			points.Widht = s.constData.widhtY
-			points.Height = sectorPoints - path.Y
-			s.Points[lenght-1].Height = points.Height
-		} else if sectorPoints < path.Y {
-			points.Widht = s.constData.widhtY
-			points.Height = sectorPoints - path.Y
-			s.Points[lenght-1].Height = points.Height
-		}
+		// if sectorPoints > path.Y {
+		// 	points.Widht = s.constData.widhtY
+		// 	points.Height = sectorPoints - path.Y
+		// 	s.Points[lenght-1].Height = points.Height
+		// } else if sectorPoints < path.Y {
+		// 	points.Widht = s.constData.widhtY
+		// 	points.Height = sectorPoints - path.Y
+		// 	s.Points[lenght-1].Height = points.Height
+		// }
+
+		s.Points[lenght-1].Widht = s.constData.widhtY
+		s.Points[lenght-1].Height = sectorPoints - s.Points[lenght-1].Y
+
+		// if sectorBorderPoint.Y > points.Y {
+		// 	points.Widht = s.constData.widhtY
+		// 	points.Height = 
+		// }
 	default:
 		s.logger.Errorln("Path Alignment default")
 	}

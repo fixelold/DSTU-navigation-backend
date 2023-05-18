@@ -75,7 +75,7 @@ func (s *startController) StartPath() ([]models.Coordinates, appError.AppError) 
 func (s *startController) audStartPoints(axis int) appError.AppError {
 	var err appError.AppError
 	var path models.Coordinates
-
+ 
 	// подготовка точек исходя из оси, типа и границ аудитории.
 	coordinates := s.preparation(axis, s.audienceBoundaryPoints)
 	// получение точек для начального пути.
