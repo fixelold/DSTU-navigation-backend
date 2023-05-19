@@ -102,7 +102,7 @@ VALUES
 INSERT INTO aud_border_points (id_auditorium, x, y, widht, height) 
 VALUES
     (75, 1445, 146, 1, 130),
-    (76, 1476, 20, 1, 96);
+    (76, 1477, 20, 1, 96);
     --77 78 79--
 
 ---4 этаж---

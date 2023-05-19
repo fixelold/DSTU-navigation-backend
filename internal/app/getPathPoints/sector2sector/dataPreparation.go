@@ -4,7 +4,7 @@ import (
 	"navigation/internal/models"
 )
 
-func (s *sectorToSectorController) preparation(axis int, borderPoint, points models.Coordinates, lastPathSector bool) models.Coordinates {
+func (s *sectorToSectorController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	// var factor int
 	// // var factorY int
 	
@@ -58,20 +58,62 @@ func (s *sectorToSectorController) preparation(axis int, borderPoint, points mod
 	// 	}
 	// }
 
-	var factorWidht int
+	switch axis {
+	case s.constData.axisX:
+		var factorX int
+		var factorBorderX int
+		var factorY int
+		var initFactorY = 1
 
-	if borderPoint.Y < points.Y {
-		factorWidht = 1
-	} else {
-		factorWidht = -1
+		if borderPoint.X > points.X {
+			factorX = 0 
+			factorBorderX = 10
+		} else {
+			factorX = 1
+			factorBorderX = 10 // тут было -10
+		}
+
+		if points.Height == s.constData.heightX || points.Height == -s.constData.heightX { // возможно тут над будет изменить
+			factorX = 1
+			initFactorY = 0
+			factorBorderX = -15
+		}
+
+		if points.Widht == -s.constData.widhtY {
+			factorX = 0
+		}
+
+		if points.Height > 0 {
+			factorY=1
+		} else {
+			factorY=-1
+		}
+
+		result := models.Coordinates{
+			X: points.X + (points.Widht * factorX),
+			Y: points.Y + (points.Height * initFactorY),
+			Widht: (borderPoint.X - points.X + (points.Widht * factorX)) + factorBorderX ,
+			Height: s.constData.heightX * factorY,
+		}
+		return result
+	case s.constData.axisY:
+		
+		var factorWidht int
+
+		if points.Widht > 0 {
+			factorWidht = 1
+		} else {
+			factorWidht = -1
+		}
+	
+		result := models.Coordinates {
+			X: points.X,
+			Y: points.Y + points.Height,
+			Widht: s.constData.widhtY * factorWidht,
+			Height: borderPoint.Y - (points.Y + points.Height),
+		}
+		return result
+	default:
+		return models.Coordinates{}
 	}
-
-	result := models.Coordinates {
-		X: points.X,
-		Y: points.Y + points.Height,
-		Widht: s.constData.widhtY * factorWidht,
-		Height: borderPoint.Y - (points.Y + points.Height),
-	}
-
-	return result
 }

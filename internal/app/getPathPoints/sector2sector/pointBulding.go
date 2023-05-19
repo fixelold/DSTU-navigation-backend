@@ -11,7 +11,7 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 	temp := 0
 	repository := NewRepository(s.client, s.logger)
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
-	lastPathSector := false
+	// lastPathSector := false
 	for boolean {
 		// fmt.Println("old data - ", s.Points[iterator])
 		// if iterator == 2 {
@@ -20,17 +20,13 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 		// }
 		if s.checkOccurrence(s.Points[iterator], axis, borderSector) {
 			var points models.Coordinates
-			if temp != 0 {
-				s.pathAlignment(borderSector, axis)
-			} 
+			// if temp != 0 {
+			// 	s.pathAlignment(borderSector, axis)
+			// } 
 
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 
-			if lastPathSector == true {
-				points = s.preparation(axis, borderSector, s.Points[iterator], true)
-			} else {
-				points = s.preparation(axis, borderSector, s.Points[iterator], false)
-			}
+			points = s.preparation(axis, borderSector, s.Points[iterator])
 
 			s.Points = append(s.Points, points)
 	
@@ -38,8 +34,8 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 			boolean = false
 		} else {
 			temp += 1
-			lastPathSector = true
-			points := s.preparation(axis, borderSector, s.Points[iterator], false)
+			// lastPathSector = true
+			points := s.preparation(axis, borderSector, s.Points[iterator])
 
 			ok, err := repository.checkBorderAud(points)
 			if err.Err != nil {
