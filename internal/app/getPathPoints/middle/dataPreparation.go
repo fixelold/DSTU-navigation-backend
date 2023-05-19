@@ -1,8 +1,6 @@
 package middle
 
 import (
-	"fmt"
-
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -84,6 +82,7 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 		var factorX int
 		var factorBorderX int
 		var factorY int
+		var initFactorY = 1
 
 		if borderPoint.X > points.X {
 			factorX = 0 
@@ -93,10 +92,25 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 			factorBorderX = 10 // тут было -10
 		}
 
-		if points.Height > 0 {factorY=1} else {factorY=-1}
+		if points.Height == m.constData.heightX || points.Height == -m.constData.heightX { // возможно тут над будет изменить
+			factorX = 1
+			initFactorY = 0
+			factorBorderX = -15
+		}
+
+		if points.Widht == -m.constData.widhtY {
+			factorX = 0
+		}
+
+		if points.Height > 0 {
+			factorY=1
+		} else {
+			factorY=-1
+		}
+
 		result := models.Coordinates{
 			X: points.X + (points.Widht * factorX),
-			Y: points.Y + points.Height,
+			Y: points.Y + (points.Height * initFactorY),
 			Widht: (borderPoint.X - points.X + (points.Widht * factorX)) + factorBorderX ,
 			Height: m.constData.heightX * factorY,
 		}
@@ -141,10 +155,22 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 
 		if len(m.Points) == 1 {
 			if points.Height != m.constData.heightX && points.Height != -m.constData.heightX {
-				faactorX = 0} else {faactorX = 1}
+				faactorX = 0
+
+				} else {
+					faactorX = 1
+				}
+			factorLenPath = 1
+		} else if points.Height > 0 || borderPoint.Y > points.Y {
 			factorLenPath = 1
 		} else {
 			factorLenPath = 0
+		}
+
+		if len(m.Points) != 1 && m.Points[0].Height == m.constData.heightX || m.Points[0].Height == -m.constData.heightX { // возможно тут над будет изменить
+			if m.Points[1].Height == m.constData.heightX || m.Points[1].Height == -m.constData.heightX {
+				factorLenPath = 0
+			}
 		}
 
 		if points.Widht > 0 {factorXWidht=1} else {factorXWidht=-1}
@@ -154,9 +180,6 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 			Widht: m.constData.widhtY * factorXWidht,
 			Height: borderPoint.Y - (points.Y + (points.Height * factorLenPath)),
 		}
-		fmt.Println("sector: ", borderPoint)
-		fmt.Println("poits: ", points)
-		fmt.Println("result: ", result)
 		return result, appError.AppError{}
 	default:
 		return models.Coordinates{}, *appError.NewAppError("switch error")
