@@ -1,7 +1,6 @@
 package getPathPoints
 
 import (
-	"fmt"
 	"strconv"
 
 	"navigation/internal/app/getPathPoints/middle"
@@ -19,11 +18,11 @@ const (
 	AxisX = 1 // указывает на ось x.
 	AxisY = 2 // указывает на ось y.
 
-	WidhtX  = 10 // ширина на оси x.
+	WidhtX  = 13 // ширина на оси x.
 	HeightX = 5  // высота на оси x.
 
 	WidhtY  = 5  // ширина на оси y.
-	HeightY = 10 // высота на оси y.
+	HeightY = 13 // высота на оси y.
 
 	plus  = 0 // значение будет положительным.
 	minus = 1 // значение будет отрицательным.
@@ -166,19 +165,18 @@ func (p *controller) start(audNumber string) appError.AppError {
 
 func (p *controller) middle(entry, exit int) appError.AppError {
 	repository := NewRepository(p.client, p.logger)
-	middle := middle.NewMiddleController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	middle := middle.NewMiddleController(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
 	borderSector, err := repository.getSectorBorderPoint(entry, exit)
 	if err.Err != nil {
 		err.Wrap("middle")
 		return err
 	}
 	middle.Points = append(middle.Points, p.points...)
-	
 	data, err := middle.MiddlePoints(borderSector)
 	if err.Err != nil {
 		err.Wrap("middle")
 	}
-
+	p.points = []models.Coordinates{}
 	p.points = append(p.points, data...)
 
 	return appError.AppError{}
@@ -187,7 +185,7 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 func (p *controller) middleToTransition(entry, exit int) appError.AppError {
 	// entry, exit = exit, entry
 	repository := NewRepository(p.client, p.logger)
-	middle := middle.NewMiddleController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	middle := middle.NewMiddleController(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
 	borderSector, err := repository.getTransitionSectorBorderPoint(exit)
 	if err.Err != nil {
 		err.Wrap("middle to transition")
@@ -206,11 +204,12 @@ func (p *controller) middleToTransition(entry, exit int) appError.AppError {
 }
 
 func (p *controller) sector2sector() appError.AppError {
+	var data []models.Coordinates
 	repository := NewRepository(p.client, p.logger)
 	sector2sector := sectorToSector.NewSectorToSectorController(p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	sector2sector.Points = append(sector2sector.Points, p.points...)
+	data = append(data, p.points...)
 	sector2sector.OldAxis = 3 // delete
-	fmt.Println("sectors: ", p.sectors)
+	sector2sector.Points = append(sector2sector.Points, data[1:]...)
 	for i := 1; i < len(p.sectors)-1; i++ {
 		entry, exit := min(p.sectors[i], p.sectors[i+1])
 
@@ -220,14 +219,15 @@ func (p *controller) sector2sector() appError.AppError {
 			return err
 		}
 
-		data, err := sector2sector.Sector2SectorPoints(borderSector, len(sector2sector.Points) - 1)
+		_, err = sector2sector.Sector2SectorPoints(borderSector, len(sector2sector.Points) - 1)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return err
 		}
 
 		// p.points = append(p.points, data...)
-		sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
+		// fmt.Println("data - ",  data[len(data) - 1])
+		// sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
 
 	}
 
@@ -239,10 +239,15 @@ func (p *controller) sector2sector() appError.AppError {
 func (p *controller) transitionController() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
 	// var err appError.AppError
-
-	if p.transition == stair {
+	var exit int
+	if len(p.sectors) == 1 {
+		exit = p.sectors[0]
+	} else {
+		_, exit = min(p.sectors[0], p.sectors[1])
+	}
+	if p.transition == stair || len(strconv.Itoa(exit)) == 4 {
 		entry, exit := p.sectors[0], p.sectors[1]
-		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
+		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return nil, err
@@ -264,7 +269,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 
 	} else if p.transition == elevator {
 		entry, exit := min(p.sectors[0], p.sectors[1])
-		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, noTransition, p.transitionNumber)
+		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, elevator, p.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return nil, err
@@ -277,32 +282,39 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			return nil, err
 		}
 
-		err = p.middle(entry, exit)
-		if err.Err != nil {
-			return nil, err
-		}
+		if len(strconv.Itoa(exit)) == 4 {
+			err = p.middleToTransition(entry, exit)
+			if err.Err != nil {
+				return nil, err
+			}
+		} else {
+			err = p.middle(entry, exit)
+			if err.Err != nil {
+				return nil, err
+			}
 
-		// это сделано т.к с фронта возвращается не (143, 142, 141), а (1043, 143, 142, 141)
-		entry, exit = min(p.sectors[0], p.sectors[1])
-		//p.transition = stair возможно, надо будет это раскоментить или что-то сделать!!!
-		p.transitionNumber = p.sectors[len(p.sectors) - 1]
-		data, err = newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, transitionToAud, p.transitionNumber)
-		if err.Err != nil {
-			err.Wrap("getPathPoints")
-			return nil, err
-		}
-		p.data = *data
-		response = append(response, p.points...)
-		p.points = []models.Coordinates{}
+			// это сделано т.к с фронта возвращается не (143, 142, 141), а (1043, 143, 142, 141)
+			entry, exit = min(p.sectors[0], p.sectors[1])
+			//p.transition = stair возможно, надо будет это раскоментить или что-то сделать!!!
+			p.transitionNumber = p.sectors[len(p.sectors) - 1]
+			data, err = newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, transitionToAud, p.transitionNumber)
+			if err.Err != nil {
+				err.Wrap("getPathPoints")
+				return nil, err
+			}
+			p.data = *data
+			response = append(response, p.points...)
+			p.points = []models.Coordinates{}
 
-		err = p.start(p.StartAuditory)
-		if err.Err != nil {
-			return nil, err
-		}
+			err = p.start(p.StartAuditory)
+			if err.Err != nil {
+				return nil, err
+			}
 
-		err = p.middle(entry, exit)
-		if err.Err != nil {
-			return nil, err
+			err = p.middle(entry, exit)
+			if err.Err != nil {
+				return nil, err
+			}
 		}
 
 		response = append(response, p.points...)
@@ -314,6 +326,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		}
 
 		if len(p.sectors) == 1 {
+			
 			p.transition = stair
 			entry := p.sectors[0]
 			data, err := newData(p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
@@ -375,12 +388,11 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			p.data = *newData
 			response = append(response, p.points...)
 			p.points = []models.Coordinates{}
-	
 			err = p.start(p.EndAuditory)
 			if err.Err != nil {
 				return nil, err
 			}
-	
+
 			err = p.middle(entry, exit)
 			if err.Err != nil {
 				return nil, err

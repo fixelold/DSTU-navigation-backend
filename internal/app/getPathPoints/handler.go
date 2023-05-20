@@ -73,7 +73,6 @@ func (h *handler) getPoints(c *gin.Context) {
 	}
 
 	p := NewPointsController(data.Start, data.End, data.Sectors, h.logger, h.client, data.Transition, data.TransitionNumber)
-	fmt.Println("transition: ", data.Transition)
 	if data.Transition != noTransition {
 		response, err = p.transitionController()
 		if err.Err != nil {

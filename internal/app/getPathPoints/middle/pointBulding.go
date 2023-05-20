@@ -7,64 +7,59 @@ import (
 )
 
 func (m *middleController) building(borderSector models.Coordinates) appError.AppError {
-	boolean := true
-	iterator := 0
-	repository := NewRepository(m.client, m.logger)
+	repository := NewRepository(m.client, m.logger) // для обращение к базе данных
+	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
-	for boolean {
-		if m.checkOccurrence(m.Points[iterator], axis, borderSector) {
 
-			m.pathAlignment(borderSector, axis)
-
+	for i := 0; true; i++ {
+		if i == 3 {
+			break
+		} 
+		// проверка вхождение координат пути в координаты границ сектора
+		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 
-			points := m.preparation(axis, borderSector, m.Points[iterator])
-
-			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
-
-			m.Points = append(m.Points, points)
-			boolean = false
-		} else {
-
-			points := m.preparation(axis, borderSector, m.Points[iterator])
-
-			points = m.setPoints(borderSector, points, m.Points[iterator], axis)
-
-			ok, err := repository.checkBorderAud(points)
+			// m.pathAlignment(borderSector, axis)
+			
+			// расчет точек пути
+			// finalHeight := -m.constData.heightX // 1-340 - лестница
+			points, err := m.finalPreparation(axis, borderSector, m.Points[i])
 			if err.Err != nil {
-				err.Wrap("otherPathPoints")
+				err.Wrap("building")
 				return err
 			}
-
-			ok2, err := repository.checkBorderSector(points)
-			if err.Err != nil {
-				err.Wrap("otherPathPoints")
-				return err
-			}
-
-			if !ok && !ok2 {
-				//TODO написать изменения направления или типо что-то такого
-			}
-
 			m.Points = append(m.Points, points)
+			break
+		} 
+		// расчет точек пути
+		points, err := m.preparation(axis, borderSector, m.Points[i])
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
 		}
 
-		iterator += 1
+
+		ok, err := repository.checkBorderAud2(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		// изменения оси построения, если точки входят в пределы аудитории
+		if !ok {
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			points, err = m.preparation(axis, borderSector, m.Points[i])
+			if err.Err != nil {
+				err.Wrap("building")
+				return err
+			}
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+		}
+		m.Points = append(m.Points, points)
 	}
 
 	return appError.AppError{}
 }
-
-// точки от начала пути до вхождение в пределы сектора
-func (m *middleController) setPoints(borderPoints, points, lastPathPoint models.Coordinates, axis int) (models.Coordinates) {
-	p := models.Coordinates{
-		X: (points.X),
-		Y: (points.Y)}
-	p.Widht = points.Widht
-	p.Height = points.Height
-	return p
-}
-
 
 // проверка на вхождение точек пути в пределы сектора.
 func (m *middleController) checkOccurrence(points models.Coordinates, axis int, borderSector models.Coordinates) bool {
@@ -95,35 +90,29 @@ func (m *middleController) checkOccurrence(points models.Coordinates, axis int, 
 // выравнивание пути
 func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, axis int) {
 	lenght := len(m.Points)
-	path := m.Points[lenght-1]
 	switch axis {
 	case m.constData.axisX:
-		points := models.Coordinates{
-			X: (path.X),
-			Y: (path.Y)}
-		sectorPoints := (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2
-		if sectorPoints > path.X {
-			points.Widht = sectorPoints - path.X
-			points.Height = m.constData.heightX
-			m.Points[lenght-1].Widht = points.Widht
-		} else if sectorPoints < path.X {
-			points.Widht = sectorPoints - path.X
-			points.Height = m.constData.heightX
-			m.Points[lenght-1].Widht = points.Widht
-		}
+		m.Points[lenght-1].Height = (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2 - (m.Points[lenght-1].Y)
 	case m.constData.axisY:
-		points := models.Coordinates{
-			X: (path.X),
-			Y: (path.Y)}
-		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		if sectorPoints > path.Y {
-			points.Widht = m.constData.widhtY
-			points.Height = sectorPoints - path.Y
-			m.Points[lenght-1].Height = points.Height
-		} else if sectorPoints < path.Y {
-			points.Widht = m.constData.widhtY
-			points.Height = sectorPoints - path.Y
-			m.Points[lenght-1].Height = points.Height
+		if m.typeTransition >= 2 && sectorBorderPoint.Y == m.Points[lenght-1].Y {
+			m.Points[lenght-2].Height = m.Points[lenght-2].Height + 10 // TODO: тута надо сделать обратку и для - 10
+			m.Points[lenght-1].Y = m.Points[lenght-1].Y + 10 // TODO: тоже самое
+		} else {
+			// надо для того, чтобы еще аудитория находится прямо возле лестници, чтобы не было не красиво
+			// len(m.Points) > 1 
+			if len(m.Points) >= 1 {
+				var result int
+				if sectorBorderPoint.X > m.Points[lenght-1].X {
+					result = (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2 - (m.Points[lenght-1].X) // от лестницы (143) до сектора 142
+				} else {
+					result = (sectorBorderPoint.X + (sectorBorderPoint.Widht + sectorBorderPoint.X)) / 2 - (m.Points[lenght-1].X) - m.constData.widhtY // - m.constData.widhtY Лестница(122) к 121
+				}
+				if result == -25 { // это надо если аудитория находится под лестницей
+
+				} else {
+					m.Points[lenght-1].Widht = result
+				}
+			}
 		}
 	default:
 		m.logger.Errorln("Path Alignment default")

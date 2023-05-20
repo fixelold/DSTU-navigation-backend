@@ -12,7 +12,7 @@ var (
 	switchAxisError = appError.NewAppError("switch error")
 	switchSignError = appError.NewAppError("switch error")
 )
-
+ 
 // для начального пути от границ сектора
 func (s *startController) pathBuilding(points models.Coordinates, axis, sign int) (models.Coordinates, appError.AppError) {
 	var path models.Coordinates
