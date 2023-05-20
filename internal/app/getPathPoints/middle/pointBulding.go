@@ -12,9 +12,9 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 
 	for i := 0; true; i++ {
-		// if i == 1 {
-		// 	break
-		// } 
+		if i == 1 {
+			break
+		} 
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)

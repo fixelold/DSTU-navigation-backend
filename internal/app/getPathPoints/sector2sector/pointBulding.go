@@ -26,7 +26,7 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 
-			points = s.preparation(axis, borderSector, s.Points[iterator])
+			points = s.finalPreparation(axis, borderSector, s.Points[iterator])
 
 			s.Points = append(s.Points, points)
 	

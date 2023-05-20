@@ -6,77 +6,6 @@ import (
 )
 
 func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) (models.Coordinates, appError.AppError) {
-	// var factor int // необходимо для рпавильного расчета высоты
-	// var factorForY int
-	// switch axis {
-	// case m.constData.axisX:
-	// 	fmt.Println("middle work 1")
-	// 	// 1-420 - лестница
-	// 	if borderPoint.X > points.X {
-	// 		return models.Coordinates{
-	// 			X:      points.X, // Лестница(4) - 1-174
-	// 			Y:      points.Y + points.Height,
-	// 			Widht:  (borderPoint.X + (borderPoint.Widht / 2)) - points.X, // Лестница(4) - 1-174
-	// 			Height: 5,
-	// 		}, appError.AppError{}
-	
-	// 	}
-	// 	return models.Coordinates{
-	// 		X:      points.X + points.Widht, // Лестница(4) - 1-174
-	// 		Y:      points.Y + points.Height,
-	// 		Widht:  (borderPoint.X + (borderPoint.Widht / 2)) - points.X - points.Widht, // Лестница(4) - 1-174
-	// 		Height: -5,
-	// 	}, appError.AppError{}
-
-
-	// case m.constData.axisY:
-	// 	fmt.Println("middle work 2")
-	// 	if points.Widht > 0 {
-	// 		factor = -1
-	// 	} else {
-	// 		factor = 1
-	// 	}
-
-	// 	if m.typeTransition >= 2 {
-	// 		fmt.Println("middle work 3")
-	// 		if (m.thisSectorNumber % 10) == (m.sectorNumber % 10) && (m.sectorNumber % 10) == 2 && borderPoint.X > points.X {
-	// 			// 1-340 - лестница
-	// 			return models.Coordinates{
-	// 				X:      points.X + points.Widht,
-	// 				Y:      points.Y + points.Height,
-	// 				Widht:  -m.constData.widhtY,
-	// 				Height: (borderPoint.Y + (borderPoint.Height / 2)) - (points.Y + points.Height - finalHeight),
-	// 			}, appError.AppError{}
-	// 		}
-	// 	}
-	// 	if borderPoint.Y > points.Y {
-	// 		fmt.Println("middle work 4")
-	// 		return models.Coordinates{
-	// 			X:      points.X + points.Widht,
-	// 			Y:      points.Y,
-	// 			Widht:  -m.constData.widhtY * factor,
-	// 			Height: (borderPoint.Y + (borderPoint.Height / 2)) - (points.Y + points.Height) + m.constData.widhtY,
-	// 		}, appError.AppError{}
-	// 	}
-	// 	// } else if borderPoint.Y < points.Y {
-	// 	// 	return models.Coordinates{
-	// 	// 		X:      points.X + points.Widht,
-	// 	// 		Y:      points.Y,
-	// 	// 		Widht:  -m.constData.widhtY * factor,
-	// 	// 		Height: (borderPoint.Y + (borderPoint.Height / 2)) - (points.Y + points.Height) + m.constData.widhtY,
-	// 	// 	}, appError.AppError{}
-	// 	// }
-	// 	fmt.Println("Work Omega")
-	// 	return models.Coordinates{
-	// 		X:      points.X + points.Widht,
-	// 		Y:      points.Y + points.Height,
-	// 		Widht:  -m.constData.widhtY * factor,
-	// 		Height: (borderPoint.Y + (borderPoint.Height / 2)) - (points.Y + points.Height), // 1-399 - лестница
-	// 	}, appError.AppError{}
-	// default:
-	// 	return models.Coordinates{}, *appError.NewAppError("switch error")
-	// }
-
 	switch axis {
 	case m.constData.axisX:
 		var factorX int
@@ -111,9 +40,14 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 		result := models.Coordinates{
 			X: points.X + (points.Widht * factorX),
 			Y: points.Y + (points.Height * initFactorY),
-			Widht: (borderPoint.X - points.X + (points.Widht * factorX)) + factorBorderX ,
+			Widht: (borderPoint.X - points.X + (points.Widht * factorX)) + factorBorderX,
 			Height: m.constData.heightX * factorY,
 		}
+
+		if borderPoint.X < points.X && result.X + result.Widht != ((borderPoint.X + borderPoint.Widht) - 10) {
+			result.Widht = result.Widht - 5
+		}
+
 		return result, appError.AppError{}
 	case m.constData.axisY:
 		var factorY int
@@ -137,6 +71,11 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 			Widht: m.constData.widhtY * factorX,
 			Height: (borderPoint.Y - points.Y + (points.Height * factorY)) + factorBorderY,
 		}
+
+		// TODO: надо посмотреть про высоты отрисовки.
+		if borderPoint.Y < points.Y && result.Y + result.Height != ((borderPoint.Y + borderPoint.Height) - 10) {
+			result.Height = result.Height + 10
+		}
 		return result, appError.AppError{}
 	default:
 		return models.Coordinates{}, *appError.NewAppError("switch error")
@@ -146,7 +85,41 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates) (models.Coordinates, appError.AppError) {
 	switch axis {
 	case m.constData.axisX:
-		result := models.Coordinates{}
+		var factorX int
+		var factorY int
+		var initFactorY = 1
+
+		if borderPoint.X > points.X {
+			factorX = 0 
+		} else {
+			factorX = 1
+		}
+
+		if points.Height > 0 {
+			factorY=1
+		} else {
+			factorY=-1
+		}
+
+		if points.Height == m.constData.heightX || points.Height == -m.constData.heightX { // возможно тут над будет изменить
+			factorX = 1
+			initFactorY = 0
+		}
+
+		if points.Widht == -m.constData.widhtY {
+			factorX = 0
+		}
+
+		result := models.Coordinates{
+			X: points.X + (points.Widht * factorX),
+			Y: points.Y + (points.Height * initFactorY),
+			Widht: borderPoint.X - (points.X + (points.Widht * factorX)),
+			Height: m.constData.heightX * factorY,
+		}
+
+		if borderPoint.X < points.X && result.X + result.Widht != ((borderPoint.X + borderPoint.Widht) - 10) {
+			result.Widht = result.Widht - 5
+		}
 		return result, appError.AppError{}
 	case m.constData.axisY:
 		var factorLenPath int
