@@ -14,7 +14,8 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 	// lastPathSector := false
 	for boolean {
 		// fmt.Println("old data - ", s.Points[iterator])
-		// if iterator == 2 {
+		// if iterator == 4 {
+		// 	fmt.Println("==========================", iterator, "============================")
 		// 	boolean = false
 		// 	break
 		// }
