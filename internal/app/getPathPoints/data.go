@@ -25,6 +25,7 @@ type data struct {
 	sectorNumber     int    // номер сектора.
 	nextSectorNumber int    // номер следующего сектора.
 	audNumber        string // номер аудитории.
+	endPoints string
 
 	logger     *logging.Logger // логирования.
 	client postgresql.Client      // для обращения к базе данных.
@@ -37,7 +38,7 @@ type data struct {
 	sectorType int
 }
 
-func newData(audNumber string, 
+func newData(audNumber string, endPoints string, 
 	sectorEntry, sectorExit, nextSectorNumber int, 
 	logger *logging.Logger, 
 	client postgresql.Client,
@@ -45,6 +46,7 @@ func newData(audNumber string,
 	var err appError.AppError
 	data := &data{
 		audNumber:        audNumber,
+		endPoints: endPoints,
 		sectorNumber: sectorExit, //TODO: тут может быть ошибка. Может пердаваться не верный сектор. 
 		nextSectorNumber: nextSectorNumber,
 		logger:           logger,
@@ -149,6 +151,25 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
+	} else if d.transition == audToAud {
+
+		d.audPoints, err = repository.getAudPoints(d.audNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+		d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
+
+		d.sectorBorderPoints, err = repository.getAudBorderPoint(d.endPoints)
+		if err.Err != nil {
+			err.Wrap("getPoints")
+			return err
+		}
 	} else {
 		err.Err = TransitionError
 		err.Wrap("getPoints")

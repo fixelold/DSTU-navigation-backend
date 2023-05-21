@@ -25,6 +25,7 @@ const (
 	stair   = 2
 	elevator = 3
 	transitionToAud = 4
+	audToAud = 5
 
 	file                       = "handler.go"
 	getPointsFuntion           = "getPoints"
@@ -81,11 +82,20 @@ func (h *handler) getPoints(c *gin.Context) {
 			return
 		}
 	} else {
-		response, err = p.controller()
-		if err.Err != nil {
-			h.logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-			return
+		if len(data.Sectors) == 1 {
+			response, err = p.audToAud()
+			if err.Err != nil {
+				h.logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+				return
+			}
+		} else {
+			response, err = p.controller()
+			if err.Err != nil {
+				h.logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+				return
+			}
 		}
 	}
 
