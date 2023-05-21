@@ -19,11 +19,11 @@ const (
 	AxisX = 1 // указывает на ось x.
 	AxisY = 2 // указывает на ось y.
 
-	WidhtX  = 13 // ширина на оси x.
+	WidhtX  = 10 // ширина на оси x.
 	HeightX = 5  // высота на оси x.
 
 	WidhtY  = 5  // ширина на оси y.
-	HeightY = 13 // высота на оси y.
+	HeightY = 10 // высота на оси y.
 
 	plus  = 0 // значение будет положительным.
 	minus = 1 // значение будет отрицательным.
@@ -396,6 +396,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			p.data = *newData
 			response = append(response, p.points...)
 			p.points = []models.Coordinates{}
+
 			err = p.start(p.EndAuditory)
 			if err.Err != nil {
 				return nil, err

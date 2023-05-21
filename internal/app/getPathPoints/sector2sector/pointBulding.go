@@ -9,13 +9,14 @@ import (
 func (s *sectorToSectorController) building(iterator int, borderSector models.Coordinates) appError.AppError {
 	boolean := true
 	temp := 0
+	// fmt.Println(iterator)
 	repository := NewRepository(s.client, s.logger)
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
 	// lastPathSector := false
 	for boolean {
 		// fmt.Println("old data - ", s.Points[iterator])
-		// if iterator == 4 {
-		// 	fmt.Println("==========================", iterator, "============================")
+		// if iterator == 3 {
+		// 	// fmt.Println("data: ", s.Points)
 		// 	boolean = false
 		// 	break
 		// }

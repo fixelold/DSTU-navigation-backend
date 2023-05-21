@@ -9,6 +9,7 @@ import (
 func (s *sectorToSectorController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	switch axis {
 	case s.constData.axisX:
+		
 		var factorX int
 		var lenPath int
 
@@ -24,12 +25,18 @@ func (s *sectorToSectorController) preparation(axis int, borderPoint, points mod
 			factorX = 1
 		}
 
+		if points.Height == -s.constData.axisX {
+			factorX = 1
+		}
+
 		result := models.Coordinates{
 			X: points.X + points.Widht,
 			Y: points.Y + (points.Height * factorX),
 			Widht: borderPoint.X - (points.X + points.Widht) + lenPath,
 			Height: -s.constData.heightX,
 		}
+
+
 		return result
 	case s.constData.axisY:
 		var factorHeight = 15
@@ -62,27 +69,42 @@ func (s *sectorToSectorController) preparation(axis int, borderPoint, points mod
 func (s *sectorToSectorController) finalPreparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	switch axis {
 	case s.constData.axisX:
-		lenght := len(s.Points)
-		var factorX int
+		var factorHeight = 1
+		// lenght := len(s.Points)
+		// var factorX int
 
-		if points.Widht != -5 && points.Widht != 5 {
-			factorX = 0
-		} else {
-			factorX = 1
+		// if points.Widht != -5 && points.Widht != 5 {
+		// 	factorX = 0
+		// } else {
+		// 	factorX = 1
+		// }
+		if points.Height == -s.constData.heightX {
+			fmt.Println("Work")
+			factorHeight = 0
+		} else if points.Height == s.constData.heightX {
+			factorHeight = 1
 		}
+
 		result := models.Coordinates{
 			X: points.X + points.Widht,
-			Y: points.Y + (points.Height * factorX),
+			Y: points.Y + (points.Height * factorHeight),
 			Widht: borderPoint.X - (points.X + points.Widht),
 			Height: -s.constData.heightX,
 		}
 
-		if points.Height != 5 && points.Height != -5 && borderPoint.Y < points.Y {
-			s.Points[lenght - 1].Height -= 5
-		}
+		// if points.Height != 5 && points.Height != -5 && borderPoint.Y < points.Y {
+		// 	s.Points[lenght - 1].Height -= 5
+		// }
+
+		// if lenght >= 2 {
+		// 	fmt.Println("Work ")
+		// 	if s.Points[lenght - 2].X > borderPoint.X && s.Points[lenght - 2].Y < borderPoint.Y {
+		// 		result.Height = s.constData.heightX
+		// 	}
+		// }
+		fmt.Println("result: ", result, points.Y, points.Height, factorHeight)
 		return result
 	case s.constData.axisY:
-		fmt.Println("Work")
 		// var factorHeight int
 		lenght := len(s.Points)
 		var factorWidht int
