@@ -114,28 +114,28 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	// 	return nil, err
 	// }
 
-	// entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
+	entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
-	// // получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-	// newData, err := newData(p.EndAuditory, "", entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
-	// if err.Err != nil {
-	// 	err.Wrap("getPathPoints")
-	// 	return nil, err
-	// }
+	// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
+	newData, err := newData(p.EndAuditory, "", entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
 
-	// p.data = *newData
-	// response = append(response, p.points...)
-	// p.points = []models.Coordinates{}
+	p.data = *newData
+	response = append(response, p.points...)
+	p.points = []models.Coordinates{}
 
-	// err = p.start(p.EndAuditory)
-	// if err.Err != nil {
-	// 	return nil, err
-	// }
+	err = p.start(p.EndAuditory)
+	if err.Err != nil {
+		return nil, err
+	}
 
-	// err = p.middle(entry, exit)
-	// if err.Err != nil {
-	// 	return nil, err
-	// }
+	err = p.middle(entry, exit)
+	if err.Err != nil {
+		return nil, err
+	}
 
 	response = append(response, p.points...)
 

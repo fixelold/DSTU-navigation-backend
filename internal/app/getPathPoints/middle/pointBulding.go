@@ -10,7 +10,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	repository := NewRepository(m.client, m.logger) // для обращение к базе данных
 	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
-
+	var b = true
 	for i := 0; true; i++ {
 		// if i == 2 {
 		// 	break
@@ -21,14 +21,16 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 
 			if (axis == m.constData.axisX && m.Points[i].Widht == 5) || (axis == m.constData.axisY && m.Points[i].Height == 5)  {
 				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-				points = m.finalPreparation(axis, borderSector, m.Points[i], true)
+				b = true
+				points, b = m.finalPreparation(axis, borderSector, m.Points[i], b)
 			} else {
 				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-				points = m.finalPreparation(axis, borderSector, m.Points[i], false)
+				b = false
+				points, b = m.finalPreparation(axis, borderSector, m.Points[i], b)
 			}
 
 			m.Points = append(m.Points, points)
-			break
+			if b {break}
 		} 
 		// расчет точек пути
 		points := m.preparation(axis, borderSector, m.Points[i])

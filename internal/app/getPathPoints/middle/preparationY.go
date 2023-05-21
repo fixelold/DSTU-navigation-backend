@@ -10,14 +10,14 @@ func (m *middleController) preparationLeftY(borderPoint, points models.Coordinat
 			X: points.X + points.Widht,
             Y: points.Y + points.Height,
             Widht: 5,
-            Height: ((borderPoint.Y + borderPoint.Height) - (points.Y + points.Height)) - 10,
+            Height: ((borderPoint.Y + borderPoint.Height) - (points.Y + points.Height)) - 9,
 		}
 	} else if borderPoint.Y > points.Y {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
 			Y: points.Y,
 			Widht: 5,
-			Height: borderPoint.Y - points.Y + 10,
+			Height: borderPoint.Y - points.Y + 9,
 		}
 	}
 
@@ -32,14 +32,14 @@ func (m *middleController) preparationRightY(borderPoint, points models.Coordina
 			X: points.X + points.Widht,
             Y: points.Y + points.Height,
             Widht: -5,
-            Height: ((borderPoint.Y + borderPoint.Height) - (points.Y + points.Height)) - 10,
+            Height: ((borderPoint.Y + borderPoint.Height) - (points.Y + points.Height)) - 9,
 		}
 	} else if borderPoint.Y > points.Y {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
 			Y: points.Y,
 			Widht: -5,
-			Height: borderPoint.Y - points.Y + 10,
+			Height: borderPoint.Y - points.Y + 9,
 		}
 	}
 
