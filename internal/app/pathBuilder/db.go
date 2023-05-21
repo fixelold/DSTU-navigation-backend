@@ -17,12 +17,6 @@ type repository struct {
 	logger *logging.Logger
 }
 
-var (
-	txError    = appError.NewAppError("can't start transaction")
-	queryError = appError.NewAppError("failed to complete the request")
-	scanError  = appError.NewAppError("can't scan database response")
-)
-
 func NewRepository(client postgresql.Client, logger *logging.Logger) Repository {
 	return &repository{
 		client: client,
@@ -31,6 +25,10 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 }
 
 func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
+	txError    := appError.NewAppError("can't start transaction")
+	queryError := appError.NewAppError("failed to complete the request")
+	scanError  := appError.NewAppError("can't scan database response")
+
 	var sectorLink []models.SectorLink
 	req := `SELECT number_sector, link FROM sector_link;`
 	tx, err := r.client.Begin(context.Background())
@@ -73,6 +71,10 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 
 func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
+	txError    := appError.NewAppError("can't start transaction")
+	queryError := appError.NewAppError("failed to complete the request")
+	// scanError  := appError.NewAppError("can't scan database response")
+
 	req :=
 		`SELECT 
 	sector.number
@@ -105,16 +107,20 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 			queryError.Wrap("db GetSector")
 			queryError.Err = pgErr
 			return 0, *queryError
+		} else {
+			queryError.Wrap("db GetSector")
+			queryError.Err = err
+			return 0, *queryError
 		}
-		queryError.Wrap("db GetSector")
-		queryError.Err = err
-		return 0, *queryError
 	}
 	_ = tx.Commit(context.Background())
 	return sector.Number, appError.AppError{}
 }
 
 func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
+	txError    := appError.NewAppError("can't start transaction")
+	queryError := appError.NewAppError("failed to complete the request")
+	// scanError  := appError.NewAppError("can't scan database response")
 	var sector models.Sector 
 	type_transtion_sector = 1 // вообще это из базы можно будет убрать
 	req :=
@@ -156,6 +162,9 @@ func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int
 }
 
 func (r *repository) GetTransitionSector2(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
+	txError    := appError.NewAppError("can't start transaction")
+	queryError := appError.NewAppError("failed to complete the request")
+	// scanError  := appError.NewAppError("can't scan database response")
 	var sector models.Sector
 	req :=
 		`SELECT sector.number

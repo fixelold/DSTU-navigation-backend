@@ -108,4 +108,5 @@ func (h *handler) getSectors(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+	return
 }
