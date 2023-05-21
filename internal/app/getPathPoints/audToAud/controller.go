@@ -12,6 +12,7 @@ type audToAudController struct {
 	endAudBorderPoint models.Coordinates
 	startAud string
 	endAud string
+	sectorNumber int
 	client postgresql.Client
 	constData constData
 }
@@ -31,6 +32,7 @@ type constData struct {
 func NewAudToAudController(
 	startAudBorderPoint, endAudBorderPoint models.Coordinates,
 	startAud, endAud string,
+	sectorNumber int,
 	client postgresql.Client,
 	positiveCoordinate, negativeCoordinate int,
 	axisX, axisY, widhtX, heightX, widhtY, heightY int) *audToAudController {
@@ -39,6 +41,7 @@ func NewAudToAudController(
 			endAudBorderPoint: endAudBorderPoint,
 			startAud: startAud,
 			endAud: endAud,
+			sectorNumber: sectorNumber,
 			client: client,
 			constData: constData{
 				positiveCoordinate: positiveCoordinate,
