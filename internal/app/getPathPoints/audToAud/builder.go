@@ -114,3 +114,29 @@ func (a *audToAudController) middleBuilding() (appError.AppError) {
 
 	return appError.AppError{}
 }
+
+// проверка на вхождение точек пути в пределы сектора.
+func (a *audToAudController) checkOccurrence(points models.Coordinates, axis int, borderSector models.Coordinates) bool {
+	switch axis {
+	case a.constData.axisX:
+		ph := points.X + points.Widht
+		x1 := borderSector.X
+		x2 := borderSector.X + borderSector.Widht
+		if x1 <= ph && ph <= x2 {
+			return true
+		} else {
+			return false
+		}
+	case a.constData.axisY:
+		ph := points.Y + points.Height
+		y1 := borderSector.Y
+		y2 := borderSector.Y + borderSector.Height
+		if y1 <= ph && ph <= y2 {
+			return true
+		} else {
+			return false
+		}
+	default:
+		return false
+	}
+}

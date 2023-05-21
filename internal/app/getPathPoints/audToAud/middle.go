@@ -6,6 +6,8 @@ func (a *audToAudController) middle() appError.AppError {
 	err := a.middleBuilding()
 	if err.Err != nil {
 		err.Wrap("middlePoints")
-		return nil, err
+		return err
 	}
+
+	return appError.AppError{}
 }
