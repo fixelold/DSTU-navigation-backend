@@ -14,7 +14,7 @@ var (
 )
  
 // для начального пути от границ сектора
-func (s *audToAudController) pathBuilding(points models.Coordinates, axis, sign int) (models.Coordinates, appError.AppError) {
+func (s *audToAudController) startBuilding(points models.Coordinates, axis, sign int) (models.Coordinates, appError.AppError) {
 	var path models.Coordinates
 	switchAxisError.Wrap("setPointsAudStart")
 	switchSignError.Wrap("setPointsAudStart")

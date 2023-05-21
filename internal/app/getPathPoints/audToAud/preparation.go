@@ -2,7 +2,7 @@ package audToAud
 
 import "navigation/internal/models"
 
-func (s *audToAudController) preparation(axis int, borderPoint models.Coordinates) models.Coordinates {
+func (s *audToAudController) startPreparation(axis int, borderPoint models.Coordinates) models.Coordinates {
 	var coordinates models.Coordinates
 
 	XX := borderPoint.X

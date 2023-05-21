@@ -55,6 +55,11 @@ func NewAudToAudController(
 
 func (a *audToAudController) controller() ([]models.Coordinates, appError.AppError) {
 	//TODO: отрисовка начальных путей у стартовой и конечной аудиторий.
+	err := a.getStartPoints()
+	if err.Err != nil {
+		err.Wrap("startPath")
+		return nil, err
+	}
 
 	//TODO: отрисовка среднего пути от стартовой аудитории до конечной аудитории в притык.
 

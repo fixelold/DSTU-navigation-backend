@@ -43,9 +43,9 @@ func (a *audToAudController) start(axis int, borderPoint models.Coordinates, aud
 	repository := NewRepository(a.client)
  
 	// подготовка точек исходя из оси, типа и границ аудитории.
-	coordinates := a.preparation(axis, borderPoint)
+	coordinates := a.startPreparation(axis, borderPoint)
 	// получение точек для начального пути.
-	path, err = a.pathBuilding(coordinates, axis, a.constData.positiveCoordinate)
+	path, err = a.startBuilding(coordinates, axis, a.constData.positiveCoordinate)
 	if err.Err != nil {
 		err.Wrap("audStartPoints")
 		return err
@@ -69,7 +69,7 @@ func (a *audToAudController) start(axis int, borderPoint models.Coordinates, aud
 		a.points = append(a.points, path)
 		return appError.AppError{}
 	} else {
-		path, err = a.pathBuilding(coordinates, axis, a.constData.negativeCoordinate)
+		path, err = a.startBuilding(coordinates, axis, a.constData.negativeCoordinate)
 		if err.Err != nil {
 			err.Wrap("audStartPoints")
 			return err
