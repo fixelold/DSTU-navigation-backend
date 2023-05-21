@@ -1,8 +1,6 @@
 package middle
 
 import (
-	"fmt"
-
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/models"
@@ -21,8 +19,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			var points models.Coordinates
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			
-			fmt.Println("Work: ", axis, borderSector)
+
 			if (axis == m.constData.axisX && borderSector.Widht == 1) || (axis == m.constData.axisY && borderSector.Height == 1)  {
 				points = m.finalPreparation(axis, borderSector, m.Points[i], true)
 			} else {
