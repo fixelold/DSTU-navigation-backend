@@ -83,12 +83,18 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 	}
 }
 
-func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates) (models.Coordinates, appError.AppError) {
+func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions bool) models.Coordinates {
+	var path models.Coordinates
 	if axis == m.constData.axisX {
-		if len(m.Points) == 1 {
-			path, err := m.leftAndRightX(borderPoint, points)
-			if err.Err != nil {
-				
-			}
-		}
+		if exceptions {path = m.leftAndRightX(borderPoint, points)
+		} else if points.Height == -10 {path = m.downX(borderPoint, points)
+		} else if points.Height == 10 {path = m.upX(borderPoint, points)}
+
+	} else if axis == m.constData.axisY {
+		if exceptions {path = m.upAndDownY(borderPoint, points)
+			} else if points.Widht == -10 {path = m.rightY(borderPoint, points)
+			} else if points.Widht == 10 {path = m.leftY(borderPoint, points)}
+	}
+
+	return path
 }
