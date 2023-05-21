@@ -1,14 +1,11 @@
 package middle
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
 func (m *middleController) upX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
-
 	if borderPoint.X < points.X {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
