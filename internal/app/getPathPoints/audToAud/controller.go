@@ -56,7 +56,7 @@ func NewAudToAudController(
 		}
 	}
 
-func (a *audToAudController) controller() ([]models.Coordinates, appError.AppError) {
+func (a *audToAudController) Controller() ([]models.Coordinates, appError.AppError) {
 	//TODO: отрисовка начальных путей у стартовой и конечной аудиторий.
 	err := a.getStartPoints()
 	if err.Err != nil {
@@ -65,6 +65,10 @@ func (a *audToAudController) controller() ([]models.Coordinates, appError.AppErr
 	}
 
 	//TODO: отрисовка среднего пути от стартовой аудитории до конечной аудитории в притык.
-
+	err = a.middle()
+	if err.Err != nil {
+		err.Wrap("startPath")
+		return nil, err
+	}
 	return a.points, appError.AppError{}
 }

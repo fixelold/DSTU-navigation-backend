@@ -3,6 +3,7 @@ package getPathPoints
 import (
 	"strconv"
 
+	"navigation/internal/app/getPathPoints/audToAud"
 	"navigation/internal/app/getPathPoints/middle"
 	sectorToSector "navigation/internal/app/getPathPoints/sector2sector"
 	"navigation/internal/app/getPathPoints/start"
@@ -75,7 +76,7 @@ func NewPointsController(
 
 type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
-	audToAud() ([]models.Coordinates, appError.AppError)
+	aud2Aud() ([]models.Coordinates, appError.AppError)
 	// start(audNumber string, typeTransition int) appError.AppError
 	// middle(entry, exit int) appError.AppError
 	// sector2sector() appError.AppError
@@ -169,7 +170,7 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 	var err appError.AppError
 	repository := NewRepository(p.client, p.logger)
 	middle := middle.NewMiddleController(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	if p.transition == audToAud {
+	if p.transition == aud2Aud {
 		borderSector = p.data.sectorBorderPoints
 	} else {
 		borderSector, err = repository.getSectorBorderPoint(entry, exit)
@@ -412,9 +413,9 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 	return response, appError.AppError{}
 }
 
-func (p *controller) audToAud() ([]models.Coordinates, appError.AppError) {
+func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
-	p.transition = audToAud
+	p.transition = aud2Aud
 	entry := p.sectors[0]
 	data, err := newData(p.StartAuditory, p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
 	if err.Err != nil {
@@ -423,18 +424,13 @@ func (p *controller) audToAud() ([]models.Coordinates, appError.AppError) {
 	}
 	p.data = *data
 
-
-	err = p.start(p.EndAuditory)
+	aToa := audToAud.NewAudToAudController(p.data.audBorderPoints, p.data.sectorBorderPoints, p.StartAuditory, p.EndAuditory, p.data.sectorNumber, p.client, plus, minus, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY)
+	points, err := aToa.Controller()
 	if err.Err != nil {
 		return nil, err
 	}
 
-	err = p.middle(p.transitionNumber, p.transitionNumber)
-	if err.Err != nil {
-		return nil, err
-	}
-
-	response = append(response, p.points...)
+	response = append(response, points...)
 
 	return response, appError.AppError{}
 }

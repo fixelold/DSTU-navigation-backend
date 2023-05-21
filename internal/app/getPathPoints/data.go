@@ -151,7 +151,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
-	} else if d.transition == audToAud {
+	} else if d.transition == aud2Aud {
 
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {

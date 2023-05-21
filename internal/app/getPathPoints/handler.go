@@ -25,7 +25,7 @@ const (
 	stair   = 2
 	elevator = 3
 	transitionToAud = 4
-	audToAud = 5
+	aud2Aud = 5
 
 	file                       = "handler.go"
 	getPointsFuntion           = "getPoints"
@@ -83,7 +83,7 @@ func (h *handler) getPoints(c *gin.Context) {
 		}
 	} else {
 		if len(data.Sectors) == 1 {
-			response, err = p.audToAud()
+			response, err = p.aud2Aud()
 			if err.Err != nil {
 				h.logger.Error(err.Error())
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})

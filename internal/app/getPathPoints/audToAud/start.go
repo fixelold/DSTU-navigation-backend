@@ -25,14 +25,14 @@ func (a *audToAudController) getStartPoints() appError.AppError {
 	}
 
 	//отрисовка для конечной аудитории
-	axis = axes.DefenitionAxis(a.endAudBorderPoint.Widht, a.endAudBorderPoint.Height, a.constData.axisX, a.constData.axisY)
-	axis = axes.ChangeAxis(axis, a.constData.axisX, a.constData.axisY)
+	// axis = axes.DefenitionAxis(a.endAudBorderPoint.Widht, a.endAudBorderPoint.Height, a.constData.axisX, a.constData.axisY)
+	// axis = axes.ChangeAxis(axis, a.constData.axisX, a.constData.axisY)
 
-	err = a.start(axis, a.endAudBorderPoint, a.endAud)
-	if err.Err != nil {
-		err.Wrap("startPath")
-		return err
-	}
+	// err = a.start(axis, a.endAudBorderPoint, a.endAud)
+	// if err.Err != nil {
+	// 	err.Wrap("startPath")
+	// 	return err
+	// }
 
 	return appError.AppError{}
 }
