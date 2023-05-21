@@ -64,15 +64,14 @@ func (s *audToAudController) startBuilding(points models.Coordinates, axis, sign
 }
 
 func (a *audToAudController) middleBuilding() (appError.AppError) {
-	fmt.Println("Work")
 	repository := NewRepository(a.client) // для обращение к базе данных
 	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(a.endAudBorderPoint.Widht, a.endAudBorderPoint.Height, a.constData.axisX, a.constData.axisY)
 
 	for i := 0; true; i++ {
-		// if i == 3 {
-		// 	break
-		// } 
+		if i == 2 {
+			break
+		} 
 		// проверка вхождение координат пути в координаты границ сектора
 		if a.checkOccurrence(a.points[i], axis, a.endAudBorderPoint) {
 			axis = axes.ChangeAxis(axis, a.constData.axisX, a.constData.axisY)

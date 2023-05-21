@@ -1,6 +1,8 @@
 package audToAud
 
 import (
+	"fmt"
+
 	"navigation/internal/appError"
 	"navigation/internal/models"
 )
@@ -44,9 +46,10 @@ func (a *audToAudController) middlePreparation(axis int, borderPoint, points mod
 			factorBorderX = 10
 		} else {
 			factorX = 1
-			factorBorderX = 10 // тут было -10
+			factorBorderX = borderPoint.Widht - (borderPoint.X + (borderPoint.Widht + borderPoint.X)) / 2 // тут было -10
 		}
 
+		fmt.Println("Work: ", (borderPoint.X + (borderPoint.Widht + borderPoint.X)) / 2, borderPoint)
 		if points.Height == a.constData.heightX || points.Height == -a.constData.heightX { // возможно тут над будет изменить
 			factorX = 1
 			initFactorY = 0
@@ -91,17 +94,21 @@ func (a *audToAudController) middlePreparation(axis int, borderPoint, points mod
 
 		if points.Widht > 0 {factorX=1} else {factorX=-1}
 
+		if borderPoint.Widht == 1 {
+			factorBorderY = 10
+		}
+
 		result := models.Coordinates{
 			X: points.X + points.Widht,
 			Y: points.Y + (points.Height * factorY * factorFinal),
 			Widht: a.constData.widhtY * factorX,
-			Height: (borderPoint.Y - points.Y + (points.Height * factorY)) + factorBorderY,
+			Height: borderPoint.Y - points.Y + factorBorderY,
 		}
 
 		// TODO: надо посмотреть про высоты отрисовки.
-		if borderPoint.Y < points.Y && result.Y + result.Height != ((borderPoint.Y + borderPoint.Height) - 10) {
-			result.Height = result.Height + 10
-		}
+		// if borderPoint.Y < points.Y && result.Y + result.Height != ((borderPoint.Y + borderPoint.Height) - 10) {
+		// 	result.Height = result.Height + 10
+		// }
 		return result, appError.AppError{}
 	default:
 		return models.Coordinates{}, *appError.NewAppError("switch error")
