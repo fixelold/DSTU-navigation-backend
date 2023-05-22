@@ -49,7 +49,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		// изменения оси построения, если точки входят в пределы аудитории
 		if !ok {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			// points = m.preparation(axis, borderSector, m.Points[i])
+			points = m.preparation(axis, borderSector, m.Points[i])
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 		}
 		m.Points = append(m.Points, points)

@@ -7,57 +7,54 @@ import (
 )
  
 func (s *sectorToSectorController) building(iterator int, borderSector models.Coordinates) appError.AppError {
-	boolean := true
-	temp := 0
-	// fmt.Println(iterator)
-	repository := NewRepository(s.client, s.logger)
+	// repository := NewRepository(s.client, s.logger) // для обращение к базе данных
+	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
-	// lastPathSector := false
-	for boolean {
-		// fmt.Println("old data - ", s.Points[iterator])
-		// if iterator == 3 {
-		// 	// fmt.Println("data: ", s.Points)
-		// 	boolean = false
+	// var b = true
+	// i := 0
+	for true {
+		// if i == 3 {
 		// 	break
-		// }
+		// } 
+		// i += 1
+		// проверка вхождение координат пути в координаты границ сектора
 		if s.checkOccurrence(s.Points[iterator], axis, borderSector) {
 			var points models.Coordinates
-			// if temp != 0 {
-			// 	s.pathAlignment(borderSector, axis)
-			// } 
-
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
-
 			points = s.finalPreparation(axis, borderSector, s.Points[iterator])
 
-			s.Points = append(s.Points, points)
-	
-			s.OldAxis = axis
-			boolean = false
-		} else {
-			temp += 1
-			// lastPathSector = true
-			points := s.preparation(axis, borderSector, s.Points[iterator])
-
-			ok, err := repository.checkBorderAud(points)
-			if err.Err != nil {
-				err.Wrap("otherPathPoints")
-				return err
-			}
-			ok2, err := repository.checkBorderSector(points)
-			if err.Err != nil {
-				err.Wrap("otherPathPoints")
-				return err
-			}
-
-			if !ok && !ok2 {
-				//TODO написать изменения направления или типо что-то такого
-			}
+			// if (axis == s.constData.axisX && s.Points[iterator].Widht == 5) || (axis == s.constData.axisY && s.Points[iterator].Height == 5)  {
+			// 	fmt.Println("Work")
+			// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
+			// 	b = true
+			// 	points = s.finalPreparation(axis, borderSector, s.Points[iterator])
+			// } else {
+			// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
+			// 	b = false
+			// 	points = s.finalPreparation(axis, borderSector, s.Points[iterator])
+			// }
 
 			s.Points = append(s.Points, points)
-		}
+			break
+		} 
+		// // расчет точек пути
+		// points := s.preparation(axis, borderSector, s.Points[iterator])
 
-		iterator += 1
+
+		// // TODO: просмотреть проверку ругался на 1-408.
+		// ok, err := repository.checkBorderAud2(points, s.thisSectorNumber)
+		// if err.Err != nil {
+		// 	err.Wrap("building")
+		// 	return err
+		// }
+
+		// // изменения оси построения, если точки входят в пределы аудитории
+		// if !ok {
+		// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
+		// 	points = s.preparation(axis, borderSector, s.Points[iterator])
+		// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
+		// }
+		// s.Points = append(s.Points, points)
 	}
 
 	return appError.AppError{}

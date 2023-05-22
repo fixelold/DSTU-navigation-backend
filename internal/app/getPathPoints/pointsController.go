@@ -109,10 +109,10 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 		return nil, err
 	}
 
-	// err = p.sector2sector()
-	// if err.Err != nil {
-	// 	return nil, err
-	// }
+	err = p.sector2sector()
+	if err.Err != nil {
+		return nil, err
+	}
 
 	entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
