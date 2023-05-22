@@ -232,7 +232,6 @@ func (p *controller) sector2sector() appError.AppError {
 			err.Wrap("getPathPoints")
 			return err
 		}
-
 		// p.points = append(p.points, data...)
 		// fmt.Println("data - ",  data[len(data) - 1])
 		// sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])

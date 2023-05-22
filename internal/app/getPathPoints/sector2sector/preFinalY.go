@@ -1,6 +1,8 @@
 package sectorToSector
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/models"
+)
 
 func (m *sectorToSectorController) leftDownY(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
@@ -14,9 +16,9 @@ func (m *sectorToSectorController) leftDownY(borderPoint, points models.Coordina
 	} else if borderPoint.Y > points.Y {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
-            Y: points.Y + points.Height,
-            Widht: 5,
-            Height: borderPoint.Y - (points.Y + points.Height),
+            Y: points.Y, // убрал
+            Widht: -5, // добавил -
+            Height: borderPoint.Y - points.Y + points.Height,
 		}
 	}
 
@@ -29,15 +31,15 @@ func (m *sectorToSectorController) leftUpY(borderPoint, points models.Coordinate
 		result = models.Coordinates{
 			X: points.X + points.Widht,
             Y: points.Y, // убрал points.Height
-            Widht: 5,
+            Widht: -5,
             Height: borderPoint.Y - points.Y,
 		}
 	} else if borderPoint.Y > points.Y {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
-            Y: points.Y,
-            Widht: 5,
-            Height: borderPoint.Y - points.Y,
+            Y: points.Y + points.Height, // добавил points.Height
+            Widht: -5, // добавил -
+            Height: borderPoint.Y - points.Y + 5, // добавил 5
 		}
 	}
 
@@ -49,16 +51,16 @@ func (m *sectorToSectorController) rightDownY(borderPoint, points models.Coordin
 	var result models.Coordinates
 	if borderPoint.Y < points.Y {
 		result = models.Coordinates{
-			X: points.X,
-            Y: points.Y,
-            Widht: -5,
-            Height: borderPoint.Y - points.Y,
+			X: points.X + points.Widht, // добавил points.Widht
+            Y: points.Y + points.Height,
+            Widht: 5,
+            Height: borderPoint.Y - (points.Y + points.Height),
 		}
 	} else if borderPoint.Y > points.Y {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
             Y: points.Y + points.Height,
-            Widht: -5,
+            Widht: 5,
             Height: borderPoint.Y - (points.Y + points.Height),
 		}
 	}
@@ -73,7 +75,7 @@ func (m *sectorToSectorController) rightUpY(borderPoint, points models.Coordinat
 		result = models.Coordinates{
 			X: points.X + points.Widht,
             Y: points.Y, // убрал points.Height
-            Widht: -5,
+            Widht: 5, // убрал -
             Height: borderPoint.Y - points.Y,
 		}
 	} else if borderPoint.Y > points.Y {

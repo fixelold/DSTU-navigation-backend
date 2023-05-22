@@ -13,9 +13,9 @@ func (s *sectorToSectorController) preparation(axis int, borderPoint, points mod
 	
 	}else if axis == s.constData.axisY {
 		if borderPoint.Y > (points.Y + points.Height) {path = s.prePathDownY(borderPoint, points)
-			}else if borderPoint.Y < (points.Y + points.Height) {path = s.prePathDownY(borderPoint, points)}
+			}else if borderPoint.Y < (points.Y + points.Height) {path = s.prePathUpY(borderPoint, points)}
 	}
-
+ 
 	return path
 }
 
@@ -24,21 +24,21 @@ func (s *sectorToSectorController) finalPreparation(axis int, borderPoint, point
 	if exeption {
 		if axis == s.constData.axisX {
 			if points.Height < 0 {
-				if s.Points[0].Widht == 5 {path = s.downLeftX(borderPoint, points)
-				} else if s.Points[0].Widht == -5 {path = s.downRightX(borderPoint, points)}
+				if points.Widht == 5 {path = s.downLeftX(borderPoint, points)
+				} else if points.Widht == -5 {path = s.downRightX(borderPoint, points)}
 			
 			} else if points.Height > 0 {
-				if s.Points[0].Widht == 5 {path = s.upLeftX(borderPoint, points)
-					} else if s.Points[0].Widht == -5 {path = s.upRightX(borderPoint, points)}	
+				if points.Widht == 5 {path = s.upLeftX(borderPoint, points)
+					} else if points.Widht == -5 {path = s.upRightX(borderPoint, points)}	
 			}
 		} else if axis == s.constData.axisY {
 			if points.Widht < 0 {
-				if s.Points[0].Height == 5 {path = s.leftDownY(borderPoint, points)
-				} else if s.Points[0].Height == -5 {path = s.leftUpY(borderPoint, points)}
+				if points.Height == 5 {path = s.leftDownY(borderPoint, points)
+				} else if points.Height == -5 {path = s.leftUpY(borderPoint, points)}
 			
 			} else if points.Widht > 0 {
-				if s.Points[0].Height == 5 {path = s.rightDownY(borderPoint, points)
-					} else if s.Points[0].Height == -5 {path = s.rightUpY(borderPoint, points)}	
+				if points.Height == 5 {path = s.rightDownY(borderPoint, points)
+					} else if points.Height == -5 {path = s.rightUpY(borderPoint, points)}	
 			}
 		} 
 	} else {

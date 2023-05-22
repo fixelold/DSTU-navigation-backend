@@ -11,12 +11,10 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
 	var b = false
-	// i := 0
-	for true {
-		// if i == 2 {
+	for i := 0; true; i++ {
+		// if i == 1 {
 		// 	break
 		// } 
-		// i += 1
 		// проверка вхождение координат пути в координаты границ сектора
 		lenght := len(s.Points)
 		if s.checkOccurrence(s.Points[lenght - 1], axis, borderSector) {

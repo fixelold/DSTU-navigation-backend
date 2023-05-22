@@ -50,7 +50,7 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 				if m.Points[0].Height == 10 {path = m.leftDownY(borderPoint, points)
 				} else if m.Points[0].Height == -10 {path = m.leftUpY(borderPoint, points)}
 
-			} else if points.Widht > 0 {
+			} else if points.Widht < 0 {
 				if m.Points[0].Height == 10 {path = m.rightDownY(borderPoint, points)
 					} else if m.Points[0].Height == -10 {path = m.rightUpY(borderPoint, points)}
 			}
