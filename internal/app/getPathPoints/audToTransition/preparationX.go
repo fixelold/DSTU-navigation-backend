@@ -1,8 +1,6 @@
-package middle
+package audToTransition
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
@@ -30,13 +28,12 @@ func (m *middleController) preparationUpX(borderPoint, points models.Coordinates
 
 func (m *middleController) preparationDownX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
-	fmt.Println("Work")
 	if borderPoint.X < points.X {
 		result = models.Coordinates{
-			X: points.X + points.Widht,
+			X: points.X,
             Y: points.Y + points.Height,
-            Widht: ((borderPoint.X + borderPoint.Widht) - (points.X + points.Widht)) - 10,
-            Height: -5,
+            Widht: ((borderPoint.X + borderPoint.Widht) - points.X) - 10,
+            Height: 5,
 		}
 	} else if borderPoint.X > points.X {
 		result = models.Coordinates{

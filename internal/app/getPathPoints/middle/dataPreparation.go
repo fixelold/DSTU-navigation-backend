@@ -8,6 +8,11 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 	var path models.Coordinates
 
 	if axis == m.constData.axisX {
+		if m.typeTransition == 2 {
+			if points.Widht == 5 {path = m.preparationDownX(borderPoint, points)
+				}else if points.Widht == -5 {path = m.preparationUpX(borderPoint, points)}
+			
+		}
 		if points.Height == -10 {path = m.preparationDownX(borderPoint, points)
 		}else if points.Height == 10 {path = m.preparationUpX(borderPoint, points)}
 	
@@ -46,6 +51,13 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 					} else if m.Points[0].Widht == -10 {path = m.upRightX(borderPoint, points)}
 			}
 		} else if axis == m.constData.axisY {
+			if m.typeTransition == 2 {
+				if points.Widht < 0 {
+					if points.Height == -5 {path = m.rightDownY(borderPoint, points)
+						} else if points.Height == 5 {path = m.rightUpY(borderPoint, points)}
+				}
+			}
+
 			if points.Widht > 0 {
 				if m.Points[0].Height == 10 {path = m.leftDownY(borderPoint, points)
 				} else if m.Points[0].Height == -10 {path = m.leftUpY(borderPoint, points)}
