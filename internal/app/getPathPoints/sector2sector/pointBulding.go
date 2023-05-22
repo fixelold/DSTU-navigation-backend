@@ -10,18 +10,19 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 	// repository := NewRepository(s.client, s.logger) // для обращение к базе данных
 	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
-	// var b = true
+	var b = false
 	// i := 0
 	for true {
-		// if i == 3 {
+		// if i == 2 {
 		// 	break
 		// } 
 		// i += 1
 		// проверка вхождение координат пути в координаты границ сектора
-		if s.checkOccurrence(s.Points[iterator], axis, borderSector) {
+		lenght := len(s.Points)
+		if s.checkOccurrence(s.Points[lenght - 1], axis, borderSector) {
 			var points models.Coordinates
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
-			points = s.finalPreparation(axis, borderSector, s.Points[iterator])
+			points = s.finalPreparation(axis, borderSector, s.Points[lenght - 1], b)
 
 			// if (axis == s.constData.axisX && s.Points[iterator].Widht == 5) || (axis == s.constData.axisY && s.Points[iterator].Height == 5)  {
 			// 	fmt.Println("Work")
@@ -37,9 +38,9 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 			s.Points = append(s.Points, points)
 			break
 		} 
-		// // расчет точек пути
-		// points := s.preparation(axis, borderSector, s.Points[iterator])
-
+		// расчет точек пути
+		points := s.preparation(axis, borderSector, s.Points[lenght - 1])
+		b = true
 
 		// // TODO: просмотреть проверку ругался на 1-408.
 		// ok, err := repository.checkBorderAud2(points, s.thisSectorNumber)
@@ -48,13 +49,15 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 		// 	return err
 		// }
 
-		// // изменения оси построения, если точки входят в пределы аудитории
+		// изменения оси построения, если точки входят в пределы аудитории
 		// if !ok {
 		// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 		// 	points = s.preparation(axis, borderSector, s.Points[iterator])
 		// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 		// }
-		// s.Points = append(s.Points, points)
+		// fmt.Println("old: ", s.Points)
+		s.Points = append(s.Points, points)
+		// fmt.Println("new: ", s.Points)
 	}
 
 	return appError.AppError{}

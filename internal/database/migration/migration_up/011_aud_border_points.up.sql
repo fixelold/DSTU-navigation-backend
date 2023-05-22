@@ -31,8 +31,8 @@ VALUES
     (26, 436, 501, 31, 1),
     (27, 470, 501, 31, 1),
     (28, 470, 472, 33, 1),
-    (29, 437, 473, 31, 1),
-    (30, 293, 473, 140, 1);
+    (29, 437, 476, 31, 1),
+    (30, 293, 476, 140, 1);
 
 INSERT INTO aud_border_points (id_auditorium, x, y, widht, height) 
 VALUES
@@ -43,7 +43,7 @@ VALUES
 
 INSERT INTO aud_border_points (id_auditorium, x, y, widht, height) 
 VALUES
-    (35, 505, 473, 116, 1),
+    (35, 505, 476, 116, 1),
     (36, 505, 501, 31, 1),
 
     (37, 539, 501, 29, 1),
