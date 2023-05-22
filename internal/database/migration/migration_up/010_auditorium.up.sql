@@ -1,4 +1,4 @@
---131--
+--131-- 
 INSERT INTO auditorium (number, id_sector) VALUES
     (unnest(array['1-319а', '1-319', '1-317а', '1-317', '1-319б', '1-320', '1-321', '1-321а', '1-315']), 3);
 

@@ -1,6 +1,8 @@
 package middle
 
 import (
+	"fmt"
+
 	axes "navigation/internal/app/getPathPoints/axis"
 	"navigation/internal/appError"
 	"navigation/internal/models"
@@ -20,6 +22,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 			var points models.Coordinates
 
 			if (axis == m.constData.axisX && m.Points[i].Widht == 5) || (axis == m.constData.axisY && m.Points[i].Height == 5)  {
+				fmt.Println("Work")
 				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 				b = true
 				points, b = m.finalPreparation(axis, borderSector, m.Points[i], b)

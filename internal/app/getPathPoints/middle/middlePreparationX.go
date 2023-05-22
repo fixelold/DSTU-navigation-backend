@@ -1,13 +1,10 @@
 package middle
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
 func (m *middleController) downLeftX(borderPoint, points models.Coordinates) models.Coordinates {
-	fmt.Println("Work 1")
 	var result models.Coordinates
 	if borderPoint.X < points.X {
 		result = models.Coordinates{
@@ -29,7 +26,6 @@ func (m *middleController) downLeftX(borderPoint, points models.Coordinates) mod
 }
 
 func (m *middleController) downRightX(borderPoint, points models.Coordinates) models.Coordinates {
-	fmt.Println("Work 2")
 	var result models.Coordinates
 	if borderPoint.X < points.X {
 		result = models.Coordinates{
@@ -51,7 +47,6 @@ func (m *middleController) downRightX(borderPoint, points models.Coordinates) mo
 }
 
 func (m *middleController) upLeftX(borderPoint, points models.Coordinates) models.Coordinates {
-	fmt.Println("Work 3")
 	var result models.Coordinates
 	if borderPoint.X < points.X {
 		result = models.Coordinates{
@@ -73,7 +68,6 @@ func (m *middleController) upLeftX(borderPoint, points models.Coordinates) model
 }
 
 func (m *middleController) upRightX(borderPoint, points models.Coordinates) models.Coordinates {
-	fmt.Println("Work 4")
 	var result models.Coordinates
 	if borderPoint.X < points.X {
 		result = models.Coordinates{

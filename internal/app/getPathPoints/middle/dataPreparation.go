@@ -1,8 +1,6 @@
 package middle
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
@@ -26,7 +24,6 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 	var lenght = len(m.Points)
 
 	if lenght == 1 {
-		fmt.Println("Work -2")
 		if axis == m.constData.axisX {
 			if exceptions {path = m.leftAndRightX(borderPoint, points)
 			} else if points.Height == -10 {path = m.downX(borderPoint, points)
@@ -39,9 +36,7 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 		}
 
 	} else {
-		fmt.Println("Work -1")
 		if axis == m.constData.axisX {
-			fmt.Println("Work 0")
 			if points.Height < 0 {
 				if m.Points[0].Widht == 10 {path = m.downLeftX(borderPoint, points)
 				} else if m.Points[0].Widht == -10 {path = m.downRightX(borderPoint, points)}
@@ -50,15 +45,15 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 				if m.Points[0].Widht == 10 {path = m.upLeftX(borderPoint, points)
 					} else if m.Points[0].Widht == -10 {path = m.upRightX(borderPoint, points)}
 			}
-		// } else if axis == m.constData.axisY {
-		// 	if points.Widht > 0 {
-		// 		if m.Points[0].Height == 10 {path = m.leftDownY(borderPoint, points)
-		// 		} else if m.Points[0].Height == -10 {path = m.leftUpY(borderPoint, points)}
+		} else if axis == m.constData.axisY {
+			if points.Widht > 0 {
+				if m.Points[0].Height == 10 {path = m.leftDownY(borderPoint, points)
+				} else if m.Points[0].Height == -10 {path = m.leftUpY(borderPoint, points)}
 
-		// 	} else if points.Height > 0 {
-		// 		if m.Points[0].Height == 10 {path = m.rightDownY(borderPoint, points)
-		// 			} else if m.Points[0].Height == -10 {path = m.rightUpY(borderPoint, points)}
-		// 	}
+			} else if points.Height > 0 {
+				if m.Points[0].Height == 10 {path = m.rightDownY(borderPoint, points)
+					} else if m.Points[0].Height == -10 {path = m.rightUpY(borderPoint, points)}
+			}
 		}
 	}	
 
