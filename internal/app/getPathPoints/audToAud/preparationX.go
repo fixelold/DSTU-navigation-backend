@@ -18,7 +18,7 @@ func (m *middleController) preparationUpX(borderPoint, points models.Coordinates
 			X: points.X,
             Y: points.Y + points.Height,
             Widht: borderPoint.X - points.X + 10,
-            Height: 5,
+            Height: -5, // added -5 for 1-319б
 		}
 	}
 

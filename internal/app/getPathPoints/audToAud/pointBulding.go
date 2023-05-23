@@ -9,12 +9,13 @@ import (
 func (m *middleController) building(borderSector models.Coordinates) appError.AppError {
 	repository := NewRepository(m.client, m.logger) // для обращение к базе данных
 	// ось для перехода в другой сектор
-	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
+	// axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 	var b = true
 	for i := 0; true; i++ {
-		// if i == 1 {
-		// 	break
-		// } 
+		axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
+		if i == 2 {
+			break
+		} 
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			var points models.Coordinates
@@ -33,17 +34,20 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		} 
 		// расчет точек пути
 		var points models.Coordinates
-		if i == 0 && borderSector.Height == 1 && (m.Points[i].Widht == -10 || m.Points[i].Widht == 10) {
-			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.preparation(axis, borderSector, m.Points[i])
-			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-		} else {
-			points = m.preparation(axis, borderSector, m.Points[i])
-		}
+		points = m.preparation(axis, borderSector, m.Points[i])
+		// if i == 0 && borderSector.Height == 1 && (m.Points[i].Widht == -10 || m.Points[i].Widht == 10) {
+		// 	// fmt.Println("Work")
+		// 	// axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+		// 	points = m.preparation(axis, borderSector, m.Points[i])
+		// 	// axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+		// } else {
+		// 	points = m.preparation(axis, borderSector, m.Points[i])
+		// }
 
 
 
 		// TODO: просмотреть проверку ругался на 1-408.
+		// TODO: просмотреть проверку ругался на 1-317а.
 		ok, err := repository.checkBorderAud2(points, m.thisSectorNumber)
 		if err.Err != nil {
 			err.Wrap("building")

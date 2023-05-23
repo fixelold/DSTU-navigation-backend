@@ -16,6 +16,7 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 			}else if points.Widht == 10 {path = m.preparationUpX(borderPoint, points)}
 	
 	}else if axis == m.constData.axisY {
+		fmt.Println("Work: ", points.Widht)
 		if points.Widht == -5 {path = m.preparationRightY(borderPoint, points)
 			}else if points.Widht == 5 {path = m.preparationLeftY(borderPoint, points)}
 
