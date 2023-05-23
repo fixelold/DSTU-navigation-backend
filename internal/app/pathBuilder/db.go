@@ -73,7 +73,7 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 	var sector models.Sector
 	txError    := appError.NewAppError("can't start transaction")
 	queryError := appError.NewAppError("failed to complete the request")
-	// scanError  := appError.NewAppError("can't scan database response")
+	// // scanError  := appError.NewAppError("can't scan database response")
 
 	req :=
 		`SELECT 
@@ -86,13 +86,14 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 	AND building.number = $2;`
 
 	tx, err := r.client.Begin(context.Background())
+	// fmt.Println("Work: ", tx, err, r.client)
+	
 	if err != nil {
 		_ = tx.Rollback(context.Background())
 		txError.Wrap("db GetSector")
 		txError.Err = err
 		return 0, *txError
 	}
-
 	err = tx.QueryRow(
 		context.Background(),
 		req,

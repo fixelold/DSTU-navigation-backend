@@ -1,70 +1,49 @@
 package audToAud
 
-import (
-	"fmt"
+// func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
+// 	var path models.Coordinates
+// 	if axis == m.constData.axisX {
+// 		if points.Widht == -5 {path = m.preparationDownX(borderPoint, points)
+// 		}else if points.Widht == 5 {path = m.preparationUpX(borderPoint, points)}
 
-	"navigation/internal/models"
-)
+// 		if points.Widht == -10 {path = m.preparationDownX(borderPoint, points)
+// 			}else if points.Widht == 10 {path = m.preparationUpX(borderPoint, points)}
 
-func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
-	var path models.Coordinates
-	if axis == m.constData.axisX {
-		if points.Widht == -5 {path = m.preparationDownX(borderPoint, points)
-		}else if points.Widht == 5 {path = m.preparationUpX(borderPoint, points)}
+// 	}else if axis == m.constData.axisY {
+// 		if points.Widht == -5 {path = m.preparationRightY(borderPoint, points)
+// 			}else if points.Widht == 5 {path = m.preparationLeftY(borderPoint, points)}
 
-		if points.Widht == -10 {path = m.preparationDownX(borderPoint, points)
-			}else if points.Widht == 10 {path = m.preparationUpX(borderPoint, points)}
-	
-	}else if axis == m.constData.axisY {
-		fmt.Println("Work: ", points.Widht)
-		if points.Widht == -5 {path = m.preparationRightY(borderPoint, points)
-			}else if points.Widht == 5 {path = m.preparationLeftY(borderPoint, points)}
+// 		if points.Widht == -10 {path = m.preparationRightY(borderPoint, points)
+// 			}else if points.Widht == 10 {path = m.preparationLeftY(borderPoint, points)}
+// 	}
 
-		if points.Widht == -10 {path = m.preparationRightY(borderPoint, points)
-			}else if points.Widht == 10 {path = m.preparationLeftY(borderPoint, points)}
-	}
+// 	return path
+// }
 
-	return path
-}
+// func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions bool) models.Coordinates {
+// 	var path models.Coordinates
+// 	var factor int
 
-func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions bool) (models.Coordinates, bool) {
-	var path models.Coordinates
-	var lenght = len(m.Points)
+// 	if exceptions {
+// 		if axis == m.constData.axisX {
+// 			if points.Height == -10 {factor = -1
+// 			} else if points.Height == 10 {factor = 1}
 
-	if lenght == 1 {
-		if axis == m.constData.axisX {
-			if exceptions {path = m.leftAndRightX(borderPoint, points)
-			} else if points.Height == -10 {path = m.downX(borderPoint, points)
-			} else if points.Height == 10 {path = m.upX(borderPoint, points)}
-	
-		} else if axis == m.constData.axisY {
-			fmt.Println("Work: ", points.Widht, exceptions)
-			if exceptions {path = m.upAndDownY(borderPoint, points)
-				} else if points.Widht == -10 {path = m.rightY(borderPoint, points) // added -10
-				} else if points.Widht == 10 {path = m.leftY(borderPoint, points)} // added 10
-		}
+// 			if borderPoint.X > points.X {m.pointsRightX(borderPoint, points, endPoints,  factor)
+// 				} else if borderPoint.X < points.X {m.pointsLeftX(borderPoint, points, endPoints, factor)}
 
-	} else {
-		if axis == m.constData.axisX {
-			if points.Height < 0 {
-				if points.Widht == 5 {path = m.downLeftX(borderPoint, points)
-				} else if points.Widht == -5 {path = m.downRightX(borderPoint, points)} 
+// 		} else if axis == m.constData.axisY {
+// 			if points.Widht == -10 {factor = -1
+// 				} else if points.Widht == 10 {factor = 1}
 
-			} else if points.Height > 0 {
-				if points.Widht == 5 {path = m.upLeftX(borderPoint, points) 
-					} else if points.Widht == -5 {path = m.upRightX(borderPoint, points)} 
-			}
-		} else if axis == m.constData.axisY {
-			if points.Widht > 0 {
-				if points.Height == 5 {path = m.leftDownY(borderPoint, points)
-				} else if points.Height == -5 {path = m.leftUpY(borderPoint, points)}
+// 			if borderPoint.Y > points.Y {m.pointsDownY(borderPoint, endPoints, points, factor)
+// 				} else if borderPoint.Y < points.Y {m.pointsUpY(borderPoint, endPoints, points, factor)}
+// 		}
 
-			} else if points.Widht < 0 {
-				if points.Height == 5 {path = m.rightDownY(borderPoint, points)
-					} else if points.Height == -5 {path = m.rightUpY(borderPoint, points)}
-			}
-		}
-	}	
+// 	} else {
+// 		if axis == m.constData.axisX {path = m.firstFinalX(borderPoint, points)
+// 		} else if axis == m.constData.axisY {path = m.firstFinalY(borderPoint, points)}
+// 	}
 
-	return path, true
-}
+// 	return path
+// }

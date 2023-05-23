@@ -54,11 +54,11 @@ func NewAudToAud(
 }
 
 func (m *middleController) MiddlePoints(borderSector models.Coordinates) ([]models.Coordinates, appError.AppError) {
-	err := m.building(borderSector)
-	if err.Err != nil {
-		err.Wrap("middlePoints")
-		return nil, err
-	}
+	// err := m.building(borderSector)
+	// if err.Err != nil {
+	// 	err.Wrap("middlePoints")
+	// 	return nil, err
+	// }
 
 	return m.Points, appError.AppError{}
 }

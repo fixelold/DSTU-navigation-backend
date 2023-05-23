@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"navigation/internal/config"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
+
+	"navigation/internal/config"
 )
 
 type Client interface {
@@ -26,7 +28,7 @@ func NewClient(ctx context.Context, cfg config.AppConfig) Client {
 		cfg.Storage.Port,
 		cfg.Storage.Database,
 	)
-	conn, err := pgx.Connect(ctx, dsn)
+	conn, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
 		log.Fatalf("can't connect to database %s", err.Error())
 	}
