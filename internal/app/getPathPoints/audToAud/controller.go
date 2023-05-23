@@ -3,23 +3,13 @@ package audToAud
 import (
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
+	"navigation/internal/logging"
 	"navigation/internal/models"
 )
 
-type audToAudController struct {
-	points []models.Coordinates
-	startAudBorderPoint models.Coordinates
-	endAudBorderPoint models.Coordinates
-	startAud string
-	endAud string
-	sectorNumber int
-	client postgresql.Client
-	constData constData
-}
-
 type constData struct {
-	positiveCoordinate int
-	negativeCoordinate int
+	// positiveCoordinate int
+	// negativeCoordinate int
 	axisX int
 	axisY int
 	widhtX int
@@ -28,47 +18,47 @@ type constData struct {
 	heightY int
 }
 
+type middleController struct {
+	Points []models.Coordinates
+	constData constData
+	sectorNumber int
+	thisSectorNumber int
+	typeTransition int
 
-func NewAudToAudController(
-	startAudBorderPoint, endAudBorderPoint models.Coordinates,
-	startAud, endAud string,
-	sectorNumber int,
-	client postgresql.Client,
-	positiveCoordinate, negativeCoordinate int,
-	axisX, axisY, widhtX, heightX, widhtY, heightY int) *audToAudController {
-		return &audToAudController{
-			startAudBorderPoint: startAudBorderPoint,
-			endAudBorderPoint: endAudBorderPoint,
-			startAud: startAud,
-			endAud: endAud,
-			sectorNumber: sectorNumber,
-			client: client,
-			constData: constData{
-				positiveCoordinate: positiveCoordinate,
-				negativeCoordinate: negativeCoordinate,
-				axisX: axisX,
-				axisY: axisY,
-				widhtX: widhtX,
-				heightX: heightX,
-				widhtY: widhtY,
-				heightY: heightY,
-			},
-		}
+	client postgresql.Client
+	logger *logging.Logger
+}
+
+func NewAudToAud(
+	typeTransition int,
+	thisSectorNumber int,
+	sectorNumber int, 
+	client postgresql.Client, 
+	axisX, axisY, widhtX, heightX, widhtY, heightY int, 
+	logger *logging.Logger) *middleController {
+	return &middleController{
+		typeTransition: typeTransition,
+		thisSectorNumber: thisSectorNumber,
+		sectorNumber: sectorNumber,
+		client: client,
+		logger: logger,
+		constData: constData{
+			axisX: axisX,
+			axisY: axisY,
+			widhtX: widhtX,
+			heightX: heightX,
+			widhtY: widhtY,
+			heightY: heightY,
+		},
 	}
+}
 
-func (a *audToAudController) Controller() ([]models.Coordinates, appError.AppError) {
-	//TODO: отрисовка начальных путей у стартовой и конечной аудиторий.
-	err := a.getStartPoints()
+func (m *middleController) MiddlePoints(borderSector models.Coordinates) ([]models.Coordinates, appError.AppError) {
+	err := m.building(borderSector)
 	if err.Err != nil {
-		err.Wrap("startPath")
+		err.Wrap("middlePoints")
 		return nil, err
 	}
 
-	//TODO: отрисовка среднего пути от стартовой аудитории до конечной аудитории в притык.
-	err = a.middle()
-	if err.Err != nil {
-		err.Wrap("startPath")
-		return nil, err
-	}
-	return a.points, appError.AppError{}
+	return m.Points, appError.AppError{}
 }

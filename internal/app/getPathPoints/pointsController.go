@@ -191,15 +191,18 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 	return appError.AppError{}
 }
 
-func (p *controller) middleToTransition(entry, exit int) appError.AppError {
-	// entry, exit = exit, entry
+func (p *controller) middleToTransition(entry int) appError.AppError {
+	var borderSector models.Coordinates
 	repository := NewRepository(p.client, p.logger)
+	var err appError.AppError
 	middle := audToTransition.NewAudToTransition(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	borderSector, err := repository.getTransitionSectorBorderPoint(exit)
+	
+	borderSector, err = repository.getTransitionSectorBorderPoint(entry)
 	if err.Err != nil {
 		err.Wrap("middle to transition")
 		return err
 	}
+
 	middle.Points = append(middle.Points, p.points...)
 	
 	data, err := middle.MiddlePoints(borderSector)
@@ -268,7 +271,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			return nil, err
 		}
 
-		err = p.middleToTransition(entry, exit)
+		err = p.middleToTransition(entry)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -291,7 +294,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		}
 
 		if len(strconv.Itoa(exit)) == 4 {
-			err = p.middleToTransition(entry, exit)
+			err = p.middleToTransition(entry)
 			if err.Err != nil {
 				return nil, err
 			}
@@ -350,7 +353,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 				return nil, err
 			}
 
-			err = p.middleToTransition(p.transitionNumber, p.transitionNumber)
+			err = p.middleToTransition(p.transitionNumber)
 			if err.Err != nil {
 				return nil, err
 			}
@@ -425,15 +428,38 @@ func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
 	}
 	p.data = *data
 
-	aToa := audToAud.NewAudToAudController(p.data.audBorderPoints, p.data.sectorBorderPoints, p.StartAuditory, p.EndAuditory, p.data.sectorNumber, p.client, plus, minus, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY)
-	points, err := aToa.Controller()
+	err = p.start(p.StartAuditory)
 	if err.Err != nil {
 		return nil, err
 	}
 
-	response = append(response, points...)
+	err = p.middleAudToAud()
+	if err.Err != nil {
+		return nil, err
+	}
+
+	response = append(response, p.points...)
+
 
 	return response, appError.AppError{}
+}
+
+func (p *controller) middleAudToAud() appError.AppError {
+	var borderSector models.Coordinates
+	// repository := NewRepository(p.client, p.logger)
+	var err appError.AppError
+	middle := audToAud.NewAudToAud(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	borderSector = p.data.sectorBorderPoints
+	middle.Points = append(middle.Points, p.points...)
+	
+	data, err := middle.MiddlePoints(borderSector)
+	if err.Err != nil {
+		err.Wrap("middle to transition")
+	}
+
+	p.points = append(p.points, data...)
+
+	return appError.AppError{}
 }
 func min(a, b int) (int, int) {
 	if a < b {
