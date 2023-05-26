@@ -1,6 +1,8 @@
 package audToAud
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/models"
+)
 
 func (m *middleController) pointsLeftX(borderPoint, points, endPoints models.Coordinates, factor int) models.Coordinates {
 	var result models.Coordinates
@@ -15,12 +17,11 @@ func (m *middleController) pointsLeftX(borderPoint, points, endPoints models.Coo
 
 func (m *middleController) final(borderPoint, points models.Coordinates, factor int) models.Coordinates {
 	var result models.Coordinates
-
 	result = models.Coordinates{
 		X: points.X + points.Widht,
 		Y: points.Y + points.Height,
 		Widht: (borderPoint.X - (points.X + points.Widht)) + 10,
-		Height: -5,
+		Height: 5 * factor,
 	}
 
 	return result

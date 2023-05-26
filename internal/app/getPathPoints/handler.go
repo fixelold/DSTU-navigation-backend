@@ -139,6 +139,5 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 
 	response.Start = audPoints.StartAuditoryPoints
 	response.End = audPoints.EndAuditoryPoints
-	fmt.Println("Hello: ",response)
 	c.JSON(http.StatusOK, response)
 }

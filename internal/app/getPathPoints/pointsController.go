@@ -196,7 +196,6 @@ func (p *controller) middleToTransition(entry int) appError.AppError {
 	repository := NewRepository(p.client, p.logger)
 	var err appError.AppError
 	middle := audToTransition.NewAudToTransition(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	
 	borderSector, err = repository.getTransitionSectorBorderPoint(entry)
 	if err.Err != nil {
 		err.Wrap("middle to transition")
@@ -271,7 +270,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			return nil, err
 		}
 
-		err = p.middleToTransition(entry)
+		err = p.middleToTransition(exit)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -421,19 +420,35 @@ func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
 	p.transition = aud2Aud
 	entry := p.sectors[0]
-	data, err := newData(p.StartAuditory, p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
+
+	data, err := newData( p.EndAuditory, p.StartAuditory, entry, entry, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return nil, err
 	}
+
 	p.data = *data
+
+	err = p.start(p.EndAuditory)
+	if err.Err != nil {
+		return nil, err
+	}
+
+	newdata, err := newData(p.StartAuditory, p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
+	p.data = *newdata
+	endPoints := p.points[0]
+	p.points = []models.Coordinates{}
 
 	err = p.start(p.StartAuditory)
 	if err.Err != nil {
 		return nil, err
 	}
 
-	err = p.middleAudToAud()
+	err = p.middleAudToAud(endPoints)
 	if err.Err != nil {
 		return nil, err
 	}
@@ -444,11 +459,11 @@ func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
 	return response, appError.AppError{}
 }
 
-func (p *controller) middleAudToAud() appError.AppError {
+func (p *controller) middleAudToAud(endPints models.Coordinates) appError.AppError {
 	var borderSector models.Coordinates
 	// repository := NewRepository(p.client, p.logger)
 	var err appError.AppError
-	middle := audToAud.NewAudToAud(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	middle := audToAud.NewAudToAud(p.transition, p.sectors[0], p.data.sectorNumber, endPints, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
 	borderSector = p.data.sectorBorderPoints
 	middle.Points = append(middle.Points, p.points...)
 	

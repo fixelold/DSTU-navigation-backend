@@ -1,27 +1,37 @@
 package audToAud
 
-// func (m *middleController) downFinal(borderPoint, points models.Coordinates) models.Coordinates {
-// 	var result models.Coordinates
+import (
+	"navigation/internal/models"
+)
 
-// 	result = models.Coordinates{
-// 		X: points.X + points.Widht,
-// 		Y: points.Y,
-// 		Widht: 5 * factor,
-// 		Height: (borderPoint.Y - points.Y) + 10,
-// 	}
+func (m *middleController) firstFinalX(borderPoint, points models.Coordinates, factor int) models.Coordinates {
+	var result models.Coordinates
+	var factoHeight int
 
-// 	return result
-// }
+	if m.endPoints.Widht == 10 {
+		factoHeight = 1
+	} else {
+		factoHeight = 0
+	}
 
-// func (m *middleController) endDownUpX(borderPoint, points models.Coordinates) models.Coordinates {
-// 	var result models.Coordinates
+	result = models.Coordinates{
+		X: points.X,
+		Y: points.Y + (points.Height * factoHeight),
+		Widht: borderPoint.X - points.X,
+		Height: 5,
+	}
+	return result
+}
 
-// 	result = models.Coordinates{
-// 		X: points.X + points.Widht,
-// 		Y: points.Y,
-// 		Widht: 5 * factor,
-// 		Height: (borderPoint.Y - points.Y) + 10,
-// 	}
+func (m *middleController) firstFinalY(borderPoint, points models.Coordinates, factor int) models.Coordinates {
+	var result models.Coordinates
 
-// 	return result
-// }
+	result = models.Coordinates{
+		X: points.X,
+		Y: points.Y,
+		Widht: 5,
+		Height: (borderPoint.Y - points.Y),
+	}
+
+	return result
+}

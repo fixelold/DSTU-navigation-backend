@@ -12,6 +12,7 @@ import (
 	"navigation/internal/config"
 )
 
+// Интерфейс клиента
 type Client interface {
 	Begin(ctx context.Context) (pgx.Tx, error)
 	Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
@@ -19,6 +20,7 @@ type Client interface {
 	QueryRow(context.Context, string, ...interface{}) pgx.Row
 }
 
+// Создание нового клиента
 func NewClient(ctx context.Context, cfg config.AppConfig) Client {
 	dsn := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%s/%s",
@@ -28,6 +30,7 @@ func NewClient(ctx context.Context, cfg config.AppConfig) Client {
 		cfg.Storage.Port,
 		cfg.Storage.Database,
 	)
+	// Подключение к базе данных
 	conn, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
 		log.Fatalf("can't connect to database %s", err.Error())

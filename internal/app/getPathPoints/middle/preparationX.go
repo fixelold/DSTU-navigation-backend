@@ -1,8 +1,6 @@
 package middle
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
@@ -30,7 +28,6 @@ func (m *middleController) preparationUpX(borderPoint, points models.Coordinates
 
 func (m *middleController) preparationDownX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
-	fmt.Println("Work")
 	if borderPoint.X < points.X {
 		result = models.Coordinates{
 			X: points.X + points.Widht,
