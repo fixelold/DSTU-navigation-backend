@@ -26,7 +26,7 @@ import (
 // 	return path
 // }
 
-func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions bool) models.Coordinates {
+func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions, final bool) models.Coordinates {
 	var path models.Coordinates
 	var factor int
 	fmt.Println("work: ", borderPoint, points, axis)
@@ -36,15 +36,15 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 			if points.Height == -10  {factor = -1 // снизу
 			} else if points.Height == 10  {factor = 1} else {factor = 1} // сверху
 
-			if borderPoint.X > points.X {path = m.pointsRightX(borderPoint, points, m.endPoints,  factor)
-				} else if borderPoint.X < points.X {path = m.pointsLeftX(borderPoint, points, m.endPoints, factor)}
+			if borderPoint.X > points.X {path = m.pointsRightX(borderPoint, points, m.endPoints,  factor, axis, final)
+				} else if borderPoint.X < points.X {path = m.pointsLeftX(borderPoint, points, m.endPoints, factor, final)}
 
 		} else if axis == m.constData.axisY {
 			if points.Widht == -10  {factor = -1
 				} else if points.Widht == 10  {factor = 1}
 
-			if borderPoint.Y > points.Y {path = m.pointsDownY(borderPoint, points, m.endPoints, factor)
-				} else if borderPoint.Y < points.Y {path = m.pointsUpY(borderPoint, points, m.endPoints, factor)}
+			if borderPoint.Y > points.Y {path = m.pointsDownY(borderPoint, points, m.endPoints, factor, axis)
+				} else if borderPoint.Y < points.Y {path = m.pointsUpY(borderPoint, points, m.endPoints, factor, axis)}
 		}
 
 	} else {

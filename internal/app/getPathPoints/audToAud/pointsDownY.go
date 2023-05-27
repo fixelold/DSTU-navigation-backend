@@ -4,10 +4,11 @@ import (
 	"navigation/internal/models"
 )
 
-func (m *middleController) pointsDownY(borderPoint, points, endPoints models.Coordinates, factor int) models.Coordinates {
+func (m *middleController) pointsDownY(borderPoint, points, endPoints models.Coordinates, factor, axis int) models.Coordinates {
 	var result models.Coordinates
-	if endPoints.Height == 5 {result = m.pointsDownFinal(borderPoint, points, factor)
-	} else if endPoints.Widht == 5 {
+
+	if points.Height == 5 || points.Height == -5  {result = m.pointsDownFinal(borderPoint, points, factor, axis)
+	} else if points.Widht == -5 { // added -5 for 1-309 to 1-340
 		if endPoints.Height == 10 {result = m.endDownUpY(borderPoint, points, factor)	
 		} else if endPoints.Height == -10 {result = m.endDownDownY(borderPoint, points, factor)}
 	}
@@ -15,14 +16,21 @@ func (m *middleController) pointsDownY(borderPoint, points, endPoints models.Coo
 	return result
 }
 
-func (m *middleController) pointsDownFinal(borderPoint, points models.Coordinates, factor int) models.Coordinates {
+func (m *middleController) pointsDownFinal(borderPoint, points models.Coordinates, factor, axis int) models.Coordinates {
 	var result models.Coordinates
+	var heightFactor int
+	if borderPoint.Widht == 1 && axis == m.constData.axisX {
+		heightFactor = 1
+	} else {
+		heightFactor = 0
+	}
+
 	factor = 1
 	result = models.Coordinates{
 		X: points.X + points.Widht,
-		Y: points.Y + points.Height, // added points.Height for end 1-33а
+		Y: points.Y,
 		Widht: 5 * factor,
-		Height: (borderPoint.Y - (points.Y + points.Height)) + 10,  // added points.Height for end 1-33а
+		Height: (borderPoint.Y - points.Y) + (10 * heightFactor),
 	}
 
 	return result

@@ -13,14 +13,14 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	// var b = true
 	var exception = false
 	for i := 0; true; i++ {
-		if i == 5 {
-			break
-		}
+		// if i == 1  {
+		// 	break
+		// }
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			var points models.Coordinates
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.finalPreparation(axis, borderSector, m.Points[i], exception)
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, true)
 
 			m.Points = append(m.Points, points)
 			break
@@ -28,23 +28,41 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		// расчет точек пути
 		exception = true
 		var points models.Coordinates
-		if (m.Points[0].Height == 10 || m.Points[0].Height == -10) && (borderSector.Height == 10 || borderSector.Height == -10) {
-			points = m.finalPreparation(axis, borderSector, m.Points[i], exception)
+		if (m.Points[0].Height == 10 || m.Points[0].Height == -10) && (m.endPoints.Height == 10 || m.endPoints.Height == -10) {
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, false)
 		} else {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.finalPreparation(axis, borderSector, m.Points[i], exception)
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, false)
 		}
 
-		ok, err := repository.checkBorderAud2(points, m.thisSectorNumber)
+		ok1, err := repository.checkBorderAud(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		ok2, err := repository.checkBorderAud2(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		ok3, err := repository.checkBorderAud3(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		ok4, err := repository.checkBorderAud4(points, m.thisSectorNumber)
 		if err.Err != nil {
 			err.Wrap("building")
 			return err
 		}
 
 		// изменения оси построения, если точки входят в пределы аудитории
-		if !ok {
+		if !ok1 || !ok2 || !ok3 || !ok4 {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.finalPreparation(axis, borderSector, m.Points[i], exception)
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, false)
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 		}
 		m.Points = append(m.Points, points)
