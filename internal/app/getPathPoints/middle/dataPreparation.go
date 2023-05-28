@@ -1,12 +1,14 @@
 package middle
 
 import (
+	"fmt"
+
 	"navigation/internal/models"
 )
 
 func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	var path models.Coordinates
-
+	fmt.Println("Work preparation: ", borderPoint, points, axis, m.typeTransition)
 	if axis == m.constData.axisX {
 		if m.typeTransition == 2 {
 			if points.Widht == 5 {path = m.preparationDownX(borderPoint, points)
@@ -18,7 +20,8 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 	
 	}else if axis == m.constData.axisY {
 		if points.Widht == -10 {path = m.preparationRightY(borderPoint, points)
-			}else if points.Widht == 10 {path = m.preparationLeftY(borderPoint, points)}
+			}else if points.Widht == 10 {path = m.preparationLeftY(borderPoint, points)
+			} else if points.Widht == 5 && points.Height == 10 {path = m.preparationDownY(borderPoint, points)}
 	}
 
 	return path
@@ -27,7 +30,7 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions bool) (models.Coordinates, bool) {
 	var path models.Coordinates
 	var lenght = len(m.Points)
-
+	fmt.Println("Work: ", borderPoint, points, lenght, axis, exceptions, m.typeTransition)
 	if lenght == 1 {
 		if axis == m.constData.axisX {
 			if exceptions {path = m.leftAndRightX(borderPoint, points)
@@ -48,7 +51,8 @@ func (m *middleController) finalPreparation(axis int, borderPoint, points models
 
 			} else if points.Height > 0 {
 				if m.Points[0].Widht == 10 {path = m.upLeftX(borderPoint, points)
-					} else if m.Points[0].Widht == -10 {path = m.upRightX(borderPoint, points)}
+					} else if m.Points[0].Widht == -10 {path = m.upRightX(borderPoint, points)
+					}else if points.Widht == 5 && points.Height > 10 {path = m.preparationRightAndLeftX(borderPoint, points)}
 			}
 		} else if axis == m.constData.axisY {
 			if m.typeTransition == 2 {

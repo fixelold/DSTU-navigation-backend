@@ -1,17 +1,20 @@
 package middle
 
 import (
+	"fmt"
+
 	"navigation/internal/models"
 )
 
 func (m *middleController) leftDownY(borderPoint, points models.Coordinates) models.Coordinates {
+	fmt.Println("This work")
 	var result models.Coordinates
 	if borderPoint.Y < points.Y {
 		result = models.Coordinates{
-			X: points.X,
-            Y: points.Y,
+			X: points.X + points.Widht, // added for stairs 143 to 1-420
+            Y: points.Y + points.Height, // added for stairs 143 to 1-420
             Widht: 5,
-            Height: borderPoint.Y - points.Y,
+            Height: borderPoint.Y - (points.Y + points.Height), // added for stairs 143 to 1-420
 		}
 	} else if borderPoint.Y > points.Y {
 		result = models.Coordinates{

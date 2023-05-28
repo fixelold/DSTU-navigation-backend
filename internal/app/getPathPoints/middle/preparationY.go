@@ -1,6 +1,21 @@
 package middle
 
-import "navigation/internal/models"
+import (
+	"navigation/internal/models"
+)
+
+func (m *middleController) preparationDownY(borderPoint, points models.Coordinates) models.Coordinates {
+	var result models.Coordinates
+
+	result = models.Coordinates{
+		X: points.X,
+		Y: points.Y + points.Height,
+		Widht: 5,
+		Height: (borderPoint.Y - (points.Y + points.Height)) + 10,
+	}
+
+	return result
+}
 
 func (m *middleController) preparationLeftY(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates

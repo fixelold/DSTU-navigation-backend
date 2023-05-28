@@ -12,7 +12,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 	var b = true
 	for i := 0; true; i++ {
-		// if i == 3 {
+		// if i == 2 {
 		// 	break
 		// } 
 		// проверка вхождение координат пути в координаты границ сектора

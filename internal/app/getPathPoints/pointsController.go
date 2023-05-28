@@ -366,12 +366,10 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			if err.Err != nil {
 				return nil, err
 			}
-
 			err = p.middle(entry, exit)
 			if err.Err != nil {
 				return nil, err
 			}
-
 			err = p.sector2sector()
 			if err.Err != nil {
 				return nil, err
