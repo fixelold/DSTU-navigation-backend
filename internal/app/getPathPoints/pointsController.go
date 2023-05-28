@@ -17,29 +17,6 @@ import (
 var ()
 
 const (
-	AxisX = 1 // указывает на ось x.
-	AxisY = 2 // указывает на ось y.
-
-	WidhtX  = 10 // ширина на оси x.
-	HeightX = 5  // высота на оси x.
-
-	WidhtY  = 5  // ширина на оси y.
-	HeightY = 10 // высота на оси y.
-
-	plus  = 0 // значение будет положительным.
-	minus = 1 // значение будет отрицательным.
-)
-
-// эти константы будут использовать для рассчета данных. Они буду передаваться в switch.
-
-// const (
-// 	audStartPoints  	= 1 // для начального пути от границ аудитории.
-// 	auditory2Sector 	= 2
-// 	path2Sector     	= 3
-// 	sector2Sector   	= 4
-// )
-
-const (
 	secondSector = 1
 )
 
@@ -83,6 +60,21 @@ type pointsController interface {
 	// sector2sector() appError.AppError
 	transitionController() ([]models.Coordinates, appError.AppError)
 }
+
+const (
+	AxisX = 1 // указывает на ось x.
+	AxisY = 2 // указывает на ось y.
+
+	WidhtX  = 10 // ширина на оси x.
+	HeightX = 5  // высота на оси x.
+
+	WidhtY  = 5  // ширина на оси y.
+	HeightY = 10 // высота на оси y.
+
+	plus  = 0 // значение будет положительным.
+	minus = 1 // значение будет отрицательным.
+)
+
 
 func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates

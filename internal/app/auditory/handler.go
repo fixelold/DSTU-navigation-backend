@@ -70,64 +70,72 @@ func (h *handler) read(c *gin.Context) {
 	var auditory auditory
 	var err error
 
+	// Связывание данных, полученных от клиентской стороны, со структурой readRequest
 	if err := c.ShouldBindQuery(&r); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
 
+	// Получение аудитории по ее номеру
 	auditory, err = h.repository.Read(r.Number)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
+	// Возврат ответа на клиентскую сторону
 	c.JSON(http.StatusOK, auditory)
 }
 
+// Получение описания начальной и конечной аудитории.
 func (h *handler) getDescription(c *gin.Context) {
 	var auditorys audNumber
 	var response response
 	var err error
 
+	// Связывание данных, полученных от клиентской стороны, со структурой audNumber
 	if err := c.ShouldBindQuery(&auditorys); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
 
+	// Получение описание начальной аудитории
 	response.Start, err = h.repository.GetDescription(auditorys.Start)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
+	// Получение описание конечной адуитории
 	response.End, err = h.repository.GetDescription(auditorys.End)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
+	// Возврат ответа на клиентскую сторону
 	c.JSON(http.StatusOK, response)
 }
 
+
+// Обновление описания аудитории
 func (h *handler) update(c *gin.Context) {
 	var err error
 	var audDescript updateDescription
 
+	// Связывание данных, полученных от клиентской стороны, со структурой updateDescription
 	if err := c.ShouldBindJSON(&audDescript); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
 		return
 	}
 
-	if audDescript.JWTToken == "" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
-		return
-	}
-
+	// Обновление описания аудитории по ее id
 	err = h.repository.Update(audDescript.Description, audDescript.AuditoryID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
+	// Возврат ответа на клиентскую сторону
 	c.JSON(http.StatusOK, gin.H{"seccuess": true})
 }
