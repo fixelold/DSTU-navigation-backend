@@ -12,7 +12,7 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 	var b = true
 	for i := 0; true; i++ {
-		// if i == 2 {
+		// if i == 1 {
 		// 	break
 		// } 
 		// проверка вхождение координат пути в координаты границ сектора
@@ -44,15 +44,32 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		}
 
 
-		// TODO: просмотреть проверку ругался на 1-408.
-		ok, err := repository.checkBorderAud2(points, m.thisSectorNumber)
+		ok1, err := repository.checkBorderAud(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		ok2, err := repository.checkBorderAud2(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		ok3, err := repository.checkBorderAud3(points, m.thisSectorNumber)
+		if err.Err != nil {
+			err.Wrap("building")
+			return err
+		}
+
+		ok4, err := repository.checkBorderAud4(points, m.thisSectorNumber)
 		if err.Err != nil {
 			err.Wrap("building")
 			return err
 		}
 
 		// изменения оси построения, если точки входят в пределы аудитории
-		if !ok {
+		if  !ok1 || !ok2 || !ok3 || !ok4 {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 			points = m.preparation(axis, borderSector, m.Points[i])
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)

@@ -277,7 +277,6 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			return nil, err
 		}
 		p.data = *data
-		// entry, exit := p.sectors[0], p.sectors[1]
 
 		err = p.start(p.StartAuditory)
 		if err.Err != nil {
@@ -370,6 +369,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			if err.Err != nil {
 				return nil, err
 			}
+
 			err = p.sector2sector()
 			if err.Err != nil {
 				return nil, err

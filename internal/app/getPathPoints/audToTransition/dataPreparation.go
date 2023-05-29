@@ -1,12 +1,14 @@
 package audToTransition
 
 import (
+	"fmt"
+
 	"navigation/internal/models"
 )
 
 func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	var path models.Coordinates
-
+	fmt.Println("Work: ", borderPoint, points, axis)
 	if axis == m.constData.axisX {
 		if points.Widht == -5 {path = m.preparationDownX(borderPoint, points)
 		}else if points.Widht == 5 {path = m.preparationUpX(borderPoint, points)}
