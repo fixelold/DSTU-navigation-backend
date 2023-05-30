@@ -37,6 +37,7 @@ func NewColoring(start, end string, logging *logging.Logger, client postgresql.C
 const (
 	transitionNo = 1
 	transitionYes = 2
+	transitionToAud = 4
 )
 
 func (c *coloring) GetColoringPoints() appError.AppError {
@@ -67,6 +68,20 @@ func (c *coloring) GetColoringPoints() appError.AppError {
 			err.Wrap("getAuditoryPoints")
 			return err
 		}
+
+	case transitionToAud:
+		c.StartAuditoryPoints, err = c.getColoringTransitionPoints(c.EndAuditoryNumber)
+		if err.Err != nil {
+			err.Wrap("getAuditoryPoints")
+			return err
+		}
+		
+		c.EndAuditoryPoints, err = c.getColoringAudPoints(c.EndAuditoryNumber)
+		if err.Err != nil {
+			err.Wrap("getAuditoryPoints")
+			return err
+		}
+
 	}
 
 	return err

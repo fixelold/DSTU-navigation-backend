@@ -8,7 +8,7 @@ func (m *sectorToSectorController) leftDownY(borderPoint, points models.Coordina
 	var result models.Coordinates
 	if borderPoint.Y < points.Y {
 		result = models.Coordinates{
-			X: points.X,
+			X: points.X + points.Widht, // added for 1-353 to 1-116
             Y: points.Y,
             Widht: 5,
             Height: borderPoint.Y - points.Y,
