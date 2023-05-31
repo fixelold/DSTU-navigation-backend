@@ -1,0 +1,56 @@
+package audToTransition
+
+import (
+	"navigation/internal/models"
+)
+
+func (m *middleController) preparationLeftY(borderPoint, points models.Coordinates) models.Coordinates {
+	var result models.Coordinates
+	var heightFactor int
+
+	if borderPoint.Height == 1 {
+		heightFactor = 1
+	} else if borderPoint.Widht == 1 {
+		heightFactor = -1
+	}
+
+	if borderPoint.Y < points.Y {
+
+		result = models.Coordinates{
+			X: points.X + points.Widht,
+            Y: points.Y + points.Height,
+            Widht: 5,
+            Height: ((borderPoint.Y + borderPoint.Height) - (points.Y + points.Height)) + (10 * heightFactor),
+		}
+	} else if borderPoint.Y > points.Y {
+		result = models.Coordinates{
+			X: points.X + points.Widht,
+			Y: points.Y,
+			Widht: 5,
+			Height: borderPoint.Y - points.Y + 9,
+		}
+	}
+
+	return result
+}
+
+func (m *middleController) preparationRightY(borderPoint, points models.Coordinates) models.Coordinates {
+	var result models.Coordinates
+	if borderPoint.Y < points.Y {
+		result = models.Coordinates{
+			X: points.X + points.Widht,
+            Y: points.Y + points.Height,
+            Widht: -5,
+            Height: ((borderPoint.Y + borderPoint.Height) - (points.Y + points.Height)) + 10,
+		}
+	} else if borderPoint.Y > points.Y {
+		result = models.Coordinates{
+			X: points.X + points.Widht,
+			Y: points.Y,
+			Widht: -5,
+			Height: (borderPoint.Y - points.Y) + 10,
+		}
+	}
+
+	return result
+}

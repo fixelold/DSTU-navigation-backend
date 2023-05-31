@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	getPathPoints "navigation/internal/app/getPathPoints/coloringAuditorium"
 	"navigation/internal/appError"
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
@@ -25,6 +26,7 @@ const (
 	stair   = 2
 	elevator = 3
 	transitionToAud = 4
+	aud2Aud = 5
 
 	file                       = "handler.go"
 	getPointsFuntion           = "getPoints"
@@ -81,11 +83,20 @@ func (h *handler) getPoints(c *gin.Context) {
 			return
 		}
 	} else {
-		response, err = p.controller()
-		if err.Err != nil {
-			h.logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-			return
+		if len(data.Sectors) == 1 {
+			response, err = p.aud2Aud()
+			if err.Err != nil {
+				h.logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+				return
+			}
+		} else {
+			response, err = p.controller()
+			if err.Err != nil {
+				h.logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+				return
+			}
 		}
 	}
 
@@ -99,9 +110,15 @@ type request struct {
 	TransitionNumber int    `form:"transition_number"`
 }
 
+type response struct {
+	Start models.Coordinates `json:"start"`
+	End models.Coordinates `json:"end"`
+}
+
 func (h *handler) getAuddiencePoints(c *gin.Context) {
 	var request request
 	var err appError.AppError
+	var response response
 
 	err.Err = c.ShouldBindQuery(&request)
 	if err.Err != nil {
@@ -111,14 +128,16 @@ func (h *handler) getAuddiencePoints(c *gin.Context) {
 		return
 	}
 
-	// audPoints := NewColoring(request.Start, request.End, h.logger, h.client, request.Transition, request.TransitionNumber)
-	// err = audPoints.GetColoringPoints()
-	// if err.Err != nil {
-	// 	err.Wrap("getAuddiencePoints")
-	// 	h.logger.Error(err.Error())
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
-	// 	return
-	// }
+	audPoints := getPathPoints.NewColoring(request.Start, request.End, h.logger, h.client, request.Transition, request.TransitionNumber)
+	err = audPoints.GetColoringPoints()
+	if err.Err != nil {
+		err.Wrap("getAuddiencePoints")
+		h.logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		return
+	}
 
-	// c.JSON(http.StatusOK, audPoints)
+	response.Start = audPoints.StartAuditoryPoints
+	response.End = audPoints.EndAuditoryPoints
+	c.JSON(http.StatusOK, response)
 }

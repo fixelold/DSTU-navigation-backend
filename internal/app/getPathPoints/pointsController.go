@@ -3,6 +3,8 @@ package getPathPoints
 import (
 	"strconv"
 
+	"navigation/internal/app/getPathPoints/audToAud"
+	"navigation/internal/app/getPathPoints/audToTransition"
 	"navigation/internal/app/getPathPoints/middle"
 	sectorToSector "navigation/internal/app/getPathPoints/sector2sector"
 	"navigation/internal/app/getPathPoints/start"
@@ -13,29 +15,6 @@ import (
 )
 
 var ()
-
-const (
-	AxisX = 1 // указывает на ось x.
-	AxisY = 2 // указывает на ось y.
-
-	WidhtX  = 13 // ширина на оси x.
-	HeightX = 5  // высота на оси x.
-
-	WidhtY  = 5  // ширина на оси y.
-	HeightY = 13 // высота на оси y.
-
-	plus  = 0 // значение будет положительным.
-	minus = 1 // значение будет отрицательным.
-)
-
-// эти константы будут использовать для рассчета данных. Они буду передаваться в switch.
-
-// const (
-// 	audStartPoints  	= 1 // для начального пути от границ аудитории.
-// 	auditory2Sector 	= 2
-// 	path2Sector     	= 3
-// 	sector2Sector   	= 4
-// )
 
 const (
 	secondSector = 1
@@ -75,11 +54,27 @@ func NewPointsController(
 
 type pointsController interface {
 	controller() ([]models.Coordinates, appError.AppError)
+	aud2Aud() ([]models.Coordinates, appError.AppError)
 	// start(audNumber string, typeTransition int) appError.AppError
 	// middle(entry, exit int) appError.AppError
 	// sector2sector() appError.AppError
 	transitionController() ([]models.Coordinates, appError.AppError)
 }
+
+const (
+	AxisX = 1 // указывает на ось x.
+	AxisY = 2 // указывает на ось y.
+
+	WidhtX  = 10 // ширина на оси x.
+	HeightX = 5  // высота на оси x.
+
+	WidhtY  = 5  // ширина на оси y.
+	HeightY = 10 // высота на оси y.
+
+	plus  = 0 // значение будет положительным.
+	minus = 1 // значение будет отрицательным.
+)
+
 
 func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
@@ -90,7 +85,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	*/
 
 	entry, exit := min(p.sectors[0], p.sectors[1])
-	data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
+	data, err := newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return nil, err
@@ -115,7 +110,7 @@ func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	entry, exit = min(p.sectors[len(p.sectors)-1], p.sectors[len(p.sectors)-2])
 
 	// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
-	newData, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
+	newData, err := newData(p.EndAuditory, "", entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
 	if err.Err != nil {
 		err.Wrap("getPathPoints")
 		return nil, err
@@ -164,12 +159,18 @@ func (p *controller) start(audNumber string) appError.AppError {
 }
 
 func (p *controller) middle(entry, exit int) appError.AppError {
+	var borderSector models.Coordinates
+	var err appError.AppError
 	repository := NewRepository(p.client, p.logger)
 	middle := middle.NewMiddleController(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	borderSector, err := repository.getSectorBorderPoint(entry, exit)
-	if err.Err != nil {
-		err.Wrap("middle")
-		return err
+	if p.transition == aud2Aud {
+		borderSector = p.data.sectorBorderPoints
+	} else {
+		borderSector, err = repository.getSectorBorderPoint(entry, exit)
+		if err.Err != nil {
+			err.Wrap("middle")
+			return err
+		}
 	}
 	middle.Points = append(middle.Points, p.points...)
 	data, err := middle.MiddlePoints(borderSector)
@@ -182,15 +183,17 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 	return appError.AppError{}
 }
 
-func (p *controller) middleToTransition(entry, exit int) appError.AppError {
-	// entry, exit = exit, entry
+func (p *controller) middleToTransition(entry int) appError.AppError {
+	var borderSector models.Coordinates
 	repository := NewRepository(p.client, p.logger)
-	middle := middle.NewMiddleController(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
-	borderSector, err := repository.getTransitionSectorBorderPoint(exit)
+	var err appError.AppError
+	middle := audToTransition.NewAudToTransition(p.transition, p.sectors[0], p.data.sectorNumber, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	borderSector, err = repository.getTransitionSectorBorderPoint(entry)
 	if err.Err != nil {
 		err.Wrap("middle to transition")
 		return err
 	}
+
 	middle.Points = append(middle.Points, p.points...)
 	
 	data, err := middle.MiddlePoints(borderSector)
@@ -224,7 +227,6 @@ func (p *controller) sector2sector() appError.AppError {
 			err.Wrap("getPathPoints")
 			return err
 		}
-
 		// p.points = append(p.points, data...)
 		// fmt.Println("data - ",  data[len(data) - 1])
 		// sector2sector.Points = append(sector2sector.Points, data[len(data) - 1])
@@ -247,7 +249,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 	}
 	if p.transition == stair || len(strconv.Itoa(exit)) == 4 {
 		entry, exit := p.sectors[0], p.sectors[1]
-		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)
+		data, err := newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return nil, err
@@ -260,7 +262,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			return nil, err
 		}
 
-		err = p.middleToTransition(entry, exit)
+		err = p.middleToTransition(exit)
 		if err.Err != nil {
 			return nil, err
 		}
@@ -269,13 +271,12 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 
 	} else if p.transition == elevator {
 		entry, exit := min(p.sectors[0], p.sectors[1])
-		data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, elevator, p.transitionNumber)
+		data, err := newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, elevator, p.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPathPoints")
 			return nil, err
 		}
 		p.data = *data
-		// entry, exit := p.sectors[0], p.sectors[1]
 
 		err = p.start(p.StartAuditory)
 		if err.Err != nil {
@@ -283,7 +284,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 		}
 
 		if len(strconv.Itoa(exit)) == 4 {
-			err = p.middleToTransition(entry, exit)
+			err = p.middleToTransition(entry)
 			if err.Err != nil {
 				return nil, err
 			}
@@ -297,7 +298,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			entry, exit = min(p.sectors[0], p.sectors[1])
 			//p.transition = stair возможно, надо будет это раскоментить или что-то сделать!!!
 			p.transitionNumber = p.sectors[len(p.sectors) - 1]
-			data, err = newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, transitionToAud, p.transitionNumber)
+			data, err = newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, transitionToAud, p.transitionNumber)
 			if err.Err != nil {
 				err.Wrap("getPathPoints")
 				return nil, err
@@ -329,7 +330,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			
 			p.transition = stair
 			entry := p.sectors[0]
-			data, err := newData(p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
+			data, err := newData(p.EndAuditory, "", entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
 			if err.Err != nil {
 				err.Wrap("getPathPoints")
 				return nil, err
@@ -342,7 +343,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 				return nil, err
 			}
 
-			err = p.middleToTransition(p.transitionNumber, p.transitionNumber)
+			err = p.middleToTransition(p.transitionNumber)
 			if err.Err != nil {
 				return nil, err
 			}
@@ -353,7 +354,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			// это сделано т.к с фронта возвращается не (143, 142, 141), а (1043, 143, 142, 141)
 			entry, exit := min(p.sectors[0], p.sectors[1])
 			//p.transition = stair возможно, надо будет это раскоментить или что-то сделать!!!
-			data, err := newData(p.StartAuditory, entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
+			data, err := newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, p.transition, p.transitionNumber)
 			if err.Err != nil {
 				err.Wrap("getPathPoints")
 				return nil, err
@@ -364,7 +365,6 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			if err.Err != nil {
 				return nil, err
 			}
-
 			err = p.middle(entry, exit)
 			if err.Err != nil {
 				return nil, err
@@ -379,7 +379,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 
 			// получаем новый объекта типа 'data'. С данными этого типа будет происходить вся работа.
 			p.transition = noTransition
-			newData, err := newData(p.EndAuditory, entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
+			newData, err := newData(p.EndAuditory, "", entry, exit, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
 			if err.Err != nil {
 				err.Wrap("getPathPoints")
 				return nil, err
@@ -388,6 +388,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 			p.data = *newData
 			response = append(response, p.points...)
 			p.points = []models.Coordinates{}
+
 			err = p.start(p.EndAuditory)
 			if err.Err != nil {
 				return nil, err
@@ -405,6 +406,66 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 	return response, appError.AppError{}
 }
 
+func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
+	var response []models.Coordinates
+	p.transition = aud2Aud
+	entry := p.sectors[0]
+
+	data, err := newData( p.EndAuditory, p.StartAuditory, entry, entry, p.sectors[len(p.sectors)-1], p.logger, p.client, p.transition, p.transitionNumber)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
+
+	p.data = *data
+
+	err = p.start(p.EndAuditory)
+	if err.Err != nil {
+		return nil, err
+	}
+
+	newdata, err := newData(p.StartAuditory, p.EndAuditory, entry, entry, p.sectors[0], p.logger, p.client, p.transition, p.transitionNumber)
+	if err.Err != nil {
+		err.Wrap("getPathPoints")
+		return nil, err
+	}
+	p.data = *newdata
+	endPoints := p.points[0]
+	p.points = []models.Coordinates{}
+
+	err = p.start(p.StartAuditory)
+	if err.Err != nil {
+		return nil, err
+	}
+
+	err = p.middleAudToAud(endPoints)
+	if err.Err != nil {
+		return nil, err
+	}
+
+	response = append(response, p.points...)
+
+
+	return response, appError.AppError{}
+}
+
+func (p *controller) middleAudToAud(endPints models.Coordinates) appError.AppError {
+	var borderSector models.Coordinates
+	// repository := NewRepository(p.client, p.logger)
+	var err appError.AppError
+	middle := audToAud.NewAudToAud(p.transition, p.sectors[0], p.data.sectorNumber, endPints, p.client, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY, p.logger)
+	borderSector = p.data.sectorBorderPoints
+	middle.Points = append(middle.Points, p.points...)
+	
+	data, err := middle.MiddlePoints(borderSector)
+	if err.Err != nil {
+		err.Wrap("middle to transition")
+	}
+
+	p.points = append(p.points, data...)
+
+	return appError.AppError{}
+}
 func min(a, b int) (int, int) {
 	if a < b {
 		return a, b

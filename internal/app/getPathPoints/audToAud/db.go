@@ -1,4 +1,4 @@
-package middle
+package audToAud
 
 import (
 	"context"
@@ -250,6 +250,7 @@ func (r *repository) checkBorderAud4(coordinates models.Coordinates, sectorNumbe
 	// Возможно тут надо это добавить в else.
 	return true, appError.AppError{}
 }
+
 func (r *repository) checkBorderAudY(coordinates models.Coordinates, sectorNumber int) (bool, appError.AppError) {
 	//TODO: тут бы немного подправить. 
 	//TODO: Т.к неособо уверен, что $1 и $2 правильно расчитываются. 

@@ -1,4 +1,4 @@
-package middle
+package audToTransition
 
 import (
 	axes "navigation/internal/app/getPathPoints/axis"
@@ -12,13 +12,12 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
 	var b = true
 	for i := 0; true; i++ {
-		// if i == 1 {
+		// if i == 2 {
 		// 	break
 		// } 
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			var points models.Coordinates
-			
 			if (axis == m.constData.axisX && m.Points[i].Widht == 5) || (axis == m.constData.axisY && m.Points[i].Height == 5)  {
 				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 				b = true
@@ -32,10 +31,9 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 			m.Points = append(m.Points, points)
 			if b {break}
 		} 
-		var points models.Coordinates
-
 		// расчет точек пути
-		if m.typeTransition == 2 && i == 0 && m.Points[i].Height == 5 && borderSector.Height == 1 {
+		var points models.Coordinates
+		if i == 0 && borderSector.Height == 1 && (m.Points[i].Widht == -10 || m.Points[i].Widht == 10) {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 			points = m.preparation(axis, borderSector, m.Points[i])
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
@@ -44,35 +42,19 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		}
 
 
-		ok1, err := repository.checkBorderAud(points, m.thisSectorNumber)
-		if err.Err != nil {
-			err.Wrap("building")
-			return err
-		}
 
-		ok2, err := repository.checkBorderAud2(points, m.thisSectorNumber)
-		if err.Err != nil {
-			err.Wrap("building")
-			return err
-		}
-
-		ok3, err := repository.checkBorderAud3(points, m.thisSectorNumber)
-		if err.Err != nil {
-			err.Wrap("building")
-			return err
-		}
-
-		ok4, err := repository.checkBorderAud4(points, m.thisSectorNumber)
+		// TODO: просмотреть проверку ругался на 1-408.
+		ok, err := repository.checkBorderAud2(points, m.thisSectorNumber)
 		if err.Err != nil {
 			err.Wrap("building")
 			return err
 		}
 
 		// изменения оси построения, если точки входят в пределы аудитории
-		if  !ok1 || !ok2 || !ok3 || !ok4 {
-			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.preparation(axis, borderSector, m.Points[i])
-			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+		if !ok {
+			// axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			// points = m.preparation(axis, borderSector, m.Points[i])
+			// axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 		}
 		m.Points = append(m.Points, points)
 	}

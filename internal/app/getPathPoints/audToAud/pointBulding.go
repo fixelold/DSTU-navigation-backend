@@ -1,4 +1,4 @@
-package middle
+package audToAud
 
 import (
 	axes "navigation/internal/app/getPathPoints/axis"
@@ -10,39 +10,30 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 	repository := NewRepository(m.client, m.logger) // для обращение к базе данных
 	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, m.constData.axisX, m.constData.axisY)
-	var b = true
+	// var b = true
+	var exception = false
 	for i := 0; true; i++ {
-		// if i == 1 {
+		// if i == 1  {
 		// 	break
-		// } 
+		// }
 		// проверка вхождение координат пути в координаты границ сектора
 		if m.checkOccurrence(m.Points[i], axis, borderSector) {
 			var points models.Coordinates
-			
-			if (axis == m.constData.axisX && m.Points[i].Widht == 5) || (axis == m.constData.axisY && m.Points[i].Height == 5)  {
-				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-				b = true
-				points, b = m.finalPreparation(axis, borderSector, m.Points[i], b)
-			} else {
-				axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-				b = false
-				points, b = m.finalPreparation(axis, borderSector, m.Points[i], b)
-			}
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, true)
 
 			m.Points = append(m.Points, points)
-			if b {break}
-		} 
-		var points models.Coordinates
-
-		// расчет точек пути
-		if m.typeTransition == 2 && i == 0 && m.Points[i].Height == 5 && borderSector.Height == 1 {
-			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.preparation(axis, borderSector, m.Points[i])
-			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-		} else {
-			points = m.preparation(axis, borderSector, m.Points[i])
+			break
 		}
-
+		// расчет точек пути
+		exception = true
+		var points models.Coordinates
+		if (m.Points[0].Height == 10 || m.Points[0].Height == -10) && (m.endPoints.Height == 10 || m.endPoints.Height == -10) {
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, false)
+		} else {
+			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, false)
+		}
 
 		ok1, err := repository.checkBorderAud(points, m.thisSectorNumber)
 		if err.Err != nil {
@@ -69,9 +60,9 @@ func (m *middleController) building(borderSector models.Coordinates) appError.Ap
 		}
 
 		// изменения оси построения, если точки входят в пределы аудитории
-		if  !ok1 || !ok2 || !ok3 || !ok4 {
+		if !ok1 || !ok2 || !ok3 || !ok4 {
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
-			points = m.preparation(axis, borderSector, m.Points[i])
+			points = m.finalPreparation(axis, borderSector, m.Points[i], exception, false)
 			axis = axes.ChangeAxis(axis, m.constData.axisX, m.constData.axisY)
 		}
 		m.Points = append(m.Points, points)
@@ -118,7 +109,7 @@ func (m *middleController) pathAlignment(sectorBorderPoint models.Coordinates, a
 			m.Points[lenght-1].Y = m.Points[lenght-1].Y + 10 // TODO: тоже самое
 		} else {
 			// надо для того, чтобы еще аудитория находится прямо возле лестници, чтобы не было не красиво
-			// len(m.Points) > 1 
+			// len(m.Points) > 1
 			if len(m.Points) >= 1 {
 				var result int
 				if sectorBorderPoint.X > m.Points[lenght-1].X {
