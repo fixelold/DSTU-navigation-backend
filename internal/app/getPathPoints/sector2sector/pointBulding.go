@@ -7,7 +7,6 @@ import (
 )
  
 func (s *sectorToSectorController) building(iterator int, borderSector models.Coordinates) appError.AppError {
-	// repository := NewRepository(s.client, s.logger) // для обращение к базе данных
 	// ось для перехода в другой сектор
 	axis := axes.DefenitionAxis(borderSector.Widht, borderSector.Height, s.constData.axisX, s.constData.axisY)
 	var b = false
@@ -22,17 +21,6 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 			axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
 			points = s.finalPreparation(axis, borderSector, s.Points[lenght - 1], b)
 
-			// if (axis == s.constData.axisX && s.Points[iterator].Widht == 5) || (axis == s.constData.axisY && s.Points[iterator].Height == 5)  {
-			// 	fmt.Println("Work")
-			// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
-			// 	b = true
-			// 	points = s.finalPreparation(axis, borderSector, s.Points[iterator])
-			// } else {
-			// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
-			// 	b = false
-			// 	points = s.finalPreparation(axis, borderSector, s.Points[iterator])
-			// }
-
 			s.Points = append(s.Points, points)
 			break
 		} 
@@ -40,22 +28,7 @@ func (s *sectorToSectorController) building(iterator int, borderSector models.Co
 		points := s.preparation(axis, borderSector, s.Points[lenght - 1])
 		b = true
 
-		// // TODO: просмотреть проверку ругался на 1-408.
-		// ok, err := repository.checkBorderAud2(points, s.thisSectorNumber)
-		// if err.Err != nil {
-		// 	err.Wrap("building")
-		// 	return err
-		// }
-
-		// изменения оси построения, если точки входят в пределы аудитории
-		// if !ok {
-		// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
-		// 	points = s.preparation(axis, borderSector, s.Points[iterator])
-		// 	axis = axes.ChangeAxis(axis, s.constData.axisX, s.constData.axisY)
-		// }
-		// fmt.Println("old: ", s.Points)
 		s.Points = append(s.Points, points)
-		// fmt.Println("new: ", s.Points)
 	}
 
 	return appError.AppError{}
@@ -113,28 +86,11 @@ func (s *sectorToSectorController) pathAlignment(sectorBorderPoint models.Coordi
 			s.Points[lenght-1].Widht = points.Widht
 		}
 	case s.constData.axisY:
-		// если расскоментировать, то надо смотреть на путь от лифта сектора 5 до ауд 1-333а
-		// points := models.Coordinates{
-		// 	X: (path.X),
-		// 	Y: (path.Y)}
 		sectorPoints := (sectorBorderPoint.Y + (sectorBorderPoint.Height + sectorBorderPoint.Y)) / 2
-		// if sectorPoints > path.Y {
-		// 	points.Widht = s.constData.widhtY
-		// 	points.Height = sectorPoints - path.Y
-		// 	s.Points[lenght-1].Height = points.Height
-		// } else if sectorPoints < path.Y {
-		// 	points.Widht = s.constData.widhtY
-		// 	points.Height = sectorPoints - path.Y
-		// 	s.Points[lenght-1].Height = points.Height
-		// }
+	
 
 		s.Points[lenght-1].Widht = s.constData.widhtY
 		s.Points[lenght-1].Height = sectorPoints - s.Points[lenght-1].Y
-
-		// if sectorBorderPoint.Y > points.Y {
-		// 	points.Widht = s.constData.widhtY
-		// 	points.Height = 
-		// }
 	default:
 		s.logger.Errorln("Path Alignment default")
 	}
