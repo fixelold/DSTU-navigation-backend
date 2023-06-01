@@ -1,6 +1,7 @@
 package pathBuilder
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -61,12 +62,13 @@ func (h *handler) getSectors(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode query"})
 		return
 	}
-
+ 
 	start, end, err := h.GetSector(request.Start, request.End, request.TypeTranstionSector)
 	if err.Err != nil {
 		err.Wrap("handler getSectors")
 		h.logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+		fmt.Println("Work sectors: ", start, end)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.ToString()})
 		return
 	}
 

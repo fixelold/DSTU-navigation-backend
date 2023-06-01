@@ -2,7 +2,6 @@ package pathBuilder
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 
@@ -25,7 +24,9 @@ func (h *handler) GetSector(start, end string, typeTransition int) (int, int, ap
 
 		startAud, errConv := strconv.Atoi(start)
 		if errConv != nil {
-			log.Fatalln("тута тебе надо переделать. Это в GetSector")
+			err.Wrap("file GetSector")
+			err.Err = errConv
+			return 0, 0, err
 		}
 		
 		sectorStart, err := h.repository.GetTransitionSector2(startAud, typeTransition)
