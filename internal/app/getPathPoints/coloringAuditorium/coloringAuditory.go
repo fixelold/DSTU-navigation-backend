@@ -43,6 +43,10 @@ const (
 func (c *coloring) GetColoringPoints() appError.AppError {
 	var err appError.AppError
 
+	if c.transition == 3 {
+		c.transition = transitionYes
+	}
+
 	switch c.transition {
 	case transitionYes:
 		c.StartAuditoryPoints, err = c.getColoringAudPoints(c.StartAuditoryNumber)
@@ -81,7 +85,6 @@ func (c *coloring) GetColoringPoints() appError.AppError {
 			err.Wrap("getAuditoryPoints")
 			return err
 		}
-
 	}
 
 	return err

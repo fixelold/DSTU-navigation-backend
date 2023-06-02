@@ -104,7 +104,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			err.Wrap("getPoints")
 			return err
 		}
-
+ 
 	} else if d.transition == elevator {
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {

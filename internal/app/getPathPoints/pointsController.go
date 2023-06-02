@@ -247,6 +247,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 	} else {
 		_, exit = min(p.sectors[0], p.sectors[1])
 	}
+
 	if p.transition == stair || len(strconv.Itoa(exit)) == 4 {
 		entry, exit := p.sectors[0], p.sectors[1]
 		data, err := newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)

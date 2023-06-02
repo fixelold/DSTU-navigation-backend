@@ -1,13 +1,11 @@
 package middle
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
 func (m *middleController) leftDownY(borderPoint, points models.Coordinates) models.Coordinates {
-	fmt.Println("This work")
+	// fmt.Println("This work")
 	var result models.Coordinates
 	if borderPoint.Y < points.Y {
 		result = models.Coordinates{
