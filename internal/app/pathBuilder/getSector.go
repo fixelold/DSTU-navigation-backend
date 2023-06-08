@@ -12,6 +12,7 @@ var (
 	splitError = appError.NewAppError("can't split text")
 )
 
+// расчет секторов
 func (h *handler) GetSector(start, end string, typeTransition int) (int, int, appError.AppError) {
 	var err appError.AppError
 

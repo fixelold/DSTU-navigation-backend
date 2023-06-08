@@ -50,6 +50,7 @@ type response struct {
 	Sectors []int `json:"sectors"`
 }
 
+// получение секторов, через которые надо пройти пользователю
 func (h *handler) getSectors(c *gin.Context) {
 	var err appError.AppError
 	var request request

@@ -4,6 +4,7 @@ import (
 	"navigation/internal/models"
 )
 
+// для расчета пути, если конечная аудитория находится слева, и путь прокладывается вниз
 func (m *middleController) downLeftX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	if borderPoint.X < points.X {
@@ -25,6 +26,7 @@ func (m *middleController) downLeftX(borderPoint, points models.Coordinates) mod
 	return result
 }
 
+// для расчета пути, если конечная аудитория находится справа, и путь прокладывается вниз
 func (m *middleController) downRightX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	if borderPoint.X < points.X {
@@ -46,6 +48,7 @@ func (m *middleController) downRightX(borderPoint, points models.Coordinates) mo
 	return result
 }
 
+// для расчета пути, если конечная аудитория находится слева, и путь прокладывается вверх
 func (m *middleController) upLeftX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	if borderPoint.X < points.X {
@@ -67,6 +70,7 @@ func (m *middleController) upLeftX(borderPoint, points models.Coordinates) model
 	return result
 }
 
+// для расчета пути, если конечная аудитория находится справа, и путь прокладывается вверх
 func (m *middleController) upRightX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	if borderPoint.X < points.X {

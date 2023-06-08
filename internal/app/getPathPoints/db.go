@@ -207,6 +207,7 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appEr
 	return true, appError.AppError{}
 }
 
+// проверка на вхождение в границы сектора
 func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, appError.AppError) {
 
 	request :=
@@ -251,6 +252,7 @@ func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, ap
 	return true, appError.AppError{}
 }
 
+// получение точеки границы переходного сектора
 func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
 	// request :=
@@ -303,6 +305,7 @@ func (r *repository) getTransitionSectorBorderPoint(start int) (models.Coordinat
 	return borderPoint, appError.AppError{}
 }
 
+// получение точки переходного сеткора
 func (r *repository) getTransitionPoints(number int) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
 	var dbErr appError.AppError

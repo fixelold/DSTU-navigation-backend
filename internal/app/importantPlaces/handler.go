@@ -52,6 +52,7 @@ func (h *handler) Register(router *gin.RouterGroup) {
 	}
 }
 
+// Создание важного места
 func (h *handler) Create(c *gin.Context) {
 	var err appError.AppError
 	var places models.ImportantPlaces
@@ -82,6 +83,7 @@ func (h *handler) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Получение сущности важного места
 func (h *handler) Read(c *gin.Context) {
 	var r request
 	var err appError.AppError
@@ -102,6 +104,7 @@ func (h *handler) Read(c *gin.Context) {
 	c.JSON(http.StatusOK, places)
 }
 
+// Обновление важного места
 func (h *handler) Update(c *gin.Context) {
 	var r request // тут будет хранится id записи, которую надо обновить
 	var err appError.AppError
@@ -152,6 +155,7 @@ func (h *handler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, newPlace)
 }
 
+// Удаление важного места
 func (h *handler) Delete(c *gin.Context) {
 	var r request // тут будет хранится id записи, которую надо обновить
 	var err appError.AppError
@@ -163,12 +167,14 @@ func (h *handler) Delete(c *gin.Context) {
 		return
 	}
 
+	// проверка на сущетсвование записи
 	_, err.Err = h.repository.Read(r.ID)
 	if err.Err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
 		return
 	}
 
+	// удаление записи
 	err.Err = h.repository.Delete(r.ID)
 	if err.Err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
@@ -182,6 +188,7 @@ type listRequest struct {
 	NumberBiuld int `form:"number_build" binding:"required"`
 }
 
+// Получение массива важного места
 func (h *handler) List(c *gin.Context) {
 	var r listRequest
 	var places []models.ImportantPlaces
@@ -195,6 +202,7 @@ func (h *handler) List(c *gin.Context) {
 	// }
 
 	r.NumberBiuld = 1
+	// полечение все записи
 	places, err.Err = h.repository.List(r.NumberBiuld)
 	if err.Err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})

@@ -4,6 +4,7 @@ import (
 	"navigation/internal/models"
 )
 
+// расчетт пути елси конечная аудитория находится сверху
 func (m *middleController) upX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	if borderPoint.X < points.X {
@@ -25,6 +26,7 @@ func (m *middleController) upX(borderPoint, points models.Coordinates) models.Co
 	return result
 }
 
+// расчетт пути елси конечная аудитория находится снизу
 func (m *middleController) downX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	if borderPoint.X < points.X {
@@ -46,6 +48,7 @@ func (m *middleController) downX(borderPoint, points models.Coordinates) models.
 	return result
 }
 
+// расчетт пути елси конечная аудитория находится слева или справа
 func (m *middleController) leftAndRightX(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	var lenght = len(m.Points)

@@ -4,7 +4,6 @@ import (
 	"navigation/internal/appError"
 )
 
-// you must provide a start sector and an end sector
 func (h *handler) Builder(start, end, transitionSector int, TypeTranstionSector int) ([]int, appError.AppError) {
 	var err appError.AppError
 	matrix, err := h.adjacencyMatrix()
@@ -21,6 +20,7 @@ func (h *handler) Builder(start, end, transitionSector int, TypeTranstionSector 
 	return q, err
 }
 
+// метод поиска в ширину
 func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int, TypeTranstionSector int) ([]int, []int) {
 	var queue []int
 	var q []int
@@ -76,6 +76,7 @@ func (h *handler) bfs(start, end, transitionSector int, matrix map[int][]int, Ty
 	return result, q
 }
 
+// получение матрицы смежности
 func (h *handler) adjacencyMatrix() (map[int][]int, appError.AppError) {
 	matrix := make(map[int][]int)
 	sectorLink, err := h.repository.GetSectorLink()
@@ -93,6 +94,7 @@ func (h *handler) adjacencyMatrix() (map[int][]int, appError.AppError) {
 	return matrix, err
 }
 
+// получение пути
 func (h *handler) getPath(end int, sectors map[int]int) []int {
 	b := true
 	var res []int
@@ -109,6 +111,7 @@ func (h *handler) getPath(end int, sectors map[int]int) []int {
 	return res
 }
 
+// разворачивание массива итоговых секторов
 func reverse(array []int) []int {
 	var res []int
 	for i := len(array) - 1; i >= 0; i-- {

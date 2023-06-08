@@ -4,6 +4,7 @@ import (
 	"navigation/internal/models"
 )
 
+// для расчета пути, если он не входит в границы следующего сектора
 func (s *sectorToSectorController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	var path models.Coordinates
 
@@ -19,6 +20,7 @@ func (s *sectorToSectorController) preparation(axis int, borderPoint, points mod
 	return path
 }
 
+// для расчета пути, если он входит в границы следующего сектора
 func (s *sectorToSectorController) finalPreparation(axis int, borderPoint, points models.Coordinates, exeption bool) models.Coordinates {
 	var path models.Coordinates
 	if exeption {
@@ -32,7 +34,6 @@ func (s *sectorToSectorController) finalPreparation(axis int, borderPoint, point
 					} else if points.Widht == -5 {path = s.upRightX(borderPoint, points)}	
 			}
 		} else if axis == s.constData.axisY {
-			// fmt.Println("aboba: ", borderPoint, points)
 			if points.Widht < 0 {
 				if points.Height == 5 {path = s.leftDownY(borderPoint, points)
 				} else if points.Height == -5 {path = s.leftUpY(borderPoint, points)}

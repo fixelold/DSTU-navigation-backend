@@ -61,6 +61,7 @@ type requestData struct {
 	TransitionNumber int `json:"transition_number"`
 }
 
+// Хендлер для получения точек пути
 func (h *handler) getPoints(c *gin.Context) {
 	var err appError.AppError
 	var data requestData
@@ -115,6 +116,7 @@ type response struct {
 	End models.Coordinates `json:"end"`
 }
 
+// Хендлер для получения точек аудитории
 func (h *handler) getAuddiencePoints(c *gin.Context) {
 	var request request
 	var err appError.AppError

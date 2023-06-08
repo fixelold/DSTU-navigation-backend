@@ -44,6 +44,7 @@ func NewRepository(
 	}
 }
 
+// Создание важного места
 func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlaces, appError.AppError) {
 	var newImportantPlaces models.ImportantPlaces
 	req := `INSERT INTO important_places (name, id_auditorium, auditory_number) 
@@ -84,6 +85,7 @@ func (r *repository) Create(places models.ImportantPlaces) (models.ImportantPlac
 	return newImportantPlaces, appError.AppError{}
 }
 
+// Получение важного места
 func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 	var importantPlaces models.ImportantPlaces
 	request :=
@@ -125,6 +127,7 @@ func (r *repository) Read(id int) (models.ImportantPlaces, error) {
 	return importantPlaces, nil
 }
 
+// Обновление важного места
 func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.ImportantPlaces) (models.ImportantPlaces, error) {
 	request := `
 		UPDATE important_places
@@ -167,6 +170,7 @@ func (r *repository) Update(oldPlaces models.ImportantPlaces, newPlaces models.I
 	return newPlaces, nil
 }
 
+// Удаление важного места
 func (r *repository) Delete(id int) error {
 	request := `
 	DELETE FROM important_places
@@ -201,6 +205,7 @@ func (r *repository) Delete(id int) error {
 	return nil
 }
 
+// Получения массива важного места
 func (r *repository) List(numberBuild int) ([]models.ImportantPlaces, error) {
 	var places []models.ImportantPlaces
 	req := `SELECT * FROM important_places;`

@@ -1,5 +1,6 @@
 package axes
 
+// определения оси расчета
 func DefenitionAxis(width, height, AxisX, AxisY int) int {
 	if width == 1 {
 		return AxisY
@@ -10,6 +11,7 @@ func DefenitionAxis(width, height, AxisX, AxisY int) int {
 	}
 }
 
+// изменения оси расчета
 func ChangeAxis(axis, AxisX, AxisY int) int {
 	if axis == AxisX {
 		axis = AxisY

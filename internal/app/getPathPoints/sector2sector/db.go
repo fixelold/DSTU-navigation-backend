@@ -74,6 +74,7 @@ func (r *repository) checkBorderAud(coordinates models.Coordinates) (bool, appEr
 	return true, appError.AppError{}
 }
 
+// проверка, чтобы точки пути не находились в границах сектора.
 func (r *repository) checkBorderSector(coordinates models.Coordinates) (bool, appError.AppError) {
 
 	request :=

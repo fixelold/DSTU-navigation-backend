@@ -73,7 +73,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 	var err appError.AppError
 	repository := NewRepository(d.client, d.logger)
 	// получаем координаты аудитории по ее номеру.
-	if d.transition == stair {
+	if d.transition == stair { // Если лестнциа
 		d.audBorderPoints, err = repository.getAudBorderPoint(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
@@ -86,7 +86,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
-	} else if d.transition == noTransition {
+	} else if d.transition == noTransition { // Если перехода между этажами нет
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
@@ -105,7 +105,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
  
-	} else if d.transition == elevator {
+	} else if d.transition == elevator { // Если лифт
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
@@ -132,7 +132,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			}
 		}
 		
-	} else if d.transition == transitionToAud {
+	} else if d.transition == transitionToAud { // Если от перехоного сектора до конечной аудитории
 		d.audPoints, err = repository.getTransitionPoints(d.transitionNumber)
 		if err.Err != nil {
 			err.Wrap("getPoints")
@@ -151,7 +151,7 @@ func (d *data) getPoints(entry, exit int) appError.AppError {
 			return err
 		}
 
-	} else if d.transition == aud2Aud {
+	} else if d.transition == aud2Aud { // Если аудитории находятся в одном секторе
 
 		d.audPoints, err = repository.getAudPoints(d.audNumber)
 		if err.Err != nil {

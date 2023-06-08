@@ -65,6 +65,7 @@ type auditory struct {
 	AuditoryID int    `json:"auditory_id"`
 }
 
+// получение сущности аудитории
 func (h *handler) read(c *gin.Context) {
 	var r readRequest
 	var auditory auditory

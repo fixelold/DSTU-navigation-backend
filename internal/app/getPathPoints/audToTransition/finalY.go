@@ -4,6 +4,7 @@ import (
 	"navigation/internal/models"
 )
 
+// для расчета пути, если конечная аудитория находится слева
 func (m *middleController) leftY(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 
@@ -26,6 +27,7 @@ func (m *middleController) leftY(borderPoint, points models.Coordinates) models.
 	return result
 }
 
+// для расчета пути, если конечная аудитория находится справа
 func (m *middleController) rightY(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 
@@ -48,6 +50,7 @@ func (m *middleController) rightY(borderPoint, points models.Coordinates) models
 	return result
 }
 
+// для расчета пути, если конечная аудитория находится сверху и снизу
 func (m *middleController) upAndDownY(borderPoint, points models.Coordinates) models.Coordinates {
 	var result models.Coordinates
 	// var lenght = len(m.Points)
