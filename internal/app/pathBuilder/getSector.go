@@ -2,7 +2,6 @@ package pathBuilder
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 
@@ -13,6 +12,7 @@ var (
 	splitError = appError.NewAppError("can't split text")
 )
 
+// расчет секторов
 func (h *handler) GetSector(start, end string, typeTransition int) (int, int, appError.AppError) {
 	var err appError.AppError
 
@@ -25,7 +25,9 @@ func (h *handler) GetSector(start, end string, typeTransition int) (int, int, ap
 
 		startAud, errConv := strconv.Atoi(start)
 		if errConv != nil {
-			log.Fatalln("тута тебе надо переделать. Это в GetSector")
+			err.Wrap("file GetSector")
+			err.Err = errConv
+			return 0, 0, err
 		}
 		
 		sectorStart, err := h.repository.GetTransitionSector2(startAud, typeTransition)

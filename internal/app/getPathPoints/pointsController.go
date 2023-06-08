@@ -75,7 +75,7 @@ const (
 	minus = 1 // значение будет отрицательным.
 )
 
-
+// Распределитель для расчета обычного пути
 func (p *controller) controller() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
 	var err appError.AppError
@@ -146,6 +146,7 @@ entry всегда должен быть меньше exit
 	
 // }
 
+// Расчет точек для начального пути
 func (p *controller) start(audNumber string) appError.AppError {
 	start := start.NewStartController(p.data.audBorderPoints, p.client, audNumber, plus, minus, AxisX, AxisY, WidhtX, HeightX, WidhtY, HeightY)
 	data, err := start.StartPath()
@@ -158,6 +159,7 @@ func (p *controller) start(audNumber string) appError.AppError {
 	return appError.AppError{}
 }
 
+// Расчет точек от начального пути до выхода из сектора
 func (p *controller) middle(entry, exit int) appError.AppError {
 	var borderSector models.Coordinates
 	var err appError.AppError
@@ -183,6 +185,7 @@ func (p *controller) middle(entry, exit int) appError.AppError {
 	return appError.AppError{}
 }
 
+// Расчет точек от начального пути до переходного сектора
 func (p *controller) middleToTransition(entry int) appError.AppError {
 	var borderSector models.Coordinates
 	repository := NewRepository(p.client, p.logger)
@@ -206,6 +209,7 @@ func (p *controller) middleToTransition(entry int) appError.AppError {
 	return appError.AppError{}
 }
 
+// Расчет точек от между секторами
 func (p *controller) sector2sector() appError.AppError {
 	var data []models.Coordinates
 	repository := NewRepository(p.client, p.logger)
@@ -238,6 +242,7 @@ func (p *controller) sector2sector() appError.AppError {
 	return appError.AppError{}
 }
 
+// Распределитель для расчета пути с переходом между этажами
 func (p *controller) transitionController() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
 	// var err appError.AppError
@@ -247,6 +252,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 	} else {
 		_, exit = min(p.sectors[0], p.sectors[1])
 	}
+
 	if p.transition == stair || len(strconv.Itoa(exit)) == 4 {
 		entry, exit := p.sectors[0], p.sectors[1]
 		data, err := newData(p.StartAuditory, "", entry, exit, p.sectors[secondSector], p.logger, p.client, stair, p.transitionNumber)
@@ -406,6 +412,7 @@ func (p *controller) transitionController() ([]models.Coordinates, appError.AppE
 	return response, appError.AppError{}
 }
 
+// Расчет точек для начального пути между аудиториями в одном секторе
 func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
 	var response []models.Coordinates
 	p.transition = aud2Aud
@@ -449,6 +456,7 @@ func (p *controller) aud2Aud() ([]models.Coordinates, appError.AppError) {
 	return response, appError.AppError{}
 }
 
+// Расчет точек от начального пути до вхождение в другую аудитория между аудиториями в одном секторе
 func (p *controller) middleAudToAud(endPints models.Coordinates) appError.AppError {
 	var borderSector models.Coordinates
 	// repository := NewRepository(p.client, p.logger)
@@ -466,6 +474,8 @@ func (p *controller) middleAudToAud(endPints models.Coordinates) appError.AppErr
 
 	return appError.AppError{}
 }
+
+// Расчет минимального числа
 func min(a, b int) (int, int) {
 	if a < b {
 		return a, b

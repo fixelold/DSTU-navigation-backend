@@ -24,6 +24,7 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 	}
 }
 
+// Получение ссылок секторов
 func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 	txError    := appError.NewAppError("can't start transaction")
 	queryError := appError.NewAppError("failed to complete the request")
@@ -69,6 +70,7 @@ func (r *repository) GetSectorLink() ([]models.SectorLink, appError.AppError) {
 	return sectorLink, appError.AppError{}
 }
 
+// получение номера сеткора
 func (r *repository) GetSector(number string, building uint) (int, appError.AppError) {
 	var sector models.Sector
 	txError    := appError.NewAppError("can't start transaction")
@@ -118,6 +120,7 @@ func (r *repository) GetSector(number string, building uint) (int, appError.AppE
 	return sector.Number, appError.AppError{}
 }
 
+// получение номера переходного сектора
 func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
 	txError    := appError.NewAppError("can't start transaction")
 	queryError := appError.NewAppError("failed to complete the request")
@@ -162,6 +165,7 @@ func (r *repository) GetTransitionSector(sectorNumber, type_transtion_sector int
 	return sector.Number, appError.AppError{}
 }
 
+// получение номера переходного сектора для лифта
 func (r *repository) GetTransitionSector2(sectorNumber, type_transtion_sector int) (int, appError.AppError) {
 	txError    := appError.NewAppError("can't start transaction")
 	queryError := appError.NewAppError("failed to complete the request")

@@ -65,6 +65,7 @@ type auditory struct {
 	AuditoryID int    `json:"auditory_id"`
 }
 
+// получение сущности аудитории
 func (h *handler) read(c *gin.Context) {
 	var r readRequest
 	var auditory auditory
@@ -117,7 +118,6 @@ func (h *handler) getDescription(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-
 // Обновление описания аудитории
 func (h *handler) update(c *gin.Context) {
 	var err error
@@ -126,6 +126,13 @@ func (h *handler) update(c *gin.Context) {
 	// Связывание данных, полученных от клиентской стороны, со структурой updateDescription
 	if err := c.ShouldBindJSON(&audDescript); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "can't decode json"})
+		return
+	}
+
+	// Проверка на существования аудитории
+	_, err = h.repository.GetDescription(audDescript.AuditoryID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

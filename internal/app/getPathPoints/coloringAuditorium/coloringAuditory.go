@@ -43,8 +43,12 @@ const (
 func (c *coloring) GetColoringPoints() appError.AppError {
 	var err appError.AppError
 
+	if c.transition == 3 {
+		c.transition = transitionYes
+	}
+
 	switch c.transition {
-	case transitionYes:
+	case transitionYes: // через переходный сектор
 		c.StartAuditoryPoints, err = c.getColoringAudPoints(c.StartAuditoryNumber)
 		if err.Err != nil {
 			err.Wrap("getAuditoryPoints")
@@ -57,7 +61,7 @@ func (c *coloring) GetColoringPoints() appError.AppError {
 			return err
 		}
 
-	case transitionNo:
+	case transitionNo: // переходного сектора нет
 		c.StartAuditoryPoints, err = c.getColoringAudPoints(c.StartAuditoryNumber)
 		if err.Err != nil {
 			err.Wrap("getAuditoryPoints")
@@ -69,7 +73,7 @@ func (c *coloring) GetColoringPoints() appError.AppError {
 			return err
 		}
 
-	case transitionToAud:
+	case transitionToAud: // аудиторя находятся в одном секторе
 		c.StartAuditoryPoints, err = c.getColoringTransitionPoints(c.EndAuditoryNumber)
 		if err.Err != nil {
 			err.Wrap("getAuditoryPoints")
@@ -81,12 +85,12 @@ func (c *coloring) GetColoringPoints() appError.AppError {
 			err.Wrap("getAuditoryPoints")
 			return err
 		}
-
 	}
 
 	return err
 }
 
+// получение точек адуитория для ее окраски
 func (c *coloring) getColoringAudPoints(number string) (models.Coordinates, appError.AppError) {
 	var err appError.AppError
 	repository := NewRepository(c.client, c.logging)
@@ -99,6 +103,7 @@ func (c *coloring) getColoringAudPoints(number string) (models.Coordinates, appE
 	return coordinates, err
 }
 
+// получение точек переходного сеткора для окраски
 func (c *coloring) getColoringTransitionPoints(number string) (models.Coordinates, appError.AppError) {
 	var err appError.AppError
 	repository := NewRepository(c.client, c.logging)

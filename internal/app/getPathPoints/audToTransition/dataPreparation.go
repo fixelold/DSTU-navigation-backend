@@ -1,14 +1,12 @@
 package audToTransition
 
 import (
-	"fmt"
-
 	"navigation/internal/models"
 )
 
+// для расчета пути, если он не входит в границы следующего сектора
 func (m *middleController) preparation(axis int, borderPoint, points models.Coordinates) models.Coordinates {
 	var path models.Coordinates
-	fmt.Println("Work: ", borderPoint, points, axis)
 	if axis == m.constData.axisX {
 		if points.Widht == -5 {path = m.preparationDownX(borderPoint, points)
 		}else if points.Widht == 5 {path = m.preparationUpX(borderPoint, points)}
@@ -24,6 +22,7 @@ func (m *middleController) preparation(axis int, borderPoint, points models.Coor
 	return path
 }
 
+// для расчета пути, если он входит в границы следующего сектора
 func (m *middleController) finalPreparation(axis int, borderPoint, points models.Coordinates, exceptions bool) (models.Coordinates, bool) {
 	var path models.Coordinates
 	var lenght = len(m.Points)

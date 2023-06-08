@@ -3,6 +3,7 @@ package getPathPoints
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgconn"
 
@@ -74,8 +75,11 @@ func (r *repository) getAudPoints(number string) (models.Coordinates, appError.A
 	return position, appError.AppError{}
 }
 
+// получаем координаты переходного сеткора по его номеру.
 func (r *repository) getTransitionPoints(number int) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
+	var dbErr appError.AppError
+	fmt.Println("number transition: ", number)
 	request :=
 		`SELECT x, y, widht, height 
 	FROM transition_position 
@@ -86,9 +90,10 @@ func (r *repository) getTransitionPoints(number int) (models.Coordinates, appErr
 	tx, err := r.client.Begin(context.Background())
 	if err != nil {
 		_ = tx.Rollback(context.Background())
-		txError.Wrap("getTransitionPoints")
-		txError.Err = err
-		return models.Coordinates{}, *txError
+		dbErr.Wrap("getTransitionPoints")
+		dbErr = *txError
+		dbErr.Err = err
+		return models.Coordinates{}, dbErr
 	}
 
 	err = tx.QueryRow(
@@ -105,13 +110,14 @@ func (r *repository) getTransitionPoints(number int) (models.Coordinates, appErr
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
-			queryError.Wrap("getTransitionPoints")
-			queryError.Err = pgErr
-			return models.Coordinates{}, *queryError
+			dbErr = *queryError
+			dbErr.Wrap("getTransitionPoints")
+			dbErr.Err = pgErr
+			return models.Coordinates{}, dbErr
 		}
-		queryError.Wrap("getTransitionPoints")
-		queryError.Err = err
-		return models.Coordinates{}, *queryError
+		dbErr.Wrap("getTransitionPoints")
+		dbErr.Err = err
+		return models.Coordinates{}, dbErr
 	}
 	_ = tx.Commit(context.Background())
 	return position, appError.AppError{}
