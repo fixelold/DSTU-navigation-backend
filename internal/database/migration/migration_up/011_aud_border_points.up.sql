@@ -488,3 +488,8 @@ VALUES
     (332, 1472, 120, 1, 36),
     (333, 1472, 160, 1, 47),
     (334, 1472, 215, 1, 82);
+
+--Вход--
+INSERT INTO aud_border_points (id_auditorium, x, y, widht, height) 
+VALUES
+    (363, 665, 500, 344, 1);

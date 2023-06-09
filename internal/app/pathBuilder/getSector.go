@@ -74,14 +74,15 @@ func (h *handler) GetSector(start, end string, typeTransition int) (int, int, ap
 
 func separationAudidotyNumber(number string) (string, int, appError.AppError) {
 	var err appError.AppError
-
+	if number == "1-000" {
+		number = "1-000"
+	}
 	splitText := strings.Split(number, "-")
 	if len(splitText) != 2 {
 		splitError.Err = errors.New("wrong line lenght, exected: %s, received: %s")
 		splitError.Wrap("separationAudidotyNumber")
 		return "", 0, *splitError
 	}
-
 	building, error := strconv.Atoi(splitText[0])
 	if err.Err != nil {
 		err.Err = error

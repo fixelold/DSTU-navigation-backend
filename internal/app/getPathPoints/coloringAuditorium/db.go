@@ -34,6 +34,9 @@ var (
 // получаем координаты аудитории по ее номеру.
 func (r *repository) getAudPoints(number string) (models.Coordinates, appError.AppError) {
 	var position models.Coordinates
+	if number == "1-000" {
+		number = "1-000"
+	}
 	request :=
 		`SELECT x, y, widht, height 
 	FROM auditorium_position 
