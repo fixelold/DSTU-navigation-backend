@@ -560,3 +560,8 @@ VALUES
     (377, 100, 751, 46, 57),
     (378, 1407, 357, 38, 40),
     (379, 1514, 749, 66, 59);
+
+--Музей--
+INSERT INTO auditorium_position (id_auditorium, x, y, widht, height) 
+VALUES
+    (380, 480, 504, 180, 59);

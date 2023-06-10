@@ -82,6 +82,7 @@ func (r *repository) getAudPoints(number string) (models.Coordinates, appError.A
 // получаем координаты границ аудитории по ее номеру.
 func (r *repository) getAudBorderPoint(number string) (models.Coordinates, appError.AppError) {
 	var borderPoint models.Coordinates
+	fmt.Println("number - ", number)
 	if number == "1-000" {
 		number = "1-000"
 	}
