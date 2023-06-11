@@ -5,3 +5,7 @@ storage:
   username: root
   database: navigation
   password: root
+
+user:
+  login: root
+  password: root

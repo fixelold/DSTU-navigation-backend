@@ -1,10 +1,11 @@
 package config
 
 import (
-	"navigation/internal/logging"
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
+
+	"navigation/internal/logging"
 )
 
 var config *AppConfig
@@ -20,6 +21,11 @@ type AppConfig struct {
 		Database string `yaml:"database"`
 		Password string `yaml:"password"`
 	} `yaml:"storage"`
+
+	User struct {
+		Login string `yaml:"login"`
+		Password string `yaml:"password"`
+	}
 }
 
 func GetConfig() *AppConfig {

@@ -41,8 +41,9 @@ func (r *Router) prepareData() {
 }
  
 func (r *Router) prepareRouter() {
+	appConfig := config.GetConfig()
 	userPrepareRepo := user.NewRepository(r.connection, r.logger)
-	userPrepare := user.NewUser(r.logger, userPrepareRepo)
+	userPrepare := user.NewUser(r.logger, userPrepareRepo, *appConfig)
 	userPrepare.Create()
 
 	pathBuildingRepo := pathBuilder.NewRepository(r.connection, r.logger)

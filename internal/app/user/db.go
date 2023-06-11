@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/jackc/pgconn"
+
 	"navigation/internal/database/client/postgresql"
 	"navigation/internal/logging"
 	"navigation/internal/models"
-
-	"github.com/jackc/pgconn"
 )
 
 type repository struct {
@@ -58,6 +59,49 @@ func (r *repository) Create(user models.User) (models.User, error) {
 	}
 	_ = tx.Commit(context.Background())
 	return user, nil
+}
+
+func (r *repository) Update(newData models.User) error {
+	fmt.Println("Work: ", newData.ID, newData.Login, newData.Password)
+	request := `
+	UPDATE users 
+	SET login = $1, password = $2
+	WHERE id = $3
+	`
+
+	tx, err := r.client.Begin(context.Background())
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		r.logger.Tracef("can't start transaction: %s", err.Error()) // Прочитать про Tracef
+		return err
+	}
+
+	_, err = tx.Exec(context.Background(),
+		request,
+		newData.Login,
+		newData.Password,
+		newData.ID)
+	if err != nil {
+		_ = tx.Rollback(context.Background())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf(
+				"SQL Error: %s, Detail: %s, Where: %s, Code: %s, SQLState: %s",
+				pgErr.Message,
+				pgErr.Detail,
+				pgErr.Where,
+				pgErr.Code,
+				pgErr.SQLState(),
+			)
+			r.logger.Error(newErr)
+			return newErr
+		}
+		r.logger.Error(err)
+		return err
+	}
+	_ = tx.Commit(context.Background())
+	return nil
 }
 
 func (r *repository) FindRoot() (models.User, error) {
